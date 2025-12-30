@@ -4,36 +4,46 @@ export const SAMPLE_DATA = [
   {
     name: 'Tier1',
     decks: [
-      { name: 'M∀LICE', image: '/static/deckimages/malice.png' },
+      { name: 'オノマトライゼオル', image: '/static/deckimages/onomato-ryzeal.png' },
     ],
   },
   {
     name: 'Tier2',
     decks: [
-      { name: 'スネークアイ', image: '/static/deckimages/snake-eye.png' },
-      { name: '千年M∀LICE', image: '/static/deckimages/millennium-malice.png' },
-      { name: '天盃龍', image: '/static/deckimages/tenpai-dragon.png' },
+      { name: 'ドラゴンテイル', image: '/static/deckimages/dracotail.png' },
+      { name: 'M∀LICE', image: '/static/deckimages/malice.png' },
+      { name: '巳剣', image: '/static/deckimages/mitsurugi.png' },
+      { name: '巳剣ライゼオル', image: '/static/deckimages/mitsurugi-ryzeal.png' },
     ],
   },
   {
     name: 'Tier3',
     decks: [
-      { name: '青眼', image: '/static/deckimages/blue-eyes.png' },
-      { name: 'メタビート', image: '/static/deckimages/metabeat.png' },
-      { name: '白き森', image: '/static/deckimages/white-forest.png' },
+      { name: 'ジェムナイト', image: '/static/deckimages/gemknight.png' },
+      { name: '月光', image: '/static/deckimages/moonlight.png' },
+      { name: '閃刀姫', image: '/static/deckimages/skystriker.png' },
     ],
   },
   {
     name: 'Tier4',
     decks: [
-      { name: '海皇', image: '/static/deckimages/atlantean.png' },
-      { name: '粛声', image: '/static/deckimages/voiceless_voice.png' },
-      { name: 'メメント', image: '/static/deckimages/mementotlan.png' },
+      { name: 'ティアラメンツ', image: '/static/deckimages/tearlaments.png' },
+      { name: 'オルフェゴール', image: '/static/deckimages/orcust.png' },
     ],
   },
 ]
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
+  { name: 'ヤミー', image: '/static/deckimages/yummy.png' },
+  { name: 'メタビート', image: '/static/deckimages/metabeat.png' },
+  { name: 'ライゼオル', image: '/static/deckimages/ryzeal.png' },
+  { name: '天盃龍', image: '/static/deckimages/tenpai-dragon.png' },
+  { name: '粛声', image: '/static/deckimages/voiceless_voice.png' },
+  { name: '青眼', image: '/static/deckimages/blue-eyes.png' },
+  { name: '海皇', image: '/static/deckimages/atlantean.png' },
+  { name: 'スネークアイ', image: '/static/deckimages/snake-eye.png' },
+  { name: 'メメント', image: '/static/deckimages/mementotlan.png' },
+  { name: '白き森', image: '/static/deckimages/white-forest.png' },
   { name: 'クリストロン', image: '/static/deckimages/crystron.png' },
   { name: 'ラビュリンス', image: '/static/deckimages/labrynth.png' },
   { name: 'P.U.N.K.', image: '/static/deckimages/punk.png' },
@@ -42,7 +52,6 @@ export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { name: '霊獣', image: '/static/deckimages/ritual-beast.png' },
   { name: 'ユベル', image: '/static/deckimages/yubel.png' },
   { name: '烙印', image: '/static/deckimages/branded.png' },
-  { name: 'ティアラメンツ', image: '/static/deckimages/tearlaments.png' },
   { name: 'ドライトロン', image: '/static/deckimages/drytron.png' },
   { name: '氷結界', image: '/static/deckimages/ice-barrier.png' },
   { name: 'エルドリッチ', image: '/static/deckimages/eldlich.png' },
