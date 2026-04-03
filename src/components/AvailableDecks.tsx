@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { Deck } from '../types';
-import { useDragContext } from '../context/DragContext'; // コンテキストのインポート
+import { useDragContext } from '../context/useDragContext'; // コンテキストのインポート
 
 type AvailableDecksProps = {
   decks: Deck[];
