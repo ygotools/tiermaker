@@ -10,9 +10,8 @@ const App: React.FC = () => {
 
       <TierList />
 
-      <summary className='text-white mt-4 text-sm ml-4'>
-        <span className='block mb-2'>更新履歴</span>
-        <details>
+      <details className='text-white mt-4 text-sm ml-4'>
+        <summary className='block mb-2'>更新履歴</summary>
           <ul>
           <li>2024/11/05: 【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。</li>
           <li>2024/10/14: 【霊獣】【ライトロード】を追加しました。</li>
@@ -23,8 +22,7 @@ const App: React.FC = () => {
           <li>2024/07/03: センチュリオン/ユベル/エンディミオンを追加しました。</li>
           <li>2024/06/17: v0.1.0 を公開しました。</li>
           </ul>
-        </details>
-      </summary>
+      </details>
 
       <a href="https://docs.google.com/forms/d/e/1FAIpQLScn8SCvjob9GXjtwctK6JDdIpdIg2pzX-pMDdNryTBQDsXfhw/viewform?usp=sf_link" target='_blank' className='text-sm underline my-4 inline-block'>テーマ追加希望はこちら</a>
 
