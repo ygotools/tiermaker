@@ -6,6 +6,7 @@ import AvailableDecks from './AvailableDecks';
 import { Tier, Deck } from '../types';
 import { SAMPLE_DATA, INITIAL_AVAILABLE_DECKS } from '../masterdata';
 import { exportAsImage } from '../utils/exportImage'; // インポートを追加
+import { moveDeckToAvailableDecksState } from '../utils/tierListState';
 import GlobalDropZone from './GlobalDropZone'; // インポートを追加
 import { DownloadIcon } from './Icon';
 import { DragProvider } from '../context/DragContext'; // コンテキストプロバイダーのインポート
@@ -33,10 +34,11 @@ const TierList: React.FC = () => {
   }, [tiers]);
 
   const moveDeckToAvailableDecks = useCallback((deck: Deck, sourceTierIndex: number) => {
-    const newTiers = [...tiers];
-    newTiers[sourceTierIndex].decks = newTiers[sourceTierIndex].decks.filter(d => d.name !== deck.name);
-    setTiers(newTiers);
-    setAvailableDecks(prevAvailableDecks => [deck, ...prevAvailableDecks]);
+    setAvailableDecks((prevAvailableDecks) => {
+      const nextState = moveDeckToAvailableDecksState(tiers, prevAvailableDecks, deck, sourceTierIndex);
+      setTiers(nextState.tiers);
+      return nextState.availableDecks;
+    });
   }, [tiers]);
 
   return (
