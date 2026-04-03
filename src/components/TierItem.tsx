@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Deck } from '../types';
-import { useDragContext } from '../context/DragContext'; // コンテキストのインポート
+import { useDragContext } from '../context/useDragContext'; // コンテキストのインポート
 
 type TierItemProps = {
   deck: Deck;
