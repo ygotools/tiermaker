@@ -15,7 +15,9 @@ const GlobalDropZone: React.FC<GlobalDropZoneProps> = ({ moveDeckToAvailableDeck
     drop: (item, monitor) => {
       if (!monitor.didDrop()) {
         const { deck, tierIndex } = item as { deck: Deck; tierIndex: number };
-        moveDeckToAvailableDecks(deck, tierIndex);
+        if (tierIndex >= 0) {
+          moveDeckToAvailableDecks(deck, tierIndex);
+        }
       }
     },
   });
