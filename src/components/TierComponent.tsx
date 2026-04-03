@@ -7,7 +7,7 @@ type TierComponentProps = {
   tier: Tier;
   tierIndex: number;
   moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
-  moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number) => void;
+  moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number) => void;
 }
 
@@ -16,7 +16,11 @@ const tierColors = ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500'
 const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck, moveDeckFromAvailableDecks, moveDeckToAvailableDecks }) => {
   const [, tierDrop] = useDrop({
     accept: 'deck',
-    drop: (item: { deck: Deck, index: number; tierIndex: number }) => {
+    drop: (item: { deck: Deck, index: number; tierIndex: number }, monitor) => {
+      if (monitor.didDrop()) {
+        return;
+      }
+
       if (item.tierIndex === -1) { // AvailableDecksからのドロップ
         moveDeckFromAvailableDecks(item.deck, tierIndex);
       } else if (item.tierIndex !== tierIndex) {
@@ -40,6 +44,7 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
             index={index}
             tierIndex={tierIndex}
             moveDeck={moveDeck}
+            moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
             moveDeckToAvailableDecks={moveDeckToAvailableDecks}
           />
         ))}

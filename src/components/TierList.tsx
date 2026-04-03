@@ -6,7 +6,11 @@ import AvailableDecks from './AvailableDecks';
 import { Tier, Deck } from '../types';
 import { SAMPLE_DATA, INITIAL_AVAILABLE_DECKS } from '../masterdata';
 import { exportAsImage } from '../utils/exportImage'; // インポートを追加
-import { moveDeckToAvailableDecksState } from '../utils/tierListState';
+import {
+  moveAvailableDeckState,
+  moveDeckFromAvailableDecksState,
+  moveDeckToAvailableDecksState,
+} from '../utils/tierListState';
 import GlobalDropZone from './GlobalDropZone'; // インポートを追加
 import { DownloadIcon } from './Icon';
 import { DragProvider } from '../context/DragContext'; // コンテキストプロバイダーのインポート
@@ -26,20 +30,25 @@ const TierList: React.FC = () => {
     setTiers(newTiers);
   }, [tiers]);
 
-  const moveDeckFromAvailableDecks = useCallback((deck: Deck, hoverTierIndex: number) => {
-    const newTiers = [...tiers];
-    newTiers[hoverTierIndex].decks.push(deck);
-    setTiers(newTiers);
-    setAvailableDecks(prevAvailableDecks => prevAvailableDecks.filter(d => d.name !== deck.name));
-  }, [tiers]);
-
-  const moveDeckToAvailableDecks = useCallback((deck: Deck, sourceTierIndex: number) => {
+  const moveDeckFromAvailableDecks = useCallback((deck: Deck, hoverTierIndex: number, hoverIndex?: number) => {
     setAvailableDecks((prevAvailableDecks) => {
-      const nextState = moveDeckToAvailableDecksState(tiers, prevAvailableDecks, deck, sourceTierIndex);
+      const nextState = moveDeckFromAvailableDecksState(tiers, prevAvailableDecks, deck, hoverTierIndex, hoverIndex);
       setTiers(nextState.tiers);
       return nextState.availableDecks;
     });
   }, [tiers]);
+
+  const moveDeckToAvailableDecks = useCallback((deck: Deck, sourceTierIndex: number, hoverIndex = 0) => {
+    setAvailableDecks((prevAvailableDecks) => {
+      const nextState = moveDeckToAvailableDecksState(tiers, prevAvailableDecks, deck, sourceTierIndex, hoverIndex);
+      setTiers(nextState.tiers);
+      return nextState.availableDecks;
+    });
+  }, [tiers]);
+
+  const moveAvailableDeck = useCallback((dragIndex: number, hoverIndex: number) => {
+    setAvailableDecks((prevAvailableDecks) => moveAvailableDeckState(prevAvailableDecks, dragIndex, hoverIndex));
+  }, []);
 
   return (
     <DragProvider>
@@ -58,7 +67,11 @@ const TierList: React.FC = () => {
                 />
               ))}
             </div>
-            <AvailableDecks decks={availableDecks} />
+            <AvailableDecks
+              decks={availableDecks}
+              moveAvailableDeck={moveAvailableDeck}
+              moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+            />
           </div>
           <div className='w-full max-w-[816px]'>
             <div className='flex pt-4 justify-center items-center'>
