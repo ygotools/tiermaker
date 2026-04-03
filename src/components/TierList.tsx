@@ -1,23 +1,31 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import TierComponent from './TierComponent';
 import AvailableDecks from './AvailableDecks';
-import { Tier, Deck } from '../types';
-import { SAMPLE_DATA, INITIAL_AVAILABLE_DECKS } from '../masterdata';
+import { Deck, Tier } from '../types';
 import { exportAsImage } from '../utils/exportImage'; // インポートを追加
 import {
   moveAvailableDeckState,
   moveDeckFromAvailableDecksState,
   moveDeckToAvailableDecksState,
 } from '../utils/tierListState';
+import {
+  loadTierListSnapshot,
+  saveTierListSnapshot,
+} from '../utils/tierListStorage';
 import GlobalDropZone from './GlobalDropZone'; // インポートを追加
 import { DownloadIcon } from './Icon';
 import { DragProvider } from '../context/DragContext'; // コンテキストプロバイダーのインポート
 
 const TierList: React.FC = () => {
-  const [tiers, setTiers] = useState<Tier[]>(SAMPLE_DATA);
-  const [availableDecks, setAvailableDecks] = useState<Deck[]>(INITIAL_AVAILABLE_DECKS);
+  const [{ tiers: initialTiers, availableDecks: initialAvailableDecks }] = useState(() => loadTierListSnapshot());
+  const [tiers, setTiers] = useState<Tier[]>(initialTiers);
+  const [availableDecks, setAvailableDecks] = useState<Deck[]>(initialAvailableDecks);
+
+  useEffect(() => {
+    saveTierListSnapshot({ tiers, availableDecks });
+  }, [tiers, availableDecks]);
 
   const moveDeck = useCallback((dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => {
     const newTiers = [...tiers];
