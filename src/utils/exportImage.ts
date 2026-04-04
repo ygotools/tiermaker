@@ -230,24 +230,11 @@ const canvasToBlob = (canvas: HTMLCanvasElement) => new Promise<Blob>((resolve, 
 });
 
 const downloadBlob = async (blob: Blob) => {
-  const file = new File([blob], 'tier-list.png', { type: 'image/png' });
-  const nav = navigator as Navigator & {
-    canShare?: (data?: ShareData) => boolean;
-    share?: (data?: ShareData) => Promise<void>;
-  };
-
-  if (nav.canShare?.({ files: [file] }) && nav.share) {
-    await nav.share({
-      files: [file],
-      title: 'Tier list',
-    });
-    return;
-  }
-
+  const fileName = 'tier-list.png';
   const objectUrl = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = objectUrl;
-  link.download = file.name;
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   link.remove();
