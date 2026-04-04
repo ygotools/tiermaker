@@ -32,7 +32,13 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
   });
 
   return (
-    <div className="flex export-md:flex-row md:flex-row flex-col tier w-full " data-tier-container-index={tierIndex} ref={tierDrop} style={{ minHeight: '100px' }}>
+    <div
+      className="flex export-md:flex-row md:flex-row flex-col tier w-full "
+      data-tier-index={tierIndex}
+      data-tier-container-index={tierIndex}
+      ref={tierDrop}
+      style={{ minHeight: '100px' }}
+    >
       <div className={`tier-label ${tierColors[tierIndex]} text-white font-bold m-2 text-bold w-[100%-8px] md:w-24 export-md:w-24 h-8 md:h-12 export-md:h-12 flex items-center justify-center`}>
         {tier.name}
       </div>
