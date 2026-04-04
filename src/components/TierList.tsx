@@ -4,6 +4,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import AvailableDecks from './AvailableDecks';
+import DragPreviewLayer from './DragPreviewLayer';
 import GlobalDropZone from './GlobalDropZone';
 import { DownloadIcon } from './Icon';
 import TierComponent from './TierComponent';
@@ -132,6 +133,7 @@ const TierList: React.FC = () => {
       backend={useTouchBackend ? TouchBackend : HTML5Backend}
       options={useTouchBackend ? { enableMouseEvents: true, delayTouchStart: 0 } : undefined}
     >
+      <DragPreviewLayer />
       <GlobalDropZone moveDeckToAvailableDecks={moveDeckToAvailableDecks}>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div id="tier-list-container" className="tier-list mb-2">

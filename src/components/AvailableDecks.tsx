@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { PlusCircle, Search, X } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Deck } from '../types';
 
 type AvailableDecksProps = {
@@ -331,13 +332,17 @@ const AvailableDeckItem: React.FC<{
     },
   });
 
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag, preview] = useDrag({
     type: 'deck',
     item: { deck, index, tierIndex: -1 },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
+
+  useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
 
   drag(drop(ref));
 
