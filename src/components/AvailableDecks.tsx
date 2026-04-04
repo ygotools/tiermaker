@@ -24,6 +24,7 @@ const normalizeDeckName = (name: string) => name.trim().toLocaleLowerCase();
 
 const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAvailableDeck, moveDeckToAvailableDecks, addDeck }) => {
   const [inputThemeName, setInputThemeName] = React.useState('');
+  const [isSearchFocused, setIsSearchFocused] = React.useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
   const [newDeckName, setNewDeckName] = React.useState('');
   const [newDeckIcon, setNewDeckIcon] = React.useState('');
@@ -106,6 +107,8 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
   const filteredDecks = decks
     .map((deck, index) => ({ deck, index }))
     .filter(({ deck }) => normalizeDeckName(deck.name).includes(normalizedSearchTerm));
+  const shouldRevealSearchAction = isSearchFocused || inputThemeName.length > 0;
+  const canClearSearch = inputThemeName.length > 0;
 
   return (
     <section className="available-decks-container overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-[0_20px_45px_rgba(0,0,0,0.2)]">
@@ -128,17 +131,23 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               type="text"
               value={inputThemeName}
               onChange={handleInputThemeName}
-              className="w-full rounded-md border border-transparent p-2 pr-14 text-black"
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              className={`w-full rounded-md border border-transparent p-2 pr-14 text-black transition-[padding] duration-200 ease-out md:pr-4 ${
+                shouldRevealSearchAction ? 'md:pr-16' : ''
+              }`}
               placeholder="テーマ名で絞り込む"
             />
             <button
               type="button"
               aria-label="検索条件をクリア"
-              className={`absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs transition-colors ${
-                inputThemeName
-                  ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
-                  : 'pointer-events-none text-transparent'
-              }`}
+              disabled={!canClearSearch}
+              className={`absolute right-2 top-1/2 rounded px-2 py-1 text-xs transition-all duration-150 ease-out md:duration-200 ${
+                shouldRevealSearchAction
+                  ? 'translate-y-[-50%] opacity-100 md:delay-150'
+                  : 'translate-y-[-50%] translate-x-1 opacity-0 md:delay-0'
+              } ${canClearSearch ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' : 'pointer-events-none text-gray-300'}`}
+              onMouseDown={(event) => event.preventDefault()}
               onClick={() => setInputThemeName('')}
             >
               クリア
