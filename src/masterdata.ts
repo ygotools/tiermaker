@@ -1,6 +1,15 @@
-import { Deck } from "./types";
+import { Deck, Tier } from './types';
 
-export const SAMPLE_DATA = [
+type RawDeck = Omit<Deck, 'id'>;
+type RawTier = Omit<Tier, 'decks'> & { decks: RawDeck[] };
+
+const createDeckId = (image: string) => image.split('/').pop()?.replace(/\.png$/, '') ?? '';
+const withDeckId = (deck: RawDeck): Deck => ({
+  ...deck,
+  id: createDeckId(deck.image),
+});
+
+const RAW_SAMPLE_DATA: RawTier[] = [
   {
     name: 'Tier1',
     decks: [
@@ -31,9 +40,9 @@ export const SAMPLE_DATA = [
       { name: 'ティアラメンツ', image: '/static/deckimages/tearlaments.png' },
     ],
   },
-]
+];
 
-export const INITIAL_AVAILABLE_DECKS: Deck[] = [
+const RAW_INITIAL_AVAILABLE_DECKS: RawDeck[] = [
   { name: 'オノマトライゼオル', image: '/static/deckimages/onomato-ryzeal.png' },
   { name: '巳剣', image: '/static/deckimages/mitsurugi.png' },
   { name: 'ヤミー', image: '/static/deckimages/yummy.png' },
@@ -79,3 +88,10 @@ export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { name: 'その他1', image: '/static/deckimages/others_01.png' },
   { name: 'その他2', image: '/static/deckimages/others_02.png' },
 ];
+
+export const SAMPLE_DATA: Tier[] = RAW_SAMPLE_DATA.map((tier) => ({
+  ...tier,
+  decks: tier.decks.map(withDeckId),
+}));
+
+export const INITIAL_AVAILABLE_DECKS: Deck[] = RAW_INITIAL_AVAILABLE_DECKS.map(withDeckId);

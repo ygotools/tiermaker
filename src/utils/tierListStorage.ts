@@ -9,8 +9,6 @@ type TierListSnapshot = {
 const STORAGE_KEY = 'tiermaker:tier-list';
 const TIER_QUERY_KEYS = ['tier1', 'tier2', 'tier3', 'tier4'] as const;
 
-const getDeckId = (deck: Deck) => deck.image.split('/').pop()?.replace(/\.png$/, '') ?? '';
-
 const splitDeckIds = (value: string) => (
   value
     .split(',')
@@ -22,7 +20,7 @@ const createSnapshotFromQueryParams = (queryString: string, defaultSnapshot: Tie
   const params = new URLSearchParams(queryString);
   const deckById = new Map(
     [...defaultSnapshot.tiers.flatMap((tier) => tier.decks), ...defaultSnapshot.availableDecks]
-      .map((deck) => [getDeckId(deck), deck]),
+      .map((deck) => [deck.id, deck]),
   );
   const usedDeckIds = new Set<string>();
 
@@ -68,7 +66,7 @@ const isDeck = (value: unknown): value is Deck => {
   }
 
   const deck = value as Record<string, unknown>;
-  return typeof deck.name === 'string' && typeof deck.image === 'string';
+  return typeof deck.id === 'string' && typeof deck.name === 'string' && typeof deck.image === 'string';
 };
 
 const isTier = (value: unknown): value is Tier => {
