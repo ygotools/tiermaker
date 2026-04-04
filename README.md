@@ -19,9 +19,9 @@ The default dataset includes 10 sample decks placed in tiers and 42 decks in the
 
 ## Tech Stack
 
-- React 18
+- React 19
 - TypeScript
-- Vite 5
+- Vite 8
 - Tailwind CSS
 - React DnD
 - Firebase Hosting
