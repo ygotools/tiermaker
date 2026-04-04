@@ -4,7 +4,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import TierComponent from './TierComponent';
 import AvailableDecks from './AvailableDecks';
 import { Deck, Tier } from '../types';
-import { exportAsImage } from '../utils/exportImage'; // インポートを追加
+import { exportAsImage } from '../utils/exportImage';
 import {
   moveAvailableDeckState,
   moveDeckFromAvailableDecksState,
@@ -14,14 +14,15 @@ import {
   loadTierListSnapshot,
   saveTierListSnapshot,
 } from '../utils/tierListStorage';
-import GlobalDropZone from './GlobalDropZone'; // インポートを追加
+import GlobalDropZone from './GlobalDropZone';
 import { DownloadIcon } from './Icon';
-import { DragProvider } from '../context/DragContext'; // コンテキストプロバイダーのインポート
+import { DragProvider } from '../context/DragContext';
 
 const TierList: React.FC = () => {
   const [{ tiers: initialTiers, availableDecks: initialAvailableDecks }] = useState(() => loadTierListSnapshot());
   const [tiers, setTiers] = useState<Tier[]>(initialTiers);
   const [availableDecks, setAvailableDecks] = useState<Deck[]>(initialAvailableDecks);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     saveTierListSnapshot({ tiers, availableDecks });
@@ -58,6 +59,22 @@ const TierList: React.FC = () => {
     setAvailableDecks((prevAvailableDecks) => moveAvailableDeckState(prevAvailableDecks, dragIndex, hoverIndex));
   }, []);
 
+  const handleExport = useCallback(async () => {
+    if (isExporting) {
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      await exportAsImage({ tiers });
+    } catch (error) {
+      console.error('Failed to export the tier list image.', error);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [isExporting, tiers]);
+
   return (
     <DragProvider>
       <DndProvider backend={HTML5Backend}>
@@ -81,18 +98,20 @@ const TierList: React.FC = () => {
               moveDeckToAvailableDecks={moveDeckToAvailableDecks}
             />
           </div>
-          <div className='w-full max-w-[816px]'>
-            <div className='flex pt-4 justify-center items-center'>
+          <div className="w-full max-w-[816px]">
+            <div className="flex pt-4 justify-center items-center">
               <button
                 type="button"
-                onClick={exportAsImage}
-                className={"w-[calc(50%-8px)] h-20 text-xl download-button leading-none py-2 flex items-center justify-center appearance-none transition-all text-blue-500 font-bold border-2 border-blue-500 hover:border-bg-blue-600 bg-transparent hover:bg-blue-500 hover:bg-opacity-20"}
+                onClick={handleExport}
+                disabled={isExporting}
+                aria-busy={isExporting}
+                className={`w-[calc(50%-8px)] h-20 text-xl download-button leading-none py-2 flex items-center justify-center appearance-none transition-all text-blue-500 font-bold border-2 border-blue-500 hover:border-bg-blue-600 bg-transparent hover:bg-blue-500 hover:bg-opacity-20 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
               >
-                <DownloadIcon className='w-6 h-6' />
-                <span className="inline-block ml-2">画像として書き出す</span>
+                <DownloadIcon className="w-6 h-6" />
+                <span className="inline-block ml-2">{isExporting ? 'Exporting...' : 'Export image'}</span>
               </button>
               {/* <div id="share-button" className='w-[calc(50%-8px)] h-20'>
-                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('マスターデュエルのTier表を作ったよ！')}&url=${encodeURIComponent('https://tier.ygotools.com/')}&hashtags=${encodeURIComponent('遊戯王マスターデュエル,TIERMAKERFORMD')}`} target='_blank' className="relative overflow-hidden w-full h-full text-2xl flex items-center justify-center appearance-none border-2 border-white text-white">
+                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('繝槭せ繧ｿ繝ｼ繝・Η繧ｨ繝ｫ縺ｮTier陦ｨ繧剃ｽ懊▲縺溘ｈ・・)}&url=${encodeURIComponent('https://tier.ygotools.com/')}&hashtags=${encodeURIComponent('驕頑葦邇九・繧ｹ繧ｿ繝ｼ繝・Η繧ｨ繝ｫ,TIERMAKERFORMD')}`} target='_blank' className="relative overflow-hidden w-full h-full text-2xl flex items-center justify-center appearance-none border-2 border-white text-white">
                   Share to X
                 </a>
               </div> */}
