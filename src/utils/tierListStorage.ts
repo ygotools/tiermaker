@@ -137,3 +137,31 @@ export const saveTierListSnapshot = (snapshot: TierListSnapshot) => {
 
   window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
 };
+
+export const createTierListShareUrl = (tiers: Tier[]) => {
+  const params = new URLSearchParams();
+
+  tiers.forEach((tier, index) => {
+    const queryKey = TIER_QUERY_KEYS[index];
+
+    if (!queryKey || tier.decks.length === 0) {
+      return;
+    }
+
+    params.set(queryKey, tier.decks.map((deck) => deck.id).join(','));
+  });
+
+  const queryString = params.toString();
+
+  if (typeof window === 'undefined') {
+    return queryString ? `/?${queryString}` : '/';
+  }
+
+  const shareUrl = new URL(window.location.pathname, window.location.origin);
+
+  if (queryString) {
+    shareUrl.search = queryString;
+  }
+
+  return shareUrl.toString();
+};

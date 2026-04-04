@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
+import { AlertCircle, CheckCircle, RotateCcw, Share2 } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -17,6 +17,7 @@ import {
 } from '../utils/tierListState';
 import {
   createDefaultTierListSnapshot,
+  createTierListShareUrl,
   loadTierListSnapshot,
   saveTierListSnapshot,
 } from '../utils/tierListStorage';
@@ -45,6 +46,8 @@ const TierList: React.FC = () => {
   const { tiers, availableDecks } = snapshot;
   const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
   const useTouchBackend = isTouchPrimaryDevice();
+  const shareUrl = createTierListShareUrl(tiers);
+  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent('Tier Maker で tier 表を作成しました')}&url=${encodeURIComponent(shareUrl)}`;
 
   useEffect(() => {
     saveTierListSnapshot(snapshot);
@@ -188,6 +191,15 @@ const TierList: React.FC = () => {
               <DownloadIcon className="h-6 w-6" />
               <span className="ml-2 inline-block">{isExporting ? 'Exporting...' : 'Export image'}</span>
             </button>
+            <a
+              href={xShareUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+            >
+              <Share2 className="h-4 w-4" aria-hidden="true" />
+              Xでシェア
+            </a>
             <button
               type="button"
               onClick={handleReset}

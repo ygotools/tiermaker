@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  createTierListShareUrl,
   createDefaultTierListSnapshot,
   loadTierListSnapshot,
   saveTierListSnapshot,
@@ -75,5 +76,16 @@ describe('tierListStorage', () => {
     }));
 
     expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
+  });
+
+  it('creates a share url from the current tier assignments', () => {
+    const shareUrl = createTierListShareUrl([
+      { name: 'Tier1', decks: [{ id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
+      { name: 'Tier2', decks: [{ id: 'ryzeal', name: 'Ryzeal', image: '/ryzeal.png' }] },
+      { name: 'Tier3', decks: [] },
+      { name: 'Tier4', decks: [{ id: 'malice', name: 'M∀LICE', image: '/malice.png' }] },
+    ]);
+
+    expect(shareUrl).toBe('http://localhost:3000/?tier1=blue-eyes&tier2=ryzeal&tier4=malice');
   });
 });
