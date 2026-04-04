@@ -1,23 +1,23 @@
 # Tier Maker for Yu-Gi-Oh! Master Duel
 
-遊戯王マスターデュエル向けの Tier 表をブラウザ上で作成するためのフロントエンドです。  
-デッキ画像をドラッグ＆ドロップで Tier1〜Tier4 に並べ替え、そのまま PNG として書き出せます。
+A frontend application for creating tier lists for Yu-Gi-Oh! Master Duel in the browser.  
+Drag and drop deck images into Tier 1–Tier 4, then export the result as a PNG.
 
-公開先: [https://tier.ygotools.com](https://tier.ygotools.com)
+Live site: [https://tier.ygotools.com](https://tier.ygotools.com)
 
-## 現在の実装でできること
+## Features
 
-- Tier1〜Tier4 の 4 段構成で Tier 表を編集
-- 下部のデッキ一覧から各 Tier へドラッグ＆ドロップ
-- Tier 内での並び替え
-- Tier から外へドラッグして一覧へ戻す
-- デッキ名の部分一致検索
-- 画面上の Tier 表を PNG でダウンロード
+- Edit tier lists with a 4-tier layout (Tier 1–Tier 4)
+- Drag and drop decks from the bottom deck list into each tier
+- Reorder decks within a tier
+- Drag decks out of a tier to return them to the list
+- Search decks by partial name match
+- Download the tier list as a PNG image
 
-初期状態では `src/masterdata.ts` に定義された Tier とデッキデータを読み込みます。  
-現在のデータは、Tier 表に配置済みのサンプル 10 件と、下部一覧の 42 件をあわせた構成です。
+On initial load, tier and deck data defined in `src/masterdata.ts` is used.  
+The default dataset includes 10 sample decks placed in tiers and 42 decks in the bottom list.
 
-## 技術スタック
+## Tech Stack
 
 - React 18
 - TypeScript
@@ -26,18 +26,18 @@
 - React DnD
 - Firebase Hosting
 
-## 開発環境
+## Development
 
-CI では Node.js 20 / pnpm 10 系を使っています。ローカルでも同程度のバージョンを前提にすると無難です。
+CI uses Node.js 20 and pnpm 10. Using similar versions locally is recommended.
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-開発サーバー起動後は、通常どおり Vite のローカル URL で確認できます。
+After starting the dev server, open the local URL provided by Vite.
 
-## 利用できるスクリプト
+## Available Scripts
 
 ```bash
 pnpm dev
@@ -47,40 +47,40 @@ pnpm lint
 pnpm download-assets
 ```
 
-- `pnpm dev`: 開発サーバーを起動
-- `pnpm build`: TypeScript のコンパイルと本番ビルドを実行
-- `pnpm preview`: ビルド済み成果物をローカル確認
-- `pnpm lint`: ESLint を実行
-- `pnpm download-assets`: `src/masterdata.ts` を走査し、参照されているデッキ画像を `public/static/deckimages` に取得
+- `pnpm dev`: Start the development server
+- `pnpm build`: Run TypeScript compilation and production build
+- `pnpm preview`: Preview the production build locally
+- `pnpm lint`: Run ESLint
+- `pnpm download-assets`: Scan `src/masterdata.ts` and download referenced deck images to `public/static/deckimages`
 
-## データ更新方法
+## Updating Data
 
-Tier の初期値とデッキ一覧は [src/masterdata.ts](./src/masterdata.ts) で管理しています。
+Tier defaults and the deck list are managed in [src/masterdata.ts](./src/masterdata.ts).
 
-- `SAMPLE_DATA`: 初期表示時に Tier1〜Tier4 に置いておくデッキ
-- `INITIAL_AVAILABLE_DECKS`: 下部の一覧に表示するデッキ
+- `SAMPLE_DATA`: Decks initially placed in Tier 1–Tier 4
+- `INITIAL_AVAILABLE_DECKS`: Decks shown in the bottom list
 
-画像は `public/static/deckimages/<theme>.png` を参照します。  
-新しいデッキを追加する場合は、`src/masterdata.ts` に画像パスを追加したうえで、必要なら `pnpm download-assets` を実行してください。
+Images are referenced from `public/static/deckimages/<theme>.png`.  
+To add a new deck, add its image path to `src/masterdata.ts` and run `pnpm download-assets` if needed.
 
-アセット取得元は `scripts/download-assets.mjs` にある Google Cloud Storage の公開バケットです。
+Assets are fetched from a public Google Cloud Storage bucket configured in `scripts/download-assets.mjs`.
 
-## ビルドとデプロイ
+## Build and Deploy
 
 ```bash
 pnpm build
 pnpm exec firebase deploy --only hosting
 ```
 
-ビルド成果物は `dist/` に出力され、`firebase.json` の設定で Firebase Hosting に配信します。
+Build output goes to `dist/` and is served via Firebase Hosting as configured in `firebase.json`.
 
-### CI からのデプロイ
+### CI Deployment
 
-GitHub Actions では `.github/workflows/build.yml` で build と deploy を実行します。
+GitHub Actions runs build and deploy via `.github/workflows/build.yml`.
 
-- `push` / `pull_request` / `workflow_dispatch` でテストとビルドを実行
-- `master` への `push` 時、または `master` を対象にした `workflow_dispatch` 時のみ、本番デプロイ用に `pnpm download-assets` を実行してから再ビルドし、Firebase Hosting へデプロイ
+- `push`, `pull_request`, and `workflow_dispatch` events trigger tests and builds
+- On `push` to `master`, or `workflow_dispatch` targeting `master`, `pnpm download-assets` is run before rebuilding and deploying to Firebase Hosting
 
-CI でのデプロイを有効にするには、GitHub repository secrets に `FIREBASE_TOKEN` を追加してください。値には `firebase login:ci` で発行した token を設定します。
+To enable CI deployment, add a `FIREBASE_TOKEN` to the GitHub repository secrets. Generate the token with `firebase login:ci`.
 
-`FIREBASE_TOKEN` は Firebase CLI の CI 向け認証としては legacy 扱いですが、この workflow では token 読み取りを前提にしています。
+Note: `FIREBASE_TOKEN` is considered legacy for Firebase CLI CI authentication, but this workflow relies on token-based authentication.
