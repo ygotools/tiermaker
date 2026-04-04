@@ -196,7 +196,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
           ))}
 
           {decks.length !== 0 && filteredDecks.length === 0 && (
-            <div className="flex h-24 min-w-[320px] items-center justify-center rounded-sm border border-dashed border-gray-500 px-4 text-sm text-gray-300">
+            <div className="flex h-24 min-w-full items-center justify-center px-4 text-center text-sm text-gray-300">
               一致するテーマがありません。
             </div>
           )}
