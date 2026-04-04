@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
+import { PlusCircle, Search, X } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Deck } from '../types';
 
@@ -117,9 +118,10 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <button
               type="button"
-              className="inline-flex h-11 items-center justify-center rounded-md border border-dashed border-blue-400 px-4 text-sm font-medium text-blue-200 transition-colors hover:border-blue-300 hover:bg-blue-400/10 hover:text-white"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-dashed border-blue-400 px-4 text-sm font-medium text-blue-200 transition-colors hover:border-blue-300 hover:bg-blue-400/10 hover:text-white"
               onClick={handleOpenModal}
             >
+              <PlusCircle className="h-4 w-4" aria-hidden="true" />
               テーマを追加
             </button>
             <p className="text-sm text-gray-300">
@@ -127,13 +129,14 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             </p>
           </div>
           <div className="relative w-full md:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
             <input
               type="text"
               value={inputThemeName}
               onChange={handleInputThemeName}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              className={`w-full rounded-md border border-transparent p-2 pr-14 text-black transition-[padding] duration-200 ease-out md:pr-4 ${
+              className={`w-full rounded-md border border-transparent p-2 pl-10 pr-14 text-black transition-[padding] duration-200 ease-out md:pr-4 ${
                 shouldRevealSearchAction ? 'md:pr-16' : ''
               }`}
               placeholder="テーマ名で絞り込む"
@@ -142,7 +145,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               type="button"
               aria-label="検索条件をクリア"
               disabled={!canClearSearch}
-              className={`absolute right-2 top-1/2 rounded px-2 py-1 text-xs transition-all duration-150 ease-out md:duration-200 ${
+              className={`absolute right-2 top-1/2 rounded-full p-1 transition-all duration-150 ease-out md:duration-200 ${
                 shouldRevealSearchAction
                   ? 'translate-y-[-50%] opacity-100 md:delay-150'
                   : 'translate-y-[-50%] translate-x-1 opacity-0 md:delay-0'
@@ -150,7 +153,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => setInputThemeName('')}
             >
-              クリア
+              <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </div>
         </div>

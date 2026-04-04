@@ -10,7 +10,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'テーマを追加' })).toBeInTheDocument();
   });
 
-  it('renders update history entries inside a details disclosure', () => {
+  it('renders grouped update history entries inside a details disclosure', () => {
     render(<App />);
 
     const summary = screen.getByText('更新履歴').closest('summary');
@@ -20,6 +20,6 @@ describe('App', () => {
     const details = summary?.closest('details');
 
     expect(details).toBeInTheDocument();
-    expect(within(details as HTMLElement).getByText('2024/11/05: 【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。')).toBeInTheDocument();
+    expect(within(details as HTMLElement).getByText('2024/11: 【竜剣士】【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。')).toBeInTheDocument();
   });
 });
