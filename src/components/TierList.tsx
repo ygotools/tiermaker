@@ -59,6 +59,10 @@ const TierList: React.FC = () => {
     setAvailableDecks((prevAvailableDecks) => moveAvailableDeckState(prevAvailableDecks, dragIndex, hoverIndex));
   }, []);
 
+  const addCustomDeck = useCallback((deck: Deck) => {
+    setAvailableDecks((prev) => [...prev, deck]);
+  }, []);
+
   const handleExport = useCallback(async () => {
     if (isExporting) {
       return;
@@ -96,6 +100,7 @@ const TierList: React.FC = () => {
               decks={availableDecks}
               moveAvailableDeck={moveAvailableDeck}
               moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+              addCustomDeck={addCustomDeck}
             />
           </div>
           <div className="w-full max-w-[816px]">
