@@ -6,10 +6,11 @@ import { useDragContext } from '../context/useDragContext'; // コンテキス�
 type AvailableDecksProps = {
   decks: Deck[];
   moveAvailableDeck: (dragIndex: number, hoverIndex: number) => void;
+  moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
 }
 
-const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDeck, moveDeckToAvailableDecks }) => {
+const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDeck, moveDeckFromAvailableDecks, moveDeckToAvailableDecks }) => {
   const [inputThemeName, setInputThemeName] = React.useState<string>('');
   const handleInputThemeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputThemeName(e.target.value);
@@ -20,13 +21,14 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
 
   return (
     <div className='available-decks-container rounded overflow-hidden'>
-      <div className="overflow-x-auto whitespace-nowrap p-4 bg-gray-800 flex gap-4 flex-nowrap">
+      <div data-available-container="true" className="overflow-x-auto whitespace-nowrap p-4 bg-gray-800 flex gap-4 flex-nowrap">
         {filteredDecks.map(({ deck, index }) => (
           <AvailableDeckItem
             key={deck.name}
             deck={deck}
             index={index}
             moveAvailableDeck={moveAvailableDeck}
+            moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
             moveDeckToAvailableDecks={moveDeckToAvailableDecks}
           />
         ))}
@@ -56,10 +58,12 @@ const AvailableDeckItem: React.FC<{
   deck: Deck;
   index: number;
   moveAvailableDeck: (dragIndex: number, hoverIndex: number) => void;
+  moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
-}> = ({ deck, index, moveAvailableDeck, moveDeckToAvailableDecks }) => {
+}> = ({ deck, index, moveAvailableDeck, moveDeckFromAvailableDecks, moveDeckToAvailableDecks }) => {
   const { setDragging } = useDragContext();
   const ref = React.useRef<HTMLDivElement>(null);
+  const lastTouchTargetRef = React.useRef<string>('');
 
   const [, drop] = useDrop({
     accept: 'deck',
@@ -94,8 +98,67 @@ const AvailableDeckItem: React.FC<{
 
   drag(drop(ref));
 
+  const handleTouchMove = (event: React.TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+
+    event.preventDefault();
+    const targetElement = document.elementFromPoint(touch.clientX, touch.clientY) as HTMLElement | null;
+    if (!targetElement) {
+      return;
+    }
+
+    const availableItem = targetElement.closest('[data-available-index]') as HTMLElement | null;
+    if (availableItem) {
+      const hoverIndex = Number(availableItem.dataset.availableIndex);
+      const targetKey = `available-${hoverIndex}`;
+      if (targetKey === lastTouchTargetRef.current || hoverIndex === index) {
+        return;
+      }
+      lastTouchTargetRef.current = targetKey;
+      moveAvailableDeck(index, hoverIndex);
+      return;
+    }
+
+    const tierItem = targetElement.closest('[data-tier-index][data-item-index]') as HTMLElement | null;
+    if (tierItem) {
+      const hoverTierIndex = Number(tierItem.dataset.tierIndex);
+      const hoverIndex = Number(tierItem.dataset.itemIndex);
+      const targetKey = `tier-item-${hoverTierIndex}-${hoverIndex}`;
+      if (targetKey === lastTouchTargetRef.current) {
+        return;
+      }
+      lastTouchTargetRef.current = targetKey;
+      moveDeckFromAvailableDecks(deck, hoverTierIndex, hoverIndex);
+      return;
+    }
+
+    const tierContainer = targetElement.closest('[data-tier-container-index]') as HTMLElement | null;
+    if (tierContainer) {
+      const hoverTierIndex = Number(tierContainer.dataset.tierContainerIndex);
+      const targetKey = `tier-container-${hoverTierIndex}`;
+      if (targetKey === lastTouchTargetRef.current) {
+        return;
+      }
+      lastTouchTargetRef.current = targetKey;
+      moveDeckFromAvailableDecks(deck, hoverTierIndex);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    lastTouchTargetRef.current = '';
+  };
+
   return (
-    <div ref={ref} className={`inline-block ${isDragging ? 'opacity-50' : ''} relative cursor-grab border border-gray-700`}>
+    <div
+      ref={ref}
+      data-available-index={index}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className={`inline-block ${isDragging ? 'opacity-50' : ''} relative cursor-grab touch-none border border-gray-700`}
+    >
       <img src={deck.image} alt={deck.name} className="w-40 min-w-40 max-w-40 h-24 object-cover rounded-sm overflow-hidden" />
       <span className='block text-center w-full absolute left-0 bottom-0 p-1 text-sm font-bold text-white bg-[#000000cc]'>{deck.name}</span>
     </div>

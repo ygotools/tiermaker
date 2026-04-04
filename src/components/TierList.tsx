@@ -95,6 +95,7 @@ const TierList: React.FC = () => {
             <AvailableDecks
               decks={availableDecks}
               moveAvailableDeck={moveAvailableDeck}
+              moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
               moveDeckToAvailableDecks={moveDeckToAvailableDecks}
             />
           </div>
