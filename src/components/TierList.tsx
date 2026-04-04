@@ -96,6 +96,9 @@ const TierList: React.FC = () => {
               decks={availableDecks}
               moveAvailableDeck={moveAvailableDeck}
               moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+              addDeck={(deck) => {
+                setAvailableDecks((prevAvailableDecks) => [deck, ...prevAvailableDecks]);
+              }}
             />
           </div>
           <div className="w-full max-w-[816px]">
