@@ -156,7 +156,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
         </div>
       </div>
 
-      <div className="overflow-x-auto p-4">
+      <div className="overflow-x-scroll overflow-y-hidden p-4">
         <div className="flex min-w-max gap-4">
           {filteredDecks.map(({ deck, index }) => (
             <AvailableDeckItem
