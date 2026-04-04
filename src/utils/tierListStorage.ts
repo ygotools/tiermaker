@@ -7,6 +7,60 @@ type TierListSnapshot = {
 }
 
 const STORAGE_KEY = 'tiermaker:tier-list';
+const TIER_QUERY_KEYS = ['tier1', 'tier2', 'tier3', 'tier4'] as const;
+
+const getDeckId = (deck: Deck) => deck.image.split('/').pop()?.replace(/\.png$/, '') ?? '';
+
+const splitDeckIds = (value: string) => (
+  value
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean)
+);
+
+const createSnapshotFromQueryParams = (queryString: string, defaultSnapshot: TierListSnapshot): TierListSnapshot | null => {
+  const params = new URLSearchParams(queryString);
+  const deckById = new Map(
+    [...defaultSnapshot.tiers.flatMap((tier) => tier.decks), ...defaultSnapshot.availableDecks]
+      .map((deck) => [getDeckId(deck), deck]),
+  );
+  const usedDeckIds = new Set<string>();
+
+  const tiers = defaultSnapshot.tiers.map((tier, index) => {
+    const rawValue = params.get(TIER_QUERY_KEYS[index]);
+
+    if (!rawValue) {
+      return { ...tier, decks: [] };
+    }
+
+    const decks = splitDeckIds(rawValue).flatMap((deckId) => {
+      const deck = deckById.get(deckId);
+
+      if (!deck || usedDeckIds.has(deckId)) {
+        return [];
+      }
+
+      usedDeckIds.add(deckId);
+      return [deck];
+    });
+
+    return {
+      ...tier,
+      decks,
+    };
+  });
+
+  if (usedDeckIds.size === 0) {
+    return null;
+  }
+
+  return {
+    tiers,
+    availableDecks: [...deckById.entries()]
+      .filter(([deckId]) => !usedDeckIds.has(deckId))
+      .map(([, deck]) => deck),
+  };
+};
 
 const isDeck = (value: unknown): value is Deck => {
   if (!value || typeof value !== 'object') {
@@ -53,6 +107,12 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
 
   if (typeof window === 'undefined') {
     return defaultSnapshot;
+  }
+
+  const querySnapshot = createSnapshotFromQueryParams(window.location.search, defaultSnapshot);
+
+  if (querySnapshot) {
+    return querySnapshot;
   }
 
   const rawValue = window.sessionStorage.getItem(STORAGE_KEY);
