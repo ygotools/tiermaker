@@ -189,7 +189,7 @@ const TierList: React.FC = () => {
               className={`download-button flex h-16 flex-1 items-center justify-center border-2 border-blue-500 bg-transparent px-6 text-lg font-bold text-blue-400 transition-all hover:bg-blue-500/15 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
             >
               <DownloadIcon className="h-6 w-6" />
-              <span className="ml-2 inline-block">{isExporting ? 'Exporting...' : 'Export image'}</span>
+              <span className="ml-2 inline-block">{isExporting ? 'エクスポート中...' : '画像としてエクスポート'}</span>
             </button>
             <a
               href={xShareUrl}
