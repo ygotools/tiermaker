@@ -8,6 +8,33 @@ import {
 describe('tierListStorage', () => {
   beforeEach(() => {
     window.sessionStorage.clear();
+    window.history.replaceState({}, '', '/');
+  });
+
+  it('restores tiers from query params with higher priority than session storage', () => {
+    const storedSnapshot = createDefaultTierListSnapshot();
+
+    saveTierListSnapshot(storedSnapshot);
+    window.history.replaceState({}, '', '/?tier1=blue-eyes&tier2=ryzeal&tier3=vsk9&tier4=malice');
+
+    const restored = loadTierListSnapshot();
+
+    expect(restored.tiers[0].decks.map((deck) => deck.name)).toEqual(['青眼']);
+    expect(restored.tiers[1].decks.map((deck) => deck.name)).toEqual(['ライゼオル']);
+    expect(restored.tiers[2].decks.map((deck) => deck.name)).toEqual(['VSK9']);
+    expect(restored.tiers[3].decks.map((deck) => deck.name)).toEqual(['M∀LICE']);
+  });
+
+  it('ignores invalid deck ids in query params', () => {
+    const defaultSnapshot = createDefaultTierListSnapshot();
+
+    window.history.replaceState({}, '', '/?tier1=not-found,blue-eyes,blue-eyes&tier2=unknown');
+
+    const restored = loadTierListSnapshot();
+
+    expect(restored.tiers[0].decks.map((deck) => deck.name)).toEqual(['青眼']);
+    expect(restored.tiers[1].decks).toEqual([]);
+    expect(restored.availableDecks).toHaveLength(defaultSnapshot.availableDecks.length + defaultSnapshot.tiers.flatMap((tier) => tier.decks).length - 1);
   });
 
   it('returns the default snapshot when storage is empty', () => {
