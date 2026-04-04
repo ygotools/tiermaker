@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Deck, Tier } from '../types';
 import {
+  moveDeckState,
   moveAvailableDeckState,
   moveDeckFromAvailableDecksState,
   moveDeckToAvailableDecksState,
@@ -50,5 +51,31 @@ describe('tierListState', () => {
     const result = moveAvailableDeckState(availableDecks, 2, 0);
 
     expect(result).toEqual([thirdDeck, sampleDeck, otherDeck]);
+  });
+
+  it('moves a deck between tiers without mutating the original tier data', () => {
+    const tiers: Tier[] = [
+      { name: 'Tier1', decks: [sampleDeck, otherDeck] },
+      { name: 'Tier2', decks: [thirdDeck] },
+    ];
+
+    const result = moveDeckState(tiers, 0, 1, 0, 1);
+
+    expect(result[0].decks).toEqual([otherDeck]);
+    expect(result[1].decks).toEqual([thirdDeck, sampleDeck]);
+    expect(tiers[0].decks).toEqual([sampleDeck, otherDeck]);
+  });
+
+  it('moves only the matching deck id when names are duplicated', () => {
+    const duplicateNameDeck: Deck = { id: 'blue-eyes-alt', name: 'Blue-Eyes', image: '/blue-eyes-alt.png' };
+    const tiers: Tier[] = [
+      { name: 'Tier1', decks: [sampleDeck, duplicateNameDeck] },
+      { name: 'Tier2', decks: [] },
+    ];
+
+    const result = moveDeckToAvailableDecksState(tiers, [], sampleDeck, 0);
+
+    expect(result.tiers[0].decks).toEqual([duplicateNameDeck]);
+    expect(result.availableDecks).toEqual([sampleDeck]);
   });
 });

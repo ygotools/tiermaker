@@ -8,7 +8,7 @@ type TierComponentProps = {
   tierIndex: number;
   moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
   moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
-  moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number) => void;
+  moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
 }
 
 const tierColors = ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-gray-500'];
@@ -33,13 +33,13 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
 
   return (
     <div className="flex export-md:flex-row md:flex-row flex-col tier w-full " data-tier-index={tierIndex} ref={tierDrop} style={{ minHeight: '100px' }}>
-      <div className={`tier-label ${tierColors[tierIndex]} text-white font-bold m-2 text-bold w-[100%-8px] md:w-24 export-md:w-24 h-8 md:h-12 export-md:h-12 flex items-center justify-center`}>
+      <div className={`tier-label ${tierColors[tierIndex]} m-2 flex h-8 w-[calc(100%-16px)] items-center justify-center rounded-sm font-bold text-white md:h-12 md:w-24 export-md:w-24 export-md:h-12`}>
         {tier.name}
       </div>
       <div className="flex flex-wrap w-full">
         {tier.decks.map((deck, index) => (
           <TierItem
-            key={deck.name}
+            key={deck.id}
             deck={deck}
             index={index}
             tierIndex={tierIndex}

@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { Deck } from '../types';
-import { useDragContext } from '../context/useDragContext'; // コンテキストのインポート
 
 type AvailableDecksProps = {
   decks: Deck[];
+  allDecks: Deck[];
   moveAvailableDeck: (dragIndex: number, hoverIndex: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
   addDeck: (deck: Deck) => void;
-}
+};
+
+const DEFAULT_THEME_IMAGE = '/static/deckimages/others_01.png';
 
 const createDeckId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -18,17 +20,17 @@ const createDeckId = () => {
   return `custom-${Date.now()}`;
 };
 
-const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDeck, moveDeckToAvailableDecks, addDeck }) => {
-  const [inputThemeName, setInputThemeName] = React.useState<string>('');
+const normalizeDeckName = (name: string) => name.trim().toLocaleLowerCase();
+
+const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAvailableDeck, moveDeckToAvailableDecks, addDeck }) => {
+  const [inputThemeName, setInputThemeName] = React.useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
   const [newDeckName, setNewDeckName] = React.useState('');
   const [newDeckIcon, setNewDeckIcon] = React.useState('');
   const [formError, setFormError] = React.useState('');
 
-  const DEFAULT_THEME_IMAGE = '/static/deckimages/others_01.png';
-
-  const handleInputThemeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputThemeName(e.target.value);
+  const handleInputThemeName = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputThemeName(event.target.value);
   }, []);
 
   const resetCreateForm = useCallback(() => {
@@ -37,10 +39,30 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
     setFormError('');
   }, []);
 
+  const handleOpenModal = useCallback(() => {
+    setIsCreateModalOpen(true);
+    setFormError('');
+  }, []);
+
   const handleCloseModal = useCallback(() => {
     setIsCreateModalOpen(false);
     resetCreateForm();
   }, [resetCreateForm]);
+
+  useEffect(() => {
+    if (!isCreateModalOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleCloseModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleCloseModal, isCreateModalOpen]);
 
   const handleCreateTheme = useCallback((event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -51,8 +73,8 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
       return;
     }
 
-    if (decks.some((deck) => deck.name === normalizedName)) {
-      setFormError('同じテーマ名が既に存在します。');
+    if (allDecks.some((deck) => normalizeDeckName(deck.name) === normalizeDeckName(normalizedName))) {
+      setFormError('同じ名前のテーマはすでに存在します。');
       return;
     }
 
@@ -62,7 +84,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
       image: newDeckIcon || DEFAULT_THEME_IMAGE,
     });
     handleCloseModal();
-  }, [addDeck, decks, handleCloseModal, newDeckIcon, newDeckName]);
+  }, [addDeck, allDecks, handleCloseModal, newDeckIcon, newDeckName]);
 
   const handleIconFileInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -80,88 +102,161 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
     reader.readAsDataURL(file);
   }, []);
 
+  const normalizedSearchTerm = normalizeDeckName(inputThemeName);
   const filteredDecks = decks
     .map((deck, index) => ({ deck, index }))
-    .filter(({ deck }) => deck.name.includes(inputThemeName));
+    .filter(({ deck }) => normalizeDeckName(deck.name).includes(normalizedSearchTerm));
 
   return (
-    <div className='available-decks-container rounded overflow-hidden'>
-      <div className="overflow-x-auto whitespace-nowrap p-4 bg-gray-800 flex gap-4 flex-nowrap">
-        <button
-          type="button"
-          className="w-40 min-w-40 max-w-40 h-24 rounded-sm border-2 border-dashed border-gray-500 text-4xl text-gray-200 hover:border-white hover:text-white transition-colors"
-          aria-label="テーマを追加"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          +
-        </button>
-        {filteredDecks.map(({ deck, index }) => (
-          <AvailableDeckItem
-            key={deck.name}
-            deck={deck}
-            index={index}
-            moveAvailableDeck={moveAvailableDeck}
-            moveDeckToAvailableDecks={moveDeckToAvailableDecks}
-          />
-        ))}
-        {(decks.length !== 0 && filteredDecks.length === 0) && (
-          <div className='p-2 w-full'>
-            <div className="empty-placeholder w-full h-24 flex items-center justify-center text-gray-500 border border-dashed border-gray-300">
-              &nbsp;
-            </div>
+    <section className="available-decks-container overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-[0_20px_45px_rgba(0,0,0,0.2)]">
+      <div className="border-b border-gray-700 p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-dashed border-blue-400 px-4 text-sm font-medium text-blue-200 transition-colors hover:border-blue-300 hover:bg-blue-400/10 hover:text-white"
+              onClick={handleOpenModal}
+            >
+              テーマを追加
+            </button>
+            <p className="text-sm text-gray-300">
+              {filteredDecks.length === decks.length ? `${decks.length}件の候補` : `${filteredDecks.length} / ${decks.length}件を表示`}
+            </p>
           </div>
-        )}
-        {decks.length === 0 && (
-          <div className='p-2 w-full'>
-            <div className="empty-placeholder rounded-sm w-full h-24 flex items-center justify-center text-gray-300 border border-dashed border-gray-300">
-              ドラッグしてここにデッキを追加
-            </div>
+          <div className="relative w-full md:max-w-sm">
+            <input
+              type="text"
+              value={inputThemeName}
+              onChange={handleInputThemeName}
+              className="w-full rounded-md border border-transparent p-2 pr-14 text-black"
+              placeholder="テーマ名で絞り込む"
+            />
+            <button
+              type="button"
+              aria-label="検索条件をクリア"
+              className={`absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs transition-colors ${
+                inputThemeName
+                  ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                  : 'pointer-events-none text-transparent'
+              }`}
+              onClick={() => setInputThemeName('')}
+            >
+              クリア
+            </button>
           </div>
-        )}
+        </div>
       </div>
-      <div className='w-full p-4 bg-gray-700 text-white'>
-        <input type="text" className='w-full rounded overflow-hidden p-2 text-black' placeholder='テーマ名で絞り込む' onInput={handleInputThemeName} />
+
+      <div className="overflow-x-auto p-4">
+        <div className="flex min-w-max gap-4">
+          {filteredDecks.map(({ deck, index }) => (
+            <AvailableDeckItem
+              key={deck.id}
+              deck={deck}
+              index={index}
+              moveAvailableDeck={moveAvailableDeck}
+              moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+            />
+          ))}
+
+          {decks.length !== 0 && filteredDecks.length === 0 && (
+            <div className="flex h-24 min-w-[320px] items-center justify-center rounded-sm border border-dashed border-gray-500 px-4 text-sm text-gray-300">
+              一致するテーマがありません。
+            </div>
+          )}
+
+          {decks.length === 0 && (
+            <div className="flex h-24 min-w-[320px] items-center justify-center rounded-sm border border-dashed border-gray-500 px-4 text-sm text-gray-300">
+              テーマを追加するか、ドラッグしてここに戻してください。
+            </div>
+          )}
+        </div>
       </div>
+
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-10 bg-black/70 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-gray-800 rounded-md border border-gray-600 p-4 text-white">
-            <h2 className="text-lg font-bold mb-3">テーマを追加</h2>
+        <div
+          className="fixed inset-0 z-20 flex items-center justify-center bg-black/70 p-4"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              handleCloseModal();
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-theme-title"
+            className="w-full max-w-md rounded-md border border-gray-600 bg-gray-800 p-5 text-white shadow-xl"
+          >
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div>
+                <h2 id="create-theme-title" className="text-lg font-bold">テーマを追加</h2>
+                <p className="mt-1 text-sm text-gray-300">画像 URL か画像ファイルを指定して候補に追加できます。</p>
+              </div>
+              <button
+                type="button"
+                className="rounded-md border border-white/15 px-2 py-1 text-sm text-white/70 transition-colors hover:border-white/30 hover:text-white"
+                onClick={handleCloseModal}
+              >
+                閉じる
+              </button>
+            </div>
+
+            <div className="mb-4 flex items-center gap-4 rounded-md border border-white/10 bg-white/5 p-3">
+              <img
+                src={newDeckIcon || DEFAULT_THEME_IMAGE}
+                alt="新しいテーマのプレビュー"
+                className="h-16 w-28 rounded-sm object-cover"
+              />
+              <p className="text-sm text-gray-300">
+                追加前にプレビューを確認できます。画像未指定の場合はデフォルト画像を使います。
+              </p>
+            </div>
+
             <form onSubmit={handleCreateTheme}>
-              <label className="block mb-2 text-sm">テーマ名</label>
+              <label className="mb-2 block text-sm">テーマ名</label>
               <input
                 type="text"
                 value={newDeckName}
                 onChange={(event) => setNewDeckName(event.target.value)}
-                className="w-full rounded p-2 text-black mb-3"
+                className="mb-3 w-full rounded-md p-2 text-black"
                 placeholder="例: 新テーマ"
+                autoFocus
               />
 
-              <label className="block mb-2 text-sm">アイコン画像URL（任意）</label>
+              <label className="mb-2 block text-sm">アイコン画像 URL</label>
               <input
                 type="url"
                 value={newDeckIcon}
                 onChange={(event) => setNewDeckIcon(event.target.value)}
-                className="w-full rounded p-2 text-black mb-3"
+                className="mb-3 w-full rounded-md p-2 text-black"
                 placeholder="https://..."
               />
 
-              <label className="block mb-2 text-sm">またはローカル画像を選択（任意）</label>
+              <label className="mb-2 block text-sm">またはローカル画像を選択</label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={handleIconFileInput}
-                className="w-full mb-3"
+                className="mb-3 w-full text-sm"
               />
 
               {formError && (
-                <p className="text-red-300 text-sm mb-3">{formError}</p>
+                <p className="mb-3 text-sm text-red-300">{formError}</p>
               )}
 
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={handleCloseModal} className="px-3 py-1 border border-gray-500 rounded">
+                <button
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="rounded-md border border-gray-500 px-3 py-2 text-sm"
+                >
                   キャンセル
                 </button>
-                <button type="submit" className="px-3 py-1 border border-blue-400 text-blue-300 rounded">
+                <button
+                  type="submit"
+                  className="rounded-md border border-blue-400 px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-blue-400/10"
+                >
                   追加
                 </button>
               </div>
@@ -169,7 +264,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
@@ -179,7 +274,6 @@ const AvailableDeckItem: React.FC<{
   moveAvailableDeck: (dragIndex: number, hoverIndex: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
 }> = ({ deck, index, moveAvailableDeck, moveDeckToAvailableDecks }) => {
-  const { setDragging } = useDragContext();
   const ref = React.useRef<HTMLDivElement>(null);
 
   const [, drop] = useDrop({
@@ -209,16 +303,16 @@ const AvailableDeckItem: React.FC<{
     }),
   });
 
-  useEffect(() => {
-    setDragging(isDragging);
-  }, [isDragging, setDragging]);
-
   drag(drop(ref));
 
   return (
-    <div ref={ref} className={`inline-block ${isDragging ? 'opacity-50' : ''} relative cursor-grab border border-gray-700`}>
-      <img src={deck.image} alt={deck.name} className="w-40 min-w-40 max-w-40 h-24 object-cover rounded-sm overflow-hidden" />
-      <span className='block text-center w-full absolute left-0 bottom-0 p-1 text-sm font-bold text-white bg-[#000000cc]'>{deck.name}</span>
+    <div
+      ref={ref}
+      title={deck.name}
+      className={`relative inline-block cursor-grab overflow-hidden rounded-sm border border-gray-700 ${isDragging ? 'opacity-50' : ''}`}
+    >
+      <img src={deck.image} alt={deck.name} className="h-24 w-40 min-w-40 max-w-40 object-cover" />
+      <span className="absolute bottom-0 left-0 block w-full bg-[#000000cc] p-1 text-center text-sm font-bold text-white">{deck.name}</span>
     </div>
   );
 };
