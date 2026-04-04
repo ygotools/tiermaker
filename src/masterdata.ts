@@ -5,6 +5,7 @@ export const SAMPLE_DATA = [
     name: 'Tier1',
     decks: [
       { name: 'VSK9', image: '/static/deckimages/vsk9.png' },
+      { name: 'ドレミヤミー', image: '/static/deckimages/doremi-yummy.png' },
     ],
   },
   {
