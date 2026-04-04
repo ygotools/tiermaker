@@ -6,9 +6,9 @@ import {
   moveDeckToAvailableDecksState,
 } from './tierListState';
 
-const sampleDeck: Deck = { name: 'Blue-Eyes', image: '/blue-eyes.png' };
-const otherDeck: Deck = { name: 'Dark Magician', image: '/dark-magician.png' };
-const thirdDeck: Deck = { name: 'Red-Eyes', image: '/red-eyes.png' };
+const sampleDeck: Deck = { id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' };
+const otherDeck: Deck = { id: 'dark-magician', name: 'Dark Magician', image: '/dark-magician.png' };
+const thirdDeck: Deck = { id: 'red-eyes', name: 'Red-Eyes', image: '/red-eyes.png' };
 
 const sampleTiers: Tier[] = [
   { name: 'Tier1', decks: [sampleDeck] },
