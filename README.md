@@ -73,3 +73,14 @@ pnpm exec firebase deploy --only hosting
 ```
 
 ビルド成果物は `dist/` に出力され、`firebase.json` の設定で Firebase Hosting に配信します。
+
+### CI からのデプロイ
+
+GitHub Actions では `.github/workflows/build.yml` で build と deploy を実行します。
+
+- `push` / `pull_request` / `workflow_dispatch` でテストとビルドを実行
+- `master` への `push` 時、または `master` を対象にした `workflow_dispatch` 時のみ、本番デプロイ用に `pnpm download-assets` を実行してから再ビルドし、Firebase Hosting へデプロイ
+
+CI でのデプロイを有効にするには、GitHub repository secrets に `FIREBASE_TOKEN` を追加してください。値には `firebase login:ci` で発行した token を設定します。
+
+`FIREBASE_TOKEN` は Firebase CLI の CI 向け認証としては legacy 扱いですが、この workflow では token 読み取りを前提にしています。
