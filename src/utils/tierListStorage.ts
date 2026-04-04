@@ -90,9 +90,12 @@ const isTierListSnapshot = (value: unknown): value is TierListSnapshot => {
     snapshot.availableDecks.every(isDeck);
 };
 
+const cloneDeck = (deck: Deck): Deck => ({ ...deck });
+const cloneTier = (tier: Tier): Tier => ({ ...tier, decks: tier.decks.map(cloneDeck) });
+
 export const createDefaultTierListSnapshot = (): TierListSnapshot => ({
-  tiers: SAMPLE_DATA,
-  availableDecks: INITIAL_AVAILABLE_DECKS,
+  tiers: SAMPLE_DATA.map(cloneTier),
+  availableDecks: INITIAL_AVAILABLE_DECKS.map(cloneDeck),
 });
 
 export const loadTierListSnapshot = (): TierListSnapshot => {

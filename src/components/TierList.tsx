@@ -1,62 +1,90 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import TierComponent from './TierComponent';
+import { TouchBackend } from 'react-dnd-touch-backend';
 import AvailableDecks from './AvailableDecks';
-import { Deck, Tier } from '../types';
+import GlobalDropZone from './GlobalDropZone';
+import { DownloadIcon } from './Icon';
+import TierComponent from './TierComponent';
+import { Deck } from '../types';
 import { exportAsImage } from '../utils/exportImage';
 import {
   moveAvailableDeckState,
   moveDeckFromAvailableDecksState,
+  moveDeckState,
   moveDeckToAvailableDecksState,
 } from '../utils/tierListState';
 import {
+  createDefaultTierListSnapshot,
   loadTierListSnapshot,
   saveTierListSnapshot,
 } from '../utils/tierListStorage';
-import GlobalDropZone from './GlobalDropZone';
-import { DownloadIcon } from './Icon';
-import { DragProvider } from '../context/DragContext';
+
+type FeedbackMessage = {
+  type: 'success' | 'error';
+  text: string;
+};
+
+const isTouchPrimaryDevice = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches) {
+    return true;
+  }
+
+  return navigator.maxTouchPoints > 0;
+};
 
 const TierList: React.FC = () => {
-  const [{ tiers: initialTiers, availableDecks: initialAvailableDecks }] = useState(() => loadTierListSnapshot());
-  const [tiers, setTiers] = useState<Tier[]>(initialTiers);
-  const [availableDecks, setAvailableDecks] = useState<Deck[]>(initialAvailableDecks);
+  const [snapshot, setSnapshot] = useState(() => loadTierListSnapshot());
   const [isExporting, setIsExporting] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage | null>(null);
+  const { tiers, availableDecks } = snapshot;
+  const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
+  const useTouchBackend = isTouchPrimaryDevice();
 
   useEffect(() => {
-    saveTierListSnapshot({ tiers, availableDecks });
-  }, [tiers, availableDecks]);
+    saveTierListSnapshot(snapshot);
+  }, [snapshot]);
+
+  useEffect(() => {
+    if (!feedbackMessage || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setFeedbackMessage(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [feedbackMessage]);
 
   const moveDeck = useCallback((dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => {
-    const newTiers = [...tiers];
-    const dragTier = newTiers[dragTierIndex];
-    const hoverTier = newTiers[hoverTierIndex];
-    const [movedDeck] = dragTier.decks.splice(dragIndex, 1);
-
-    hoverTier.decks.splice(hoverIndex, 0, movedDeck);
-
-    setTiers(newTiers);
-  }, [tiers]);
+    setSnapshot((prevSnapshot) => ({
+      ...prevSnapshot,
+      tiers: moveDeckState(prevSnapshot.tiers, dragIndex, hoverIndex, dragTierIndex, hoverTierIndex),
+    }));
+  }, []);
 
   const moveDeckFromAvailableDecks = useCallback((deck: Deck, hoverTierIndex: number, hoverIndex?: number) => {
-    setAvailableDecks((prevAvailableDecks) => {
-      const nextState = moveDeckFromAvailableDecksState(tiers, prevAvailableDecks, deck, hoverTierIndex, hoverIndex);
-      setTiers(nextState.tiers);
-      return nextState.availableDecks;
-    });
-  }, [tiers]);
+    setSnapshot((prevSnapshot) => (
+      moveDeckFromAvailableDecksState(prevSnapshot.tiers, prevSnapshot.availableDecks, deck, hoverTierIndex, hoverIndex)
+    ));
+  }, []);
 
   const moveDeckToAvailableDecks = useCallback((deck: Deck, sourceTierIndex: number, hoverIndex = 0) => {
-    setAvailableDecks((prevAvailableDecks) => {
-      const nextState = moveDeckToAvailableDecksState(tiers, prevAvailableDecks, deck, sourceTierIndex, hoverIndex);
-      setTiers(nextState.tiers);
-      return nextState.availableDecks;
-    });
-  }, [tiers]);
+    setSnapshot((prevSnapshot) => (
+      moveDeckToAvailableDecksState(prevSnapshot.tiers, prevSnapshot.availableDecks, deck, sourceTierIndex, hoverIndex)
+    ));
+  }, []);
 
   const moveAvailableDeck = useCallback((dragIndex: number, hoverIndex: number) => {
-    setAvailableDecks((prevAvailableDecks) => moveAvailableDeckState(prevAvailableDecks, dragIndex, hoverIndex));
+    setSnapshot((prevSnapshot) => ({
+      ...prevSnapshot,
+      availableDecks: moveAvailableDeckState(prevSnapshot.availableDecks, dragIndex, hoverIndex),
+    }));
   }, []);
 
   const handleExport = useCallback(async () => {
@@ -68,61 +96,105 @@ const TierList: React.FC = () => {
 
     try {
       await exportAsImage({ tiers });
+      setFeedbackMessage({
+        type: 'success',
+        text: '画像を出力しました。共有ダイアログまたはダウンロードを確認してください。',
+      });
     } catch (error) {
       console.error('Failed to export the tier list image.', error);
+      setFeedbackMessage({
+        type: 'error',
+        text: '画像の出力に失敗しました。時間をおいて再度お試しください。',
+      });
     } finally {
       setIsExporting(false);
     }
   }, [isExporting, tiers]);
 
+  const handleReset = useCallback(() => {
+    if (typeof window !== 'undefined' && !window.confirm('現在の並び替えを破棄して初期状態に戻します。よろしいですか？')) {
+      return;
+    }
+
+    setSnapshot(createDefaultTierListSnapshot());
+    setFeedbackMessage({
+      type: 'success',
+      text: '初期状態に戻しました。',
+    });
+  }, []);
+
   return (
-    <DragProvider>
-      <DndProvider backend={HTML5Backend}>
-        <GlobalDropZone moveDeckToAvailableDecks={moveDeckToAvailableDecks}>
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div id="tier-list-container" className="tier-list mb-2">
-              {tiers.map((tier, tierIndex) => (
-                <TierComponent
-                  key={tier.name}
-                  tier={tier}
-                  tierIndex={tierIndex}
-                  moveDeck={moveDeck}
-                  moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
-                  moveDeckToAvailableDecks={moveDeckToAvailableDecks}
-                />
-              ))}
-            </div>
-            <AvailableDecks
-              decks={availableDecks}
-              moveAvailableDeck={moveAvailableDeck}
-              moveDeckToAvailableDecks={moveDeckToAvailableDecks}
-              addDeck={(deck) => {
-                setAvailableDecks((prevAvailableDecks) => [deck, ...prevAvailableDecks]);
-              }}
-            />
+    <DndProvider
+      backend={useTouchBackend ? TouchBackend : HTML5Backend}
+      options={useTouchBackend ? { enableMouseEvents: true, delayTouchStart: 0 } : undefined}
+    >
+      <GlobalDropZone moveDeckToAvailableDecks={moveDeckToAvailableDecks}>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div id="tier-list-container" className="tier-list mb-2">
+            {tiers.map((tier, tierIndex) => (
+              <TierComponent
+                key={tier.name}
+                tier={tier}
+                tierIndex={tierIndex}
+                moveDeck={moveDeck}
+                moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
+                moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+              />
+            ))}
           </div>
-          <div className="w-full max-w-[816px]">
-            <div className="flex pt-4 justify-center items-center">
-              <button
-                type="button"
-                onClick={handleExport}
-                disabled={isExporting}
-                aria-busy={isExporting}
-                className={`w-[calc(50%-8px)] h-20 text-xl download-button leading-none py-2 flex items-center justify-center appearance-none transition-all text-blue-500 font-bold border-2 border-blue-500 hover:border-bg-blue-600 bg-transparent hover:bg-blue-500 hover:bg-opacity-20 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
-              >
-                <DownloadIcon className="w-6 h-6" />
-                <span className="inline-block ml-2">{isExporting ? 'Exporting...' : 'Export image'}</span>
-              </button>
-              {/* <div id="share-button" className='w-[calc(50%-8px)] h-20'>
-                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('繝槭せ繧ｿ繝ｼ繝・Η繧ｨ繝ｫ縺ｮTier陦ｨ繧剃ｽ懊▲縺溘ｈ・・)}&url=${encodeURIComponent('https://tier.ygotools.com/')}&hashtags=${encodeURIComponent('驕頑葦邇九・繧ｹ繧ｿ繝ｼ繝・Η繧ｨ繝ｫ,TIERMAKERFORMD')}`} target='_blank' className="relative overflow-hidden w-full h-full text-2xl flex items-center justify-center appearance-none border-2 border-white text-white">
-                  Share to X
-                </a>
-              </div> */}
-            </div>
+          <AvailableDecks
+            decks={availableDecks}
+            allDecks={allDecks}
+            moveAvailableDeck={moveAvailableDeck}
+            moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+            addDeck={(deck) => {
+              setSnapshot((prevSnapshot) => ({
+                ...prevSnapshot,
+                availableDecks: [deck, ...prevSnapshot.availableDecks],
+              }));
+              setFeedbackMessage({
+                type: 'success',
+                text: `「${deck.name}」を追加しました。`,
+              });
+            }}
+          />
+        </div>
+        <div className="w-full max-w-[816px]">
+          {feedbackMessage && (
+            <p
+              role="status"
+              aria-live="polite"
+              className={`mt-4 rounded-md border px-4 py-3 text-sm ${
+                feedbackMessage.type === 'error'
+                  ? 'border-red-400/50 bg-red-500/10 text-red-100'
+                  : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-50'
+              }`}
+            >
+              {feedbackMessage.text}
+            </p>
+          )}
+          <div className="flex flex-col gap-3 pt-4 md:flex-row md:items-center">
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={isExporting}
+              aria-busy={isExporting}
+              className={`download-button flex h-16 flex-1 items-center justify-center border-2 border-blue-500 bg-transparent px-6 text-lg font-bold text-blue-400 transition-all hover:bg-blue-500/15 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
+            >
+              <DownloadIcon className="h-6 w-6" />
+              <span className="ml-2 inline-block">{isExporting ? 'Exporting...' : 'Export image'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="h-16 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+            >
+              初期状態に戻す
+            </button>
           </div>
-        </GlobalDropZone>
-      </DndProvider>
-    </DragProvider>
+        </div>
+      </GlobalDropZone>
+    </DndProvider>
   );
 };
 
