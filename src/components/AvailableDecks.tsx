@@ -128,33 +128,56 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               {filteredDecks.length === decks.length ? `${decks.length}件の候補` : `${filteredDecks.length} / ${decks.length}件を表示`}
             </p>
           </div>
-          <div className="relative w-full md:max-w-sm">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-            <input
-              type="text"
-              value={inputThemeName}
-              onChange={handleInputThemeName}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              className={`w-full rounded-md border border-transparent p-2 pl-10 pr-14 text-black transition-[padding] duration-200 ease-out md:pr-4 ${
-                shouldRevealSearchAction ? 'md:pr-16' : ''
+          <div className="w-full md:flex md:max-w-sm md:items-center md:gap-2">
+            <div
+              className={`relative w-full transition-[width] duration-200 ease-out ${
+                shouldRevealSearchAction ? 'md:w-[calc(100%-2.5rem)]' : 'md:w-full'
               }`}
-              placeholder="テーマ名で絞り込む"
-            />
-            <button
-              type="button"
-              aria-label="検索条件をクリア"
-              disabled={!canClearSearch}
-              className={`absolute right-2 top-1/2 rounded-full p-1 transition-all duration-150 ease-out md:duration-200 ${
-                shouldRevealSearchAction
-                  ? 'translate-y-[-50%] opacity-100 md:delay-150'
-                  : 'translate-y-[-50%] translate-x-1 opacity-0 md:delay-0'
-              } ${canClearSearch ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' : 'pointer-events-none text-gray-300'}`}
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => setInputThemeName('')}
             >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </button>
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+              <input
+                type="text"
+                value={inputThemeName}
+                onChange={handleInputThemeName}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className="w-full rounded-md border border-transparent p-2 pl-10 pr-10 text-black"
+                placeholder="テーマ名で絞り込む"
+              />
+              <button
+                type="button"
+                aria-label="検索条件をクリア"
+                disabled={!canClearSearch}
+                className={`absolute right-2 top-1/2 rounded-full p-1 transition-all duration-150 ease-out md:hidden ${
+                  shouldRevealSearchAction
+                    ? 'translate-y-[-50%] opacity-100'
+                    : 'translate-y-[-50%] translate-x-1 opacity-0'
+                } ${canClearSearch ? 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' : 'pointer-events-none text-gray-300'}`}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => setInputThemeName('')}
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+            <div
+              aria-hidden={!shouldRevealSearchAction}
+              className={`hidden overflow-hidden md:flex md:shrink-0 md:transition-[width,opacity] md:duration-150 md:ease-out ${
+                shouldRevealSearchAction ? 'md:w-8 md:opacity-100 md:delay-150' : 'md:w-0 md:opacity-0 md:delay-0'
+              }`}
+            >
+              <button
+                type="button"
+                aria-label="検索条件をクリア"
+                disabled={!canClearSearch}
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
+                  canClearSearch ? 'text-gray-300 hover:bg-white/10 hover:text-white' : 'pointer-events-none text-gray-600'
+                }`}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => setInputThemeName('')}
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
