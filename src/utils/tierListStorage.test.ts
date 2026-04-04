@@ -55,15 +55,17 @@ describe('tierListStorage', () => {
     expect(loadTierListSnapshot()).toEqual(snapshot);
   });
 
-  it('falls back when the stored deck count does not match the current deck count', () => {
-    window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify({
+  it('keeps stored snapshots even when deck count differs from master data', () => {
+    const snapshot = {
       tiers: [
         { name: 'Tier1', decks: [{ id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
       ],
       availableDecks: [],
-    }));
+    };
 
-    expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
+    window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify(snapshot));
+
+    expect(loadTierListSnapshot()).toEqual(snapshot);
   });
 
   it('falls back when the stored shape does not match the snapshot schema', () => {
