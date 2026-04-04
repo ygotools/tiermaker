@@ -21,18 +21,22 @@ describe('tierListStorage', () => {
   });
 
   it('round-trips a saved snapshot', () => {
-    const snapshot = {
-      tiers: [
-        { name: 'Tier1', decks: [{ name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
-      ],
-      availableDecks: [
-        { name: 'Dark Magician', image: '/dark-magician.png' },
-      ],
-    };
+    const snapshot = createDefaultTierListSnapshot();
 
     saveTierListSnapshot(snapshot);
 
     expect(loadTierListSnapshot()).toEqual(snapshot);
+  });
+
+  it('falls back when the stored deck count does not match the current deck count', () => {
+    window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify({
+      tiers: [
+        { name: 'Tier1', decks: [{ name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
+      ],
+      availableDecks: [],
+    }));
+
+    expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
   });
 
   it('falls back when the stored shape does not match the snapshot schema', () => {

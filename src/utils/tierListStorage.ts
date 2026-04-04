@@ -38,27 +38,41 @@ const isTierListSnapshot = (value: unknown): value is TierListSnapshot => {
     snapshot.availableDecks.every(isDeck);
 };
 
+const countDecks = (snapshot: TierListSnapshot) => (
+  snapshot.availableDecks.length +
+  snapshot.tiers.reduce((total, tier) => total + tier.decks.length, 0)
+);
+
 export const createDefaultTierListSnapshot = (): TierListSnapshot => ({
   tiers: SAMPLE_DATA,
   availableDecks: INITIAL_AVAILABLE_DECKS,
 });
 
 export const loadTierListSnapshot = (): TierListSnapshot => {
+  const defaultSnapshot = createDefaultTierListSnapshot();
+
   if (typeof window === 'undefined') {
-    return createDefaultTierListSnapshot();
+    return defaultSnapshot;
   }
 
   const rawValue = window.sessionStorage.getItem(STORAGE_KEY);
 
   if (!rawValue) {
-    return createDefaultTierListSnapshot();
+    return defaultSnapshot;
   }
 
   try {
     const parsed = JSON.parse(rawValue) as unknown;
-    return isTierListSnapshot(parsed) ? parsed : createDefaultTierListSnapshot();
+
+    if (!isTierListSnapshot(parsed)) {
+      return defaultSnapshot;
+    }
+
+    return countDecks(parsed) === countDecks(defaultSnapshot)
+      ? parsed
+      : defaultSnapshot;
   } catch {
-    return createDefaultTierListSnapshot();
+    return defaultSnapshot;
   }
 };
 
