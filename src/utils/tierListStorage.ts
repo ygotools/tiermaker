@@ -38,11 +38,6 @@ const isTierListSnapshot = (value: unknown): value is TierListSnapshot => {
     snapshot.availableDecks.every(isDeck);
 };
 
-const countDecks = (snapshot: TierListSnapshot) => (
-  snapshot.availableDecks.length +
-  snapshot.tiers.reduce((total, tier) => total + tier.decks.length, 0)
-);
-
 export const createDefaultTierListSnapshot = (): TierListSnapshot => ({
   tiers: SAMPLE_DATA,
   availableDecks: INITIAL_AVAILABLE_DECKS,
@@ -68,9 +63,7 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
       return defaultSnapshot;
     }
 
-    return countDecks(parsed) === countDecks(defaultSnapshot)
-      ? parsed
-      : defaultSnapshot;
+    return parsed;
   } catch {
     return defaultSnapshot;
   }
