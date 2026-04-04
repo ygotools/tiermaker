@@ -1,25 +1,22 @@
 import React from 'react';
+import { ExternalLink, History } from 'lucide-react';
 import TierList from './components/TierList';
 
 const UPDATE_HISTORY_ITEMS = [
-  '2026/04/04: 【ドレミヤミー】【キラーチューン】を追加しました。',
-  '2026/02/04: 【VSK9】を追加しました。',
-  '2025/12/30: 【オノマトライゼオル】【ドラゴンテイル】【巳剣】【ヤミー】【月光】【閃刀姫】【ジェムナイト】【オルフェゴール】【ライゼオル】【巳剣ライゼオル】を追加しました。',
-  '2025/07/26: 【千年M∀LICE】【氷結界】【エルドリッチ】を追加しました。',
-  '2025/07/04: 【M∀LICE】【クリストロン】を追加しました。',
-  '2025/05/19: 【P.U.N.K.】【海皇】を追加しました。',
-  '2025/04/15: 【青眼】【破械】【メメント】を追加し、【メタビート】を再追加しました。',
-  '2025/02/23: 【スネークアイ】【千年】を追加しました。',
-  '2025/01/12: 【ドライトロン】【ギミック・パペット】【白き森】を追加しました。',
-  '2024/11/28: 【竜剣士】を追加しました。',
-  '2024/11/05: 【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。',
-  '2024/10/14: 【霊獣】【ライトロード】を追加しました。',
-  '2024/10/09: 【天盃龍】【インフェルノイド】を追加しました。',
-  '2024/09/16: 【古代の機械】【ヴァリアンツ】を追加しました。',
-  '2024/08/15: 【神碑】を追加しました。',
-  '2024/08/05: 【粛声】を追加しました。',
-  '2024/07/03: 【センチュリオン】【ユベル】【エンディミオン】を追加しました。',
-  '2024/06/17: v0.1.0 を公開しました。',
+  '2026/04: 【ドレミヤミー】【キラーチューン】を追加しました。',
+  '2026/02: 【VSK9】を追加しました。',
+  '2025/12: 【オノマトライゼオル】【ドラゴンテイル】【巳剣】【ヤミー】【月光】【閃刀姫】【ジェムナイト】【オルフェゴール】【ライゼオル】【巳剣ライゼオル】を追加しました。',
+  '2025/07: 【千年M∀LICE】【氷結界】【エルドリッチ】【M∀LICE】【クリストロン】を追加しました。',
+  '2025/05: 【P.U.N.K.】【海皇】を追加しました。',
+  '2025/04: 【青眼】【破械】【メメント】を追加し、【メタビート】を再追加しました。',
+  '2025/02: 【スネークアイ】【千年】を追加しました。',
+  '2025/01: 【ドライトロン】【ギミック・パペット】【白き森】を追加しました。',
+  '2024/11: 【竜剣士】【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。',
+  '2024/10: 【霊獣】【ライトロード】【天盃龍】【インフェルノイド】を追加しました。',
+  '2024/09: 【古代の機械】【ヴァリアンツ】を追加しました。',
+  '2024/08: 【神碑】【粛声】を追加しました。',
+  '2024/07: 【センチュリオン】【ユベル】【エンディミオン】を追加しました。',
+  '2024/06: v0.1.0 を公開しました。',
 ] as const;
 
 const App: React.FC = () => {
@@ -36,7 +33,10 @@ const App: React.FC = () => {
 
       <section className="mx-auto mt-6 w-full max-w-[816px] rounded-lg border border-white/10 bg-white/5 p-4 text-sm text-white">
         <details>
-          <summary className="mb-2 cursor-pointer font-semibold">更新履歴</summary>
+          <summary className="mb-2 inline-flex cursor-pointer items-center gap-2 font-semibold">
+            <History className="h-4 w-4" aria-hidden="true" />
+            更新履歴
+          </summary>
           <ul className="space-y-1 text-white/75">
             {UPDATE_HISTORY_ITEMS.map((item) => (
               <li key={item}>{item}</li>
@@ -48,8 +48,9 @@ const App: React.FC = () => {
           href="https://docs.google.com/forms/d/e/1FAIpQLScn8SCvjob9GXjtwctK6JDdIpdIg2pzX-pMDdNryTBQDsXfhw/viewform?usp=sf_link"
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex text-sm underline"
+          className="mt-4 inline-flex items-center gap-2 text-sm underline"
         >
+          <ExternalLink className="h-4 w-4" aria-hidden="true" />
           テーマ追加希望はこちら
         </a>
       </section>

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -98,7 +99,7 @@ const TierList: React.FC = () => {
       await exportAsImage({ tiers });
       setFeedbackMessage({
         type: 'success',
-        text: '画像を出力しました。共有ダイアログまたはダウンロードを確認してください。',
+        text: '画像を出力しました。ダウンロードされた PNG を確認してください。',
       });
     } catch (error) {
       console.error('Failed to export the tier list image.', error);
@@ -164,12 +165,15 @@ const TierList: React.FC = () => {
             <p
               role="status"
               aria-live="polite"
-              className={`mt-4 rounded-md border px-4 py-3 text-sm ${
+              className={`mt-4 flex items-center gap-2 rounded-md border px-4 py-3 text-sm ${
                 feedbackMessage.type === 'error'
                   ? 'border-red-400/50 bg-red-500/10 text-red-100'
                   : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-50'
               }`}
             >
+              {feedbackMessage.type === 'error'
+                ? <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                : <CheckCircle className="h-4 w-4 shrink-0" aria-hidden="true" />}
               {feedbackMessage.text}
             </p>
           )}
@@ -187,8 +191,9 @@ const TierList: React.FC = () => {
             <button
               type="button"
               onClick={handleReset}
-              className="h-16 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+              className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
             >
+              <RotateCcw className="h-4 w-4" aria-hidden="true" />
               初期状態に戻す
             </button>
           </div>
