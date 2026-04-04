@@ -58,7 +58,7 @@ describe('tierListStorage', () => {
   it('falls back when the stored deck count does not match the current deck count', () => {
     window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify({
       tiers: [
-        { name: 'Tier1', decks: [{ name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
+        { name: 'Tier1', decks: [{ id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
       ],
       availableDecks: [],
     }));

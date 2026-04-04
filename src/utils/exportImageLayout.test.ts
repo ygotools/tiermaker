@@ -38,9 +38,9 @@ describe('exportImageLayout', () => {
 
   it('computes the total canvas height from the tier rows', () => {
     const tiers: Pick<Tier, 'decks'>[] = [
-      { decks: [{ name: 'a', image: '/a.png' }, { name: 'b', image: '/b.png' }, { name: 'c', image: '/c.png' }] },
+      { decks: [{ id: 'a', name: 'a', image: '/a.png' }, { id: 'b', name: 'b', image: '/b.png' }, { id: 'c', name: 'c', image: '/c.png' }] },
       { decks: [] },
-      { decks: [{ name: 'd', image: '/d.png' }, { name: 'e', image: '/e.png' }, { name: 'f', image: '/f.png' }, { name: 'g', image: '/g.png' }] },
+      { decks: [{ id: 'd', name: 'd', image: '/d.png' }, { id: 'e', name: 'e', image: '/e.png' }, { id: 'f', name: 'f', image: '/f.png' }, { id: 'g', name: 'g', image: '/g.png' }] },
     ];
 
     expect(getExportCanvasHeight(tiers)).toBe(
