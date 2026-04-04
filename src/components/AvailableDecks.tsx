@@ -10,6 +10,14 @@ type AvailableDecksProps = {
   addDeck: (deck: Deck) => void;
 }
 
+const createDeckId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  return `custom-${Date.now()}`;
+};
+
 const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDeck, moveDeckToAvailableDecks, addDeck }) => {
   const [inputThemeName, setInputThemeName] = React.useState<string>('');
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
@@ -49,6 +57,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, moveAvailableDec
     }
 
     addDeck({
+      id: createDeckId(),
       name: normalizedName,
       image: newDeckIcon || DEFAULT_THEME_IMAGE,
     });
