@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
+
+const isTouchDevice = () =>
+  typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 import TierComponent from './TierComponent';
 import AvailableDecks from './AvailableDecks';
 import { Deck, Tier } from '../types';
@@ -77,7 +81,7 @@ const TierList: React.FC = () => {
 
   return (
     <DragProvider>
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={isTouchDevice() ? TouchBackend : HTML5Backend} options={isTouchDevice() ? { delayTouchStart: 0, enableMouseEvents: true } : {}}>
         <GlobalDropZone moveDeckToAvailableDecks={moveDeckToAvailableDecks}>
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div id="tier-list-container" className="tier-list mb-2">
