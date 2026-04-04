@@ -4,45 +4,46 @@ export const SAMPLE_DATA = [
   {
     name: 'Tier1',
     decks: [
-      { name: 'VSK9', image: '/static/deckimages/vsk9.png' },
+      { name: 'キラーチューン', image: '/static/deckimages/killer-tune.png' },
       { name: 'ドレミヤミー', image: '/static/deckimages/doremi-yummy.png' },
     ],
   },
   {
     name: 'Tier2',
     decks: [
+      { name: 'VSK9', image: '/static/deckimages/vsk9.png' },
       { name: 'ドラゴンテイル', image: '/static/deckimages/dracotail.png' },
-      { name: '巳剣', image: '/static/deckimages/mitsurugi.png' },
-      { name: 'ヤミー', image: '/static/deckimages/yummy.png' },
+      { name: 'M∀LICE', image: '/static/deckimages/malice.png' },
+      { name: 'ジェムナイト', image: '/static/deckimages/gemknight.png' },
     ],
   },
   {
     name: 'Tier3',
     decks: [
-      { name: '月光', image: '/static/deckimages/moonlight.png' },
+      { name: '巳剣ライゼオル', image: '/static/deckimages/mitsurugi-ryzeal.png' },
       { name: '閃刀姫', image: '/static/deckimages/skystriker.png' },
-      { name: 'M∀LICE', image: '/static/deckimages/malice.png' },
+      { name: '月光', image: '/static/deckimages/moonlight.png' },
     ],
   },
   {
     name: 'Tier4',
     decks: [
-      { name: 'ジェムナイト', image: '/static/deckimages/gemknight.png' },
       { name: 'ティアラメンツ', image: '/static/deckimages/tearlaments.png' },
-      { name: 'オルフェゴール', image: '/static/deckimages/orcust.png' },
     ],
   },
 ]
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { name: 'オノマトライゼオル', image: '/static/deckimages/onomato-ryzeal.png' },
+  { name: '巳剣', image: '/static/deckimages/mitsurugi.png' },
+  { name: 'ヤミー', image: '/static/deckimages/yummy.png' },
+  { name: 'オルフェゴール', image: '/static/deckimages/orcust.png' },
   { name: 'メタビート', image: '/static/deckimages/metabeat.png' },
   { name: 'ライゼオル', image: '/static/deckimages/ryzeal.png' },
   { name: '天盃龍', image: '/static/deckimages/tenpai-dragon.png' },
   { name: '粛声', image: '/static/deckimages/voiceless_voice.png' },
   { name: '青眼', image: '/static/deckimages/blue-eyes.png' },
   { name: '海皇', image: '/static/deckimages/atlantean.png' },
-  { name: '巳剣ライゼオル', image: '/static/deckimages/mitsurugi-ryzeal.png' },
   { name: 'スネークアイ', image: '/static/deckimages/snake-eye.png' },
   { name: 'メメント', image: '/static/deckimages/mementotlan.png' },
   { name: '白き森', image: '/static/deckimages/white-forest.png' },
