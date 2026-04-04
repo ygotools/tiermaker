@@ -163,7 +163,7 @@ const TierList: React.FC = () => {
             }}
           />
         </div>
-        <div className="w-full max-w-[816px]">
+        <div className="mx-auto w-full max-w-[816px]">
           {feedbackMessage && (
             <p
               role="status"

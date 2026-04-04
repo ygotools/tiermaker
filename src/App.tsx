@@ -55,7 +55,7 @@ const App: React.FC = () => {
         </a>
       </section>
 
-      <div className="mt-6 flex items-center justify-center text-sm text-white/80">
+      <div className="mx-auto mt-6 w-full max-w-[816px] text-center text-sm text-white/80">
         &copy; 2024&nbsp;
         <a href="https://x.com/potato4d" target="_blank" rel="noreferrer" className="underline">
           @potato4d
