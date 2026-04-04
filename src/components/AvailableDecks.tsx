@@ -128,12 +128,13 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               {filteredDecks.length === decks.length ? `${decks.length}件の候補` : `${filteredDecks.length} / ${decks.length}件を表示`}
             </p>
           </div>
-          <div className="w-full md:flex md:max-w-sm md:items-center md:gap-2">
-            <div
-              className={`relative w-full transition-[width] duration-200 ease-out ${
-                shouldRevealSearchAction ? 'md:w-[calc(100%-2.5rem)]' : 'md:w-full'
-              }`}
-            >
+          <div
+            className="w-full md:grid md:max-w-sm md:items-center md:transition-[grid-template-columns] md:duration-200 md:ease-out"
+            style={{
+              gridTemplateColumns: shouldRevealSearchAction ? 'minmax(0, 1fr) 2.5rem' : 'minmax(0, 1fr) 0rem',
+            }}
+          >
+            <div className="relative min-w-0">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
               <input
                 type="text"
@@ -161,8 +162,8 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             </div>
             <div
               aria-hidden={!shouldRevealSearchAction}
-              className={`hidden overflow-hidden md:flex md:shrink-0 md:transition-[width,opacity] md:duration-150 md:ease-out ${
-                shouldRevealSearchAction ? 'md:w-8 md:opacity-100 md:delay-150' : 'md:w-0 md:opacity-0 md:delay-0'
+              className={`hidden overflow-hidden md:flex md:items-center md:justify-end md:pl-2 md:transition-[width,opacity,padding] md:duration-150 md:ease-out ${
+                shouldRevealSearchAction ? 'md:opacity-100 md:delay-150' : 'md:opacity-0 md:delay-0'
               }`}
             >
               <button
