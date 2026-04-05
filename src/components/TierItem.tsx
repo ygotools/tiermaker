@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Deck } from '../types';
 
 type TierItemProps = {
@@ -40,7 +41,7 @@ const TierItem: React.FC<TierItemProps> = ({ deck, index, tierIndex, moveDeck, m
     },
   });
 
-  const [{ isDraggingItem }, drag] = useDrag({
+  const [{ isDraggingItem }, drag, preview] = useDrag({
     type: 'deck',
     item: { deck, index, tierIndex },
     collect: (monitor) => ({
@@ -53,6 +54,10 @@ const TierItem: React.FC<TierItemProps> = ({ deck, index, tierIndex, moveDeck, m
       }
     },
   });
+
+  React.useEffect(() => {
+    preview(getEmptyImage(), { captureDraggingState: true });
+  }, [preview]);
 
   drag(drop(ref));
 
