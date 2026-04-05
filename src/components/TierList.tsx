@@ -201,23 +201,25 @@ const TierList: React.FC = () => {
               <DownloadIcon className="h-6 w-6" />
               <span className="ml-2 inline-block">{isExporting ? i18n.t('tierList.exportInProgress') : i18n.t('tierList.exportButton')}</span>
             </button>
-            <a
-              href={xShareUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
-            >
-              <Share2 className="h-4 w-4" aria-hidden="true" />
-              {i18n.t('tierList.shareOnX')}
-            </a>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              {i18n.t('tierList.resetButton')}
-            </button>
+            <div className="grid grid-cols-2 gap-3 md:flex md:w-auto">
+              <a
+                href={xShareUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+              >
+                <Share2 className="h-4 w-4" aria-hidden="true" />
+                {i18n.t('tierList.shareOnX')}
+              </a>
+              <button
+                type="button"
+                onClick={handleReset}
+                className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+              >
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                {i18n.t('tierList.resetButton')}
+              </button>
+            </div>
           </div>
         </div>
       </GlobalDropZone>
