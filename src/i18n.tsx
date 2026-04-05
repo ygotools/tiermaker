@@ -10,6 +10,7 @@ type Translation = {
   };
   tierList: {
     shareIntro: string;
+    shareHashtags: string;
     exportSuccess: string;
     exportError: string;
     resetConfirmation: string;
@@ -69,7 +70,8 @@ const translations = {
       requestThemeLink: 'テーマ追加希望はこちら',
     },
     tierList: {
-      shareIntro: 'Tier Maker で tier 表を作成しました #遊戯王マスターデュエル',
+      shareIntro: 'TierMakerでTier表を作成しました',
+      shareHashtags: '#遊戯王マスターデュエル #TIERMAKERFORMD',
       exportSuccess: '画像を出力しました。ダウンロードされた PNG を確認してください。',
       exportError: '画像の出力に失敗しました。時間をおいて再度お試しください。',
       resetConfirmation: '現在の並び替えを破棄して初期状態に戻します。よろしいですか？',
@@ -130,6 +132,7 @@ const translations = {
     },
     tierList: {
       shareIntro: 'I made a tier list with Tier Maker',
+      shareHashtags: '#YuGiOhMasterDuel #TIERMAKERFORMD',
       exportSuccess: 'Image exported. Please check the downloaded PNG.',
       exportError: 'Failed to export the image. Please try again in a moment.',
       resetConfirmation: 'Discard the current order and restore the initial state?',
