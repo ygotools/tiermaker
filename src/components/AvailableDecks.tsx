@@ -138,7 +138,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <button
               type="button"
-              className="hidden h-11 items-center justify-center gap-2 rounded-md border border-dashed border-blue-400 px-4 text-sm font-medium text-blue-200 transition-colors hover:border-blue-300 hover:bg-blue-400/10 hover:text-white md:inline-flex"
+              className="hidden h-11 items-center justify-center gap-2 rounded-md px-4 text-sm font-medium text-blue-200 transition-colors hover:bg-blue-400/10 hover:text-white md:inline-flex"
               onClick={handleOpenModal}
             >
               <PlusCircle className="h-4 w-4" aria-hidden="true" />
@@ -207,7 +207,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
         <div className="flex min-h-[98px] gap-4" style={{ minWidth: deckStripMinWidth }}>
           <button
             type="button"
-            className="inline-flex h-24 min-w-24 items-center justify-center self-stretch rounded-sm border border-dashed border-blue-400 text-blue-200 transition-colors hover:border-blue-300 hover:bg-blue-400/10 hover:text-white md:hidden"
+            className="inline-flex h-24 min-w-24 items-center justify-center self-stretch rounded-sm text-blue-200 transition-colors hover:bg-blue-400/10 hover:text-white md:hidden"
             onClick={handleOpenModal}
             aria-label={i18n.t('availableDecks.addTheme')}
           >
