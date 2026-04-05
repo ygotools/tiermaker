@@ -151,7 +151,7 @@ const TierList: React.FC = () => {
       <DragPreviewLayer />
       <GlobalDropZone moveDeckToAvailableDecks={moveDeckToAvailableDecks}>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <div id="tier-list-container" className="tier-list mb-2 -mx-4 md:mx-0">
+          <div id="tier-list-container" className="tier-list mx-auto mb-2 w-full">
             {tiers.map((tier, tierIndex) => (
               <TierComponent
                 key={tier.name}
