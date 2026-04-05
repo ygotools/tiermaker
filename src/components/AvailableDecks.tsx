@@ -3,6 +3,7 @@ import { PlusCircle, Search, X } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Deck } from '../types';
+import { matchesDeckSearch } from '../utils/deckSearch';
 
 type AvailableDecksProps = {
   decks: Deck[];
@@ -110,7 +111,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
   const normalizedSearchTerm = normalizeDeckName(inputThemeName);
   const filteredDecks = decks
     .map((deck, index) => ({ deck, index }))
-    .filter(({ deck }) => normalizeDeckName(deck.name).includes(normalizedSearchTerm));
+    .filter(({ deck }) => matchesDeckSearch(deck, normalizedSearchTerm));
   const shouldRevealSearchAction = isSearchFocused || inputThemeName.length > 0;
   const canClearSearch = inputThemeName.length > 0;
   const deckStripMinWidth = decks.length > 0
