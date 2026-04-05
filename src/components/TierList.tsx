@@ -196,7 +196,7 @@ const TierList: React.FC = () => {
               onClick={handleExport}
               disabled={isExporting}
               aria-busy={isExporting}
-              className={`download-button flex h-16 flex-1 items-center justify-center border-2 border-blue-500 bg-transparent px-6 text-lg font-bold text-blue-400 transition-all hover:bg-blue-500/15 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
+              className={`download-button flex min-h-16 flex-1 items-center justify-center border-2 border-blue-500 bg-transparent px-6 py-3 text-lg font-bold text-blue-400 transition-all hover:bg-blue-500/15 md:py-0 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
             >
               <DownloadIcon className="h-6 w-6" />
               <span className="ml-2 inline-block">{isExporting ? i18n.t('tierList.exportInProgress') : i18n.t('tierList.exportButton')}</span>
