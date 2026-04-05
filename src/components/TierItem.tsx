@@ -2,6 +2,8 @@ import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Deck } from '../types';
+import { useI18n } from '../i18n';
+import { getDeckDisplayName } from '../utils/deckName';
 
 type TierItemProps = {
   deck: Deck;
@@ -13,7 +15,9 @@ type TierItemProps = {
 }
 
 const TierItem: React.FC<TierItemProps> = ({ deck, index, tierIndex, moveDeck, moveDeckFromAvailableDecks, moveDeckToAvailableDecks }) => {
+  const i18n = useI18n();
   const ref = React.useRef<HTMLDivElement>(null);
+  const deckDisplayName = getDeckDisplayName(deck, i18n.language);
   const [, drop] = useDrop({
     accept: 'deck',
     drop: () => ({ moved: true }),
@@ -62,9 +66,9 @@ const TierItem: React.FC<TierItemProps> = ({ deck, index, tierIndex, moveDeck, m
   drag(drop(ref));
 
   return (
-    <div ref={ref} title={deck.name} className={`tier-item relative m-2 cursor-grab overflow-hidden rounded-sm border border-gray-700 ${isDraggingItem ? 'border-blue-500 opacity-50' : ''}`}>
-      <img src={deck.image} alt={deck.name} className="h-[90px] w-[160px] object-cover" />
-      <span className='block text-center w-full absolute left-0 bottom-0 p-1 text-sm font-bold text-white bg-[#000000cc]'>{deck.name}</span>
+    <div ref={ref} title={deckDisplayName} className={`tier-item relative m-2 cursor-grab overflow-hidden rounded-sm border border-gray-700 ${isDraggingItem ? 'border-blue-500 opacity-50' : ''}`}>
+      <img src={deck.image} alt={deckDisplayName} className="h-[90px] w-[160px] object-cover" />
+      <span className='block text-center w-full absolute left-0 bottom-0 p-1 text-sm font-bold text-white bg-[#000000cc]'>{deckDisplayName}</span>
     </div>
   );
 };

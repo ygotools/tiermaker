@@ -31,4 +31,9 @@ describe('deckSearch', () => {
     expect(matchesDeckSearch({ id: 'blue-eyes', name: '青眼', kana: 'ぶるーあいず', image: '/static/deckimages/blue-eyes.png' }, 'blue eyes')).toBe(true);
     expect(matchesDeckSearch({ id: 'voiceless_voice', name: '粛声', kana: 'しゅくせい', image: '/static/deckimages/voiceless_voice.png' }, 'voiceless voice')).toBe(true);
   });
+
+  it('matches the localized english name when it differs from the image filename', () => {
+    expect(matchesDeckSearch({ id: 'moonlight', name: '月光', nameEn: 'Lunalight', kana: 'げっこう', image: '/static/deckimages/moonlight.png' }, 'lunalight')).toBe(true);
+    expect(matchesDeckSearch({ id: 'r-ace', name: 'R-ACE', nameEn: 'Rescue-ACE', kana: 'れすきゅーえーす', image: '/static/deckimages/r-ace.png' }, 'rescue ace')).toBe(true);
+  });
 });

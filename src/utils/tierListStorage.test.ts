@@ -100,4 +100,15 @@ describe('tierListStorage', () => {
 
     expect(shareText).toBe('Tier1 キラーチューン ヤミー\nTier2 ライゼオル\nTier3\nTier4 M∀LICE');
   });
+
+  it('creates localized share text when a deck name getter is provided', () => {
+    const shareText = createTierListShareText([
+      { name: 'Tier1', decks: [{ id: 'moonlight', name: '月光', nameEn: 'Lunalight', image: '/moonlight.png' }] },
+      { name: 'Tier2', decks: [{ id: 'r-ace', name: 'R-ACE', nameEn: 'Rescue-ACE', image: '/r-ace.png' }] },
+      { name: 'Tier3', decks: [] },
+      { name: 'Tier4', decks: [{ id: 'malice', name: 'M∀LICE', nameEn: 'Maliss', image: '/malice.png' }] },
+    ], (deck) => deck.nameEn ?? deck.name);
+
+    expect(shareText).toBe('Tier1 Lunalight\nTier2 Rescue-ACE\nTier3\nTier4 Maliss');
+  });
 });

@@ -1,4 +1,4 @@
-import { Tier } from '../types';
+import { Deck, Tier } from '../types';
 import {
   EXPORT_CANVAS_WIDTH,
   EXPORT_FOOTER_HEIGHT,
@@ -17,6 +17,7 @@ import {
 
 type ExportAsImageOptions = {
   tiers: Tier[];
+  getDeckName?: (deck: Deck) => string;
 };
 
 type LoadImageResult = {
@@ -244,7 +245,7 @@ const downloadBlob = async (blob: Blob) => {
   }, 1000);
 };
 
-export const exportAsImage = async ({ tiers }: ExportAsImageOptions) => {
+export const exportAsImage = async ({ tiers, getDeckName = (deck) => deck.name }: ExportAsImageOptions) => {
   const height = getExportCanvasHeight(tiers);
   const canvas = createCanvas(EXPORT_CANVAS_WIDTH, height);
   const context = canvas.getContext('2d');
@@ -274,7 +275,7 @@ export const exportAsImage = async ({ tiers }: ExportAsImageOptions) => {
     tier.decks.forEach((deck, deckIndex) => {
       const position = getTierCardPosition(deckIndex, cursorY);
       const deckImage = deckImageMap.get(deck.image);
-      drawDeckCard(context, deckImage?.image ?? null, deck.name, position.x, position.y);
+      drawDeckCard(context, deckImage?.image ?? null, getDeckName(deck), position.x, position.y);
     });
 
     cursorY += rowHeight;

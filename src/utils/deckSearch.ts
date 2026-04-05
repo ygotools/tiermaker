@@ -276,9 +276,15 @@ export const matchesDeckSearch = (deck: Deck, searchTerm: string) => {
   const compactImageStem = compactIdentifierForSearch(normalizedImageStem);
 
   const normalizedDeckName = normalizeSearchText(deck.name);
+  const normalizedDeckNameEn = normalizeSearchText(deck.nameEn ?? '');
+  const compactDeckName = compactIdentifierForSearch(deck.name);
+  const compactDeckNameEn = compactIdentifierForSearch(deck.nameEn ?? '');
   const normalizedDeckKana = compactKanaForSearch(deck.kana ?? '');
 
   return normalizedDeckName.includes(normalizedSearchTerm) ||
+    normalizedDeckNameEn.includes(normalizedSearchTerm) ||
+    compactDeckName.includes(compactSearchTerm) ||
+    compactDeckNameEn.includes(compactSearchTerm) ||
     normalizedDeckKana.includes(normalizedKanaSearchTerm) ||
     normalizedDeckKana.includes(hiraganaSearchTerm) ||
     normalizedImageStem.includes(normalizedSearchTerm) ||
