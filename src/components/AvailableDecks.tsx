@@ -203,7 +203,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
         </div>
       </div>
 
-      <div className="overflow-x-scroll overflow-y-hidden p-4">
+      <div className="overflow-x-scroll overflow-y-hidden px-4 py-6 md:p-4">
         <div className="flex min-h-[98px] gap-4" style={{ minWidth: deckStripMinWidth }}>
           <button
             type="button"
