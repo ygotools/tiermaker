@@ -2,6 +2,7 @@ import React from 'react';
 import { useDrop } from 'react-dnd';
 import TierItem from './TierItem';
 import { Tier, Deck } from '../types';
+import { useI18n } from '../i18n';
 
 type TierComponentProps = {
   tier: Tier;
@@ -14,6 +15,7 @@ type TierComponentProps = {
 const tierColors = ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-gray-500'];
 
 const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck, moveDeckFromAvailableDecks, moveDeckToAvailableDecks }) => {
+  const i18n = useI18n();
   const [, tierDrop] = useDrop({
     accept: 'deck',
     drop: (item: { deck: Deck, index: number; tierIndex: number }, monitor) => {
@@ -51,7 +53,7 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
         {tier.decks.length === 0 && (
           <div className='p-2 w-full'>
             <div className="empty-placeholder w-full h-[calc(6rem-4px)] flex items-center justify-center text-gray-500 border border-dashed border-gray-300">
-              ドラッグしてここにデッキを追加
+              {i18n.t('tier.emptyPlaceholder')}
             </div>
           </div>
         )}
