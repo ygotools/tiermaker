@@ -16,6 +16,7 @@ const setNavigatorLanguage = (language: string, languages = [language]) => {
 describe('App', () => {
   beforeEach(() => {
     setNavigatorLanguage('en-US');
+    window.localStorage.clear();
   });
 
   it('renders the English UI when the browser language is not Japanese', () => {
