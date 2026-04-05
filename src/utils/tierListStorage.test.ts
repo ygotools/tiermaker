@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   createTierListShareUrl,
+  createTierListShareText,
   createDefaultTierListSnapshot,
   loadTierListSnapshot,
   saveTierListSnapshot,
@@ -87,5 +88,16 @@ describe('tierListStorage', () => {
     ]);
 
     expect(shareUrl).toBe('http://localhost:3000/?tier1=blue-eyes&tier2=ryzeal&tier4=malice');
+  });
+
+  it('creates share text from current tier assignments', () => {
+    const shareText = createTierListShareText([
+      { name: 'Tier1', decks: [{ id: 'killer-tune', name: 'キラーチューン', image: '/killer-tune.png' }, { id: 'yummy', name: 'ヤミー', image: '/yummy.png' }] },
+      { name: 'Tier2', decks: [{ id: 'ryzeal', name: 'ライゼオル', image: '/ryzeal.png' }] },
+      { name: 'Tier3', decks: [] },
+      { name: 'Tier4', decks: [{ id: 'malice', name: 'M∀LICE', image: '/malice.png' }] },
+    ]);
+
+    expect(shareText).toBe('Tier1 キラーチューン ヤミー\nTier2 ライゼオル\nTier3\nTier4 M∀LICE');
   });
 });
