@@ -228,6 +228,7 @@ const getStoredLocale = (): Locale | null => {
   return storedLocale && isLocale(storedLocale) ? storedLocale : null;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const detectLocale = (): Locale => {
   const storedLocale = getStoredLocale();
 
@@ -273,6 +274,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useI18n = () => {
   const context = useContext(I18nContext);
 
