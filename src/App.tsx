@@ -19,7 +19,7 @@ const AppContent: React.FC = () => {
 
       <section className="mx-auto mt-6 w-full max-w-[816px] rounded-lg border border-white/10 bg-white/5 p-4 text-sm text-white">
         <details className="group">
-          <summary className="inline-flex cursor-pointer items-center gap-2 font-semibold group-open:mb-2">
+          <summary className="m-0 flex w-fit cursor-pointer items-center gap-2 font-semibold leading-none group-open:mb-2">
             <History className="h-4 w-4" aria-hidden="true" />
             {i18n.t('app.updateHistoryTitle')}
           </summary>
