@@ -23,6 +23,7 @@ describe('App', () => {
 
     expect(screen.getByPlaceholderText('Filter by theme name')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Add Theme' })).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true');
     expect(document.documentElement.lang).toBe('en');
   });
 
@@ -40,6 +41,7 @@ describe('App', () => {
 
     expect(screen.getByPlaceholderText('テーマ名で絞り込む')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'テーマを追加' })).toHaveLength(2);
+    expect(screen.getByRole('button', { name: '日本語' })).toHaveAttribute('aria-pressed', 'true');
     expect(document.documentElement.lang).toBe('ja');
   });
 

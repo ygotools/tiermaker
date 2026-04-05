@@ -8,6 +8,28 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="container mx-auto w-full max-w-[880px] px-4 pb-8">
+      <div className="mx-auto flex w-full max-w-[816px] justify-end pt-4 md:pt-6">
+        <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1 text-xs text-white/80">
+          <span className="px-2 uppercase tracking-[0.2em]">Language</span>
+          <button
+            type="button"
+            onClick={() => i18n.setLanguage('ja')}
+            aria-pressed={i18n.language === 'ja'}
+            className={`rounded px-2 py-1 transition-colors ${i18n.language === 'ja' ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+          >
+            日本語
+          </button>
+          <button
+            type="button"
+            onClick={() => i18n.setLanguage('en')}
+            aria-pressed={i18n.language === 'en'}
+            className={`rounded px-2 py-1 transition-colors ${i18n.language === 'en' ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+          >
+            English
+          </button>
+        </div>
+      </div>
+
       <h1
         className="mb-8 flex items-center justify-center pt-4 text-center text-4xl font-bold md:pt-8 export-md:pt-8"
         style={{ fontFamily: 'Digital Numbers' }}
