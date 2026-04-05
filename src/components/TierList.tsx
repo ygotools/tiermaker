@@ -17,6 +17,7 @@ import {
   moveDeckToAvailableDecksState,
 } from '../utils/tierListState';
 import {
+  createXShareText,
   createDefaultTierListSnapshot,
   createTierListShareText,
   createTierListShareUrl,
@@ -52,11 +53,17 @@ const TierList: React.FC = () => {
   const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
   const useTouchBackend = isTouchPrimaryDevice();
   const shareUrl = createTierListShareUrl(tiers);
-  const shareText = `${i18n.t('tierList.shareIntro')}\n\n${createTierListShareText(
+  const shareTierText = createTierListShareText(
     tiers,
     (deck) => getDeckDisplayName(deck, i18n.language),
-  )}`;
-  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+  );
+  const shareText = createXShareText({
+    intro: i18n.t('tierList.shareIntro'),
+    hashtags: i18n.t('tierList.shareHashtags'),
+    tierText: shareTierText,
+    url: shareUrl,
+  });
+  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   useEffect(() => {
     saveTierListSnapshot(snapshot);
