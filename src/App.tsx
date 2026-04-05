@@ -39,29 +39,29 @@ const AppContent: React.FC = () => {
           <ExternalLink className="h-4 w-4" aria-hidden="true" />
           {i18n.t('app.requestThemeLink')}
         </a>
-
-        <div className="mt-4 flex justify-end">
-          <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1 text-xs text-white/80">
-            <span className="px-2 uppercase tracking-[0.2em]">Language</span>
-            <button
-              type="button"
-              onClick={() => i18n.setLanguage('ja')}
-              aria-pressed={i18n.language === 'ja'}
-              className={`rounded px-2 py-1 transition-colors ${i18n.language === 'ja' ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
-            >
-              日本語
-            </button>
-            <button
-              type="button"
-              onClick={() => i18n.setLanguage('en')}
-              aria-pressed={i18n.language === 'en'}
-              className={`rounded px-2 py-1 transition-colors ${i18n.language === 'en' ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
-            >
-              English
-            </button>
-          </div>
-        </div>
       </section>
+
+      <div className="mx-auto mt-4 flex w-full max-w-[816px] justify-end">
+        <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1 text-xs text-white/80">
+          <span className="px-2 uppercase tracking-[0.2em]">Language</span>
+          <button
+            type="button"
+            onClick={() => i18n.setLanguage('ja')}
+            aria-pressed={i18n.language === 'ja'}
+            className={`rounded px-2 py-1 transition-colors ${i18n.language === 'ja' ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+          >
+            日本語
+          </button>
+          <button
+            type="button"
+            onClick={() => i18n.setLanguage('en')}
+            aria-pressed={i18n.language === 'en'}
+            className={`rounded px-2 py-1 transition-colors ${i18n.language === 'en' ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+          >
+            English
+          </button>
+        </div>
+      </div>
 
       <div className="mx-auto mt-6 w-full max-w-[816px] text-center text-sm text-white/80">
         &copy; 2024&nbsp;
