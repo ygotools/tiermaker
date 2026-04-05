@@ -92,6 +92,35 @@ const isTierListSnapshot = (value: unknown): value is TierListSnapshot => {
 
 const cloneDeck = (deck: Deck): Deck => ({ ...deck });
 const cloneTier = (tier: Tier): Tier => ({ ...tier, decks: tier.decks.map(cloneDeck) });
+const createDeckDefaultsMap = (snapshot: TierListSnapshot) => new Map(
+  [...snapshot.tiers.flatMap((tier) => tier.decks), ...snapshot.availableDecks]
+    .map((deck) => [deck.id, deck]),
+);
+
+const mergeDeckWithDefault = (deck: Deck, deckDefaultsById: Map<string, Deck>): Deck => {
+  const defaultDeck = deckDefaultsById.get(deck.id);
+
+  if (!defaultDeck) {
+    return deck;
+  }
+
+  return {
+    ...deck,
+    nameEn: deck.nameEn ?? defaultDeck.nameEn,
+  };
+};
+
+const hydrateSnapshotDeckNames = (snapshot: TierListSnapshot, defaultSnapshot: TierListSnapshot): TierListSnapshot => {
+  const deckDefaultsById = createDeckDefaultsMap(defaultSnapshot);
+
+  return {
+    tiers: snapshot.tiers.map((tier) => ({
+      ...tier,
+      decks: tier.decks.map((deck) => mergeDeckWithDefault(deck, deckDefaultsById)),
+    })),
+    availableDecks: snapshot.availableDecks.map((deck) => mergeDeckWithDefault(deck, deckDefaultsById)),
+  };
+};
 
 export const createDefaultTierListSnapshot = (): TierListSnapshot => ({
   tiers: SAMPLE_DATA.map(cloneTier),
@@ -124,7 +153,7 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
       return defaultSnapshot;
     }
 
-    return parsed;
+    return hydrateSnapshotDeckNames(parsed, defaultSnapshot);
   } catch {
     return defaultSnapshot;
   }
