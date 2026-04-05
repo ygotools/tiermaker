@@ -29,16 +29,6 @@ const AppContent: React.FC = () => {
             ))}
           </ul>
         </details>
-
-        <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLScn8SCvjob9GXjtwctK6JDdIpdIg2pzX-pMDdNryTBQDsXfhw/viewform?usp=sf_link"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex items-center gap-2 text-sm underline"
-        >
-          <ExternalLink className="h-4 w-4" aria-hidden="true" />
-          {i18n.t('app.requestThemeLink')}
-        </a>
       </section>
 
       <div className="mx-auto mt-4 flex w-full max-w-[816px] justify-end">
@@ -61,6 +51,17 @@ const AppContent: React.FC = () => {
             English
           </button>
         </div>
+      </div>
+      <div className="mx-auto mt-2 flex w-full max-w-[816px] justify-end">
+        <a
+          href="https://docs.google.com/forms/d/e/1FAIpQLScn8SCvjob9GXjtwctK6JDdIpdIg2pzX-pMDdNryTBQDsXfhw/viewform?usp=sf_link"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 text-sm text-white/80 underline transition-colors hover:text-white"
+        >
+          <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          {i18n.t('app.requestThemeLink')}
+        </a>
       </div>
 
       <div className="mx-auto mt-6 w-full max-w-[816px] text-center text-sm text-white/80">
