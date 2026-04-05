@@ -7,7 +7,7 @@ describe('App', () => {
     render(<App />);
 
     expect(screen.getByPlaceholderText('テーマ名で絞り込む')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'テーマを追加' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'テーマを追加' })).toHaveLength(2);
   });
 
   it('renders grouped update history entries inside a details disclosure', () => {
