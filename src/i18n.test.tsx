@@ -29,6 +29,21 @@ const I18nProbe = () => {
 describe('i18n', () => {
   beforeEach(() => {
     setNavigatorLanguage('ja-JP');
+    window.localStorage.clear();
+  });
+
+
+  it('uses localStorage language when available', () => {
+    window.localStorage.setItem('tier-maker-language', 'en');
+
+    render(
+      <I18nProvider>
+        <I18nProbe />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByText('Update History')).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe('en');
   });
 
   it('switches the active language through setLanguage', async () => {
@@ -45,9 +60,11 @@ describe('i18n', () => {
     await user.click(screen.getByRole('button', { name: 'switch-en' }));
     expect(screen.getByText('Update History')).toBeInTheDocument();
     expect(document.documentElement.lang).toBe('en');
+    expect(window.localStorage.getItem('tier-maker-language')).toBe('en');
 
     await user.click(screen.getByRole('button', { name: 'switch-ja' }));
     expect(screen.getByText('更新履歴')).toBeInTheDocument();
     expect(document.documentElement.lang).toBe('ja');
+    expect(window.localStorage.getItem('tier-maker-language')).toBe('ja');
   });
 });
