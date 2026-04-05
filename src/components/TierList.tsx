@@ -18,6 +18,7 @@ import {
 } from '../utils/tierListState';
 import {
   createDefaultTierListSnapshot,
+  createTierListShareText,
   createTierListShareUrl,
   loadTierListSnapshot,
   saveTierListSnapshot,
@@ -48,7 +49,8 @@ const TierList: React.FC = () => {
   const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
   const useTouchBackend = isTouchPrimaryDevice();
   const shareUrl = createTierListShareUrl(tiers);
-  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent('Tier Maker で tier 表を作成しました')}&url=${encodeURIComponent(shareUrl)}`;
+  const shareText = `Tier Maker で tier 表を作成しました\n\n${createTierListShareText(tiers)}`;
+  const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
   useEffect(() => {
     saveTierListSnapshot(snapshot);
