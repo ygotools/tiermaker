@@ -184,7 +184,7 @@ const compactKanaForSearch = (value: string) => (
 
 const compactIdentifierForSearch = (value: string) => (
   normalizeSearchText(value)
-    .replace(/[\/\\]/g, ' ')
+    .replace(/[/\\]/g, ' ')
     .replace(/[-_\s]+/g, '')
 );
 
