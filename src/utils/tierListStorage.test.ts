@@ -60,7 +60,7 @@ describe('tierListStorage', () => {
   it('keeps stored snapshots even when deck count differs from master data', () => {
     const snapshot = {
       tiers: [
-        { name: 'Tier1', decks: [{ id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
+        { name: 'Tier1', decks: [{ id: 'custom-theme', name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
       ],
       availableDecks: [],
     };
@@ -68,6 +68,22 @@ describe('tierListStorage', () => {
     window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify(snapshot));
 
     expect(loadTierListSnapshot()).toEqual(snapshot);
+  });
+
+  it('hydrates missing English names for known decks from master data', () => {
+    const snapshot = {
+      tiers: [
+        { name: 'Tier1', decks: [{ id: 'blue-eyes', name: '青眼', image: '/blue-eyes.png' }] },
+      ],
+      availableDecks: [{ id: 'ryzeal', name: 'ライゼオル', image: '/ryzeal.png' }],
+    };
+
+    window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify(snapshot));
+
+    const restored = loadTierListSnapshot();
+
+    expect(restored.tiers[0].decks[0].nameEn).toBe('Blue-Eyes');
+    expect(restored.availableDecks[0].nameEn).toBe('Ryzeal');
   });
 
   it('falls back when the stored shape does not match the snapshot schema', () => {
