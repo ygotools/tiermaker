@@ -134,7 +134,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
   return (
     <section className="available-decks-container overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-[0_20px_45px_rgba(0,0,0,0.2)]">
       <div className="border-b border-gray-700 p-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="flex items-center justify-between gap-3 md:items-end">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <button
               type="button"
@@ -149,7 +149,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             </p>
           </div>
           <div
-            className="w-full md:grid md:max-w-sm md:items-center md:transition-[grid-template-columns] md:duration-200 md:ease-out"
+            className="min-w-0 flex-1 max-w-[14rem] md:grid md:max-w-sm md:items-center md:transition-[grid-template-columns] md:duration-200 md:ease-out"
             style={{
               gridTemplateColumns: shouldRevealSearchAction ? 'minmax(0, 1fr) 2.5rem' : 'minmax(0, 1fr) 0rem',
             }}
