@@ -214,7 +214,27 @@ const getLanguageCandidates = () => {
   return navigator.language ? [navigator.language] : [];
 };
 
+const LANGUAGE_STORAGE_KEY = 'tier-maker-language';
+
+const isLocale = (value: string): value is Locale => value === 'ja' || value === 'en';
+
+const getStoredLocale = (): Locale | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+
+  return storedLocale && isLocale(storedLocale) ? storedLocale : null;
+};
+
 export const detectLocale = (): Locale => {
+  const storedLocale = getStoredLocale();
+
+  if (storedLocale) {
+    return storedLocale;
+  }
+
   const [primaryLanguage] = getLanguageCandidates();
 
   return primaryLanguage?.toLowerCase().startsWith('ja') ? 'ja' : 'en';
@@ -239,6 +259,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     document.documentElement.lang = language;
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
   }, [language]);
 
   const t = <K extends TranslationKey>(key: K): PathValue<Messages, K> => (
