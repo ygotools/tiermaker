@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  createXShareText,
   createTierListShareUrl,
   createTierListShareText,
   createDefaultTierListSnapshot,
@@ -126,5 +127,35 @@ describe('tierListStorage', () => {
     ], (deck) => deck.nameEn ?? deck.name);
 
     expect(shareText).toBe('Tier1 Lunalight\nTier2 Rescue-ACE\nTier3\nTier4 Maliss');
+  });
+
+  it('creates share text for X with intro, hashtags, tiers, and url', () => {
+    const shareText = createXShareText({
+      intro: 'TierMakerでTier表を作成しました',
+      hashtags: '#遊戯王マスターデュエル #TIERMAKERFORMD',
+      tierText: 'Tier1 青眼\nTier2 ライゼオル\nTier3\nTier4 M∀LICE',
+      url: 'https://tier.ygotools.com/?tier1=blue-eyes',
+    });
+
+    expect(shareText).toBe(
+      'TierMakerでTier表を作成しました\n#遊戯王マスターデュエル #TIERMAKERFORMD\n\nTier1 青眼\nTier2 ライゼオル\nTier3\nTier4 M∀LICE\nhttps://tier.ygotools.com/?tier1=blue-eyes',
+    );
+  });
+
+  it('truncates tier text for X to fit the post length budget', () => {
+    const shareText = createXShareText({
+      intro: 'TierMakerでTier表を作成しました',
+      hashtags: '#遊戯王マスターデュエル #TIERMAKERFORMD',
+      tierText: 'A'.repeat(400),
+      url: 'https://tier.ygotools.com/?tier1=blue-eyes',
+    });
+
+    const [header, hashtags, spacer, tierText, url] = shareText.split('\n');
+
+    expect(header).toBe('TierMakerでTier表を作成しました');
+    expect(hashtags).toBe('#遊戯王マスターデュエル #TIERMAKERFORMD');
+    expect(spacer).toBe('');
+    expect(url).toBe('https://tier.ygotools.com/?tier1=blue-eyes');
+    expect(tierText).toHaveLength(203);
   });
 });

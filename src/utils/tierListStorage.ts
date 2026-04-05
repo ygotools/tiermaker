@@ -8,6 +8,8 @@ type TierListSnapshot = {
 
 const STORAGE_KEY = 'tiermaker:tier-list';
 const TIER_QUERY_KEYS = ['tier1', 'tier2', 'tier3', 'tier4'] as const;
+const X_POST_MAX_LENGTH = 280;
+const X_SHORT_URL_LENGTH = 23;
 
 const splitDeckIds = (value: string) => (
   value
@@ -203,3 +205,23 @@ export const createTierListShareText = (
     .map((tier) => [tier.name, ...tier.decks.map((deck) => getDeckName(deck))].join(' '))
     .join('\n')
 );
+
+export const createXShareText = ({
+  intro,
+  hashtags,
+  tierText,
+  url,
+}: {
+  intro: string;
+  hashtags: string;
+  tierText: string;
+  url: string;
+}) => {
+  const prefix = `${intro}\n${hashtags}\n\n`;
+  const suffix = `\n${url}`;
+  const maxTierTextLength = Math.max(0, X_POST_MAX_LENGTH - (prefix.length + suffix.length - url.length + X_SHORT_URL_LENGTH));
+  const normalizedTierText = tierText.trim();
+  const truncatedTierText = normalizedTierText.slice(0, maxTierTextLength);
+
+  return `${prefix}${truncatedTierText}${suffix}`;
+};
