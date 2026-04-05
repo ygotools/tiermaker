@@ -13,7 +13,10 @@ module.exports = {
     'react-compiler/react-compiler': 'error',
     'react-refresh/only-export-components': [
       'warn',
-      { allowConstantExport: true },
+      {
+        allowConstantExport: true,
+        allowExportNames: ['detectLocale', 'useI18n'],
+      },
     ],
   },
 }
