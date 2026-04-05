@@ -12,6 +12,8 @@ type AvailableDecksProps = {
 };
 
 const DEFAULT_THEME_IMAGE = '/static/deckimages/others_01.png';
+const DECK_CARD_WIDTH_REM = 10;
+const DECK_CARD_GAP_REM = 1;
 
 const createDeckId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -110,6 +112,9 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
     .filter(({ deck }) => normalizeDeckName(deck.name).includes(normalizedSearchTerm));
   const shouldRevealSearchAction = isSearchFocused || inputThemeName.length > 0;
   const canClearSearch = inputThemeName.length > 0;
+  const deckStripMinWidth = decks.length > 0
+    ? `max(100%, ${decks.length * DECK_CARD_WIDTH_REM + Math.max(decks.length - 1, 0) * DECK_CARD_GAP_REM}rem)`
+    : 'max(100%, 20rem)';
 
   return (
     <section className="available-decks-container overflow-hidden rounded-lg border border-gray-700 bg-gray-800 shadow-[0_20px_45px_rgba(0,0,0,0.2)]">
@@ -184,7 +189,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
       </div>
 
       <div className="overflow-x-scroll overflow-y-hidden p-4">
-        <div className="flex min-w-max gap-4">
+        <div className="flex min-h-[98px] gap-4" style={{ minWidth: deckStripMinWidth }}>
           {filteredDecks.map(({ deck, index }) => (
             <AvailableDeckItem
               key={deck.id}
@@ -196,7 +201,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
           ))}
 
           {decks.length !== 0 && filteredDecks.length === 0 && (
-            <div className="flex h-24 min-w-full items-center justify-center px-4 text-center text-sm text-gray-300">
+            <div className="flex min-w-full items-center justify-center self-stretch rounded-sm border border-transparent px-4 text-center text-sm text-gray-300">
               一致するテーマがありません。
             </div>
           )}
@@ -231,10 +236,11 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               </div>
               <button
                 type="button"
-                className="rounded-md border border-white/15 px-2 py-1 text-sm text-white/70 transition-colors hover:border-white/30 hover:text-white"
+                aria-label="閉じる"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/15 text-white/70 transition-colors hover:border-white/30 hover:text-white"
                 onClick={handleCloseModal}
               >
-                閉じる
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
 
