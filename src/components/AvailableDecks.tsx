@@ -4,6 +4,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Deck } from '../types';
 import { matchesDeckSearch } from '../utils/deckSearch';
+import { useI18n } from '../i18n';
 
 type AvailableDecksProps = {
   decks: Deck[];
@@ -28,6 +29,7 @@ const createDeckId = () => {
 const normalizeDeckName = (name: string) => name.trim().toLocaleLowerCase();
 
 const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAvailableDeck, moveDeckToAvailableDecks, addDeck }) => {
+  const i18n = useI18n();
   const [inputThemeName, setInputThemeName] = React.useState('');
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
@@ -75,12 +77,12 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
 
     const normalizedName = newDeckName.trim();
     if (!normalizedName) {
-      setFormError('テーマ名を入力してください。');
+      setFormError(i18n.t('availableDecks.requiredThemeNameError'));
       return;
     }
 
     if (allDecks.some((deck) => normalizeDeckName(deck.name) === normalizeDeckName(normalizedName))) {
-      setFormError('同じ名前のテーマはすでに存在します。');
+      setFormError(i18n.t('availableDecks.duplicateThemeError'));
       return;
     }
 
@@ -90,7 +92,14 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
       image: newDeckIcon || DEFAULT_THEME_IMAGE,
     });
     handleCloseModal();
-  }, [addDeck, allDecks, handleCloseModal, newDeckIcon, newDeckName]);
+  }, [
+    addDeck,
+    allDecks,
+    handleCloseModal,
+    i18n,
+    newDeckIcon,
+    newDeckName,
+  ]);
 
   const handleIconFileInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -129,10 +138,10 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               onClick={handleOpenModal}
             >
               <PlusCircle className="h-4 w-4" aria-hidden="true" />
-              テーマを追加
+              {i18n.t('availableDecks.addTheme')}
             </button>
             <p className="text-sm text-gray-300">
-              {filteredDecks.length === decks.length ? `${decks.length}件の候補` : `${filteredDecks.length} / ${decks.length}件を表示`}
+              {i18n.t('availableDecks.countLabel')(filteredDecks.length, decks.length)}
             </p>
           </div>
           <div
@@ -150,11 +159,11 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
                 className="w-full rounded-md border border-transparent p-2 pl-10 pr-10 text-black"
-                placeholder="テーマ名で絞り込む"
+                placeholder={i18n.t('availableDecks.searchPlaceholder')}
               />
               <button
                 type="button"
-                aria-label="検索条件をクリア"
+                aria-label={i18n.t('availableDecks.clearSearchAriaLabel')}
                 disabled={!canClearSearch}
                 className={`absolute right-2 top-1/2 rounded-full p-1 transition-all duration-150 ease-out md:hidden ${
                   shouldRevealSearchAction
@@ -175,7 +184,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             >
               <button
                 type="button"
-                aria-label="検索条件をクリア"
+                aria-label={i18n.t('availableDecks.clearSearchAriaLabel')}
                 disabled={!canClearSearch}
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${
                   canClearSearch ? 'text-gray-300 hover:bg-white/10 hover:text-white' : 'pointer-events-none text-gray-600'
@@ -196,7 +205,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             type="button"
             className="inline-flex h-24 min-w-24 items-center justify-center self-stretch rounded-sm border border-dashed border-blue-400 text-blue-200 transition-colors hover:border-blue-300 hover:bg-blue-400/10 hover:text-white md:hidden"
             onClick={handleOpenModal}
-            aria-label="テーマを追加"
+            aria-label={i18n.t('availableDecks.addTheme')}
           >
             <PlusCircle className="h-6 w-6" aria-hidden="true" />
           </button>
@@ -212,13 +221,13 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
 
           {decks.length !== 0 && filteredDecks.length === 0 && (
             <div className="flex min-w-full items-center justify-center self-stretch rounded-sm border border-transparent px-4 text-center text-sm text-gray-300">
-              一致するテーマがありません。
+              {i18n.t('availableDecks.noMatchingThemes')}
             </div>
           )}
 
           {decks.length === 0 && (
             <div className="flex h-24 min-w-[320px] items-center justify-center rounded-sm border border-dashed border-gray-500 px-4 text-sm text-gray-300">
-              テーマを追加するか、ドラッグしてここに戻してください。
+              {i18n.t('availableDecks.emptyState')}
             </div>
           )}
         </div>
@@ -241,12 +250,12 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
-                <h2 id="create-theme-title" className="text-lg font-bold">テーマを追加</h2>
-                <p className="mt-1 text-sm text-gray-300">画像 URL か画像ファイルを指定して候補に追加できます。</p>
+                <h2 id="create-theme-title" className="text-lg font-bold">{i18n.t('availableDecks.createThemeTitle')}</h2>
+                <p className="mt-1 text-sm text-gray-300">{i18n.t('availableDecks.createThemeDescription')}</p>
               </div>
               <button
                 type="button"
-                aria-label="閉じる"
+                aria-label={i18n.t('availableDecks.closeModalAriaLabel')}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/15 text-white/70 transition-colors hover:border-white/30 hover:text-white"
                 onClick={handleCloseModal}
               >
@@ -257,26 +266,26 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             <div className="mb-4 flex items-center gap-4 rounded-md border border-white/10 bg-white/5 p-3">
               <img
                 src={newDeckIcon || DEFAULT_THEME_IMAGE}
-                alt="新しいテーマのプレビュー"
+                alt={i18n.t('availableDecks.previewAlt')}
                 className="h-16 w-28 rounded-sm object-cover"
               />
               <p className="text-sm text-gray-300">
-                追加前にプレビューを確認できます。画像未指定の場合はデフォルト画像を使います。
+                {i18n.t('availableDecks.previewDescription')}
               </p>
             </div>
 
             <form onSubmit={handleCreateTheme}>
-              <label className="mb-2 block text-sm">テーマ名</label>
+              <label className="mb-2 block text-sm">{i18n.t('availableDecks.themeNameLabel')}</label>
               <input
                 type="text"
                 value={newDeckName}
                 onChange={(event) => setNewDeckName(event.target.value)}
                 className="mb-3 w-full rounded-md p-2 text-black"
-                placeholder="例: 新テーマ"
+                placeholder={i18n.t('availableDecks.themeNamePlaceholder')}
                 autoFocus
               />
 
-              <label className="mb-2 block text-sm">アイコン画像 URL</label>
+              <label className="mb-2 block text-sm">{i18n.t('availableDecks.iconUrlLabel')}</label>
               <input
                 type="url"
                 value={newDeckIcon}
@@ -285,7 +294,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
                 placeholder="https://..."
               />
 
-              <label className="mb-2 block text-sm">またはローカル画像を選択</label>
+              <label className="mb-2 block text-sm">{i18n.t('availableDecks.localImageLabel')}</label>
               <input
                 type="file"
                 accept="image/*"
@@ -303,13 +312,13 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
                   onClick={handleCloseModal}
                   className="rounded-md border border-gray-500 px-3 py-2 text-sm"
                 >
-                  キャンセル
+                  {i18n.t('availableDecks.cancelButton')}
                 </button>
                 <button
                   type="submit"
                   className="rounded-md border border-blue-400 px-3 py-2 text-sm text-blue-200 transition-colors hover:bg-blue-400/10"
                 >
-                  追加
+                  {i18n.t('availableDecks.addButton')}
                 </button>
               </div>
             </form>

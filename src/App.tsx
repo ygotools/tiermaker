@@ -1,25 +1,11 @@
 import React from 'react';
 import { ExternalLink, History } from 'lucide-react';
 import TierList from './components/TierList';
+import { I18nProvider, useI18n } from './i18n';
 
-const UPDATE_HISTORY_ITEMS = [
-  '2026/04: 【ドレミヤミー】【キラーチューン】を追加しました。',
-  '2026/02: 【VSK9】を追加しました。',
-  '2025/12: 【オノマトライゼオル】【ドラゴンテイル】【巳剣】【ヤミー】【月光】【閃刀姫】【ジェムナイト】【オルフェゴール】【ライゼオル】【巳剣ライゼオル】を追加しました。',
-  '2025/07: 【千年M∀LICE】【氷結界】【エルドリッチ】【M∀LICE】【クリストロン】を追加しました。',
-  '2025/05: 【P.U.N.K.】【海皇】を追加しました。',
-  '2025/04: 【青眼】【破械】【メメント】を追加し、【メタビート】を再追加しました。',
-  '2025/02: 【スネークアイ】【千年】を追加しました。',
-  '2025/01: 【ドライトロン】【ギミック・パペット】【白き森】を追加しました。',
-  '2024/11: 【竜剣士】【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。',
-  '2024/10: 【霊獣】【ライトロード】【天盃龍】【インフェルノイド】を追加しました。',
-  '2024/09: 【古代の機械】【ヴァリアンツ】を追加しました。',
-  '2024/08: 【神碑】【粛声】を追加しました。',
-  '2024/07: 【センチュリオン】【ユベル】【エンディミオン】を追加しました。',
-  '2024/06: v0.1.0 を公開しました。',
-] as const;
+const AppContent: React.FC = () => {
+  const i18n = useI18n();
 
-const App: React.FC = () => {
   return (
     <div className="container mx-auto w-full max-w-[880px] px-4 pb-8">
       <h1
@@ -35,10 +21,10 @@ const App: React.FC = () => {
         <details>
           <summary className="mb-2 inline-flex cursor-pointer items-center gap-2 font-semibold">
             <History className="h-4 w-4" aria-hidden="true" />
-            更新履歴
+            {i18n.t('app.updateHistoryTitle')}
           </summary>
           <ul className="space-y-1 text-white/75">
-            {UPDATE_HISTORY_ITEMS.map((item) => (
+            {i18n.t('app.updateHistoryItems').map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
@@ -51,7 +37,7 @@ const App: React.FC = () => {
           className="mt-4 inline-flex items-center gap-2 text-sm underline"
         >
           <ExternalLink className="h-4 w-4" aria-hidden="true" />
-          テーマ追加希望はこちら
+          {i18n.t('app.requestThemeLink')}
         </a>
       </section>
 
@@ -64,5 +50,11 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <I18nProvider>
+    <AppContent />
+  </I18nProvider>
+);
 
 export default App;

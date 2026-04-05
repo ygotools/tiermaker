@@ -23,6 +23,7 @@ import {
   loadTierListSnapshot,
   saveTierListSnapshot,
 } from '../utils/tierListStorage';
+import { useI18n } from '../i18n';
 
 type FeedbackMessage = {
   type: 'success' | 'error';
@@ -42,6 +43,7 @@ const isTouchPrimaryDevice = () => {
 };
 
 const TierList: React.FC = () => {
+  const i18n = useI18n();
   const [snapshot, setSnapshot] = useState(() => loadTierListSnapshot());
   const [isExporting, setIsExporting] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage | null>(null);
@@ -49,7 +51,7 @@ const TierList: React.FC = () => {
   const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
   const useTouchBackend = isTouchPrimaryDevice();
   const shareUrl = createTierListShareUrl(tiers);
-  const shareText = `Tier Maker で tier 表を作成しました\n\n${createTierListShareText(tiers)}`;
+  const shareText = `${i18n.t('tierList.shareIntro')}\n\n${createTierListShareText(tiers)}`;
   const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
   useEffect(() => {
@@ -105,30 +107,30 @@ const TierList: React.FC = () => {
       await exportAsImage({ tiers });
       setFeedbackMessage({
         type: 'success',
-        text: '画像を出力しました。ダウンロードされた PNG を確認してください。',
+        text: i18n.t('tierList.exportSuccess'),
       });
     } catch (error) {
       console.error('Failed to export the tier list image.', error);
       setFeedbackMessage({
         type: 'error',
-        text: '画像の出力に失敗しました。時間をおいて再度お試しください。',
+        text: i18n.t('tierList.exportError'),
       });
     } finally {
       setIsExporting(false);
     }
-  }, [isExporting, tiers]);
+  }, [i18n, isExporting, tiers]);
 
   const handleReset = useCallback(() => {
-    if (typeof window !== 'undefined' && !window.confirm('現在の並び替えを破棄して初期状態に戻します。よろしいですか？')) {
+    if (typeof window !== 'undefined' && !window.confirm(i18n.t('tierList.resetConfirmation'))) {
       return;
     }
 
     setSnapshot(createDefaultTierListSnapshot());
     setFeedbackMessage({
       type: 'success',
-      text: '初期状態に戻しました。',
+      text: i18n.t('tierList.resetSuccess'),
     });
-  }, []);
+  }, [i18n]);
 
   return (
     <DndProvider
@@ -162,7 +164,7 @@ const TierList: React.FC = () => {
               }));
               setFeedbackMessage({
                 type: 'success',
-                text: `「${deck.name}」を追加しました。`,
+                text: i18n.t('tierList.addedTheme')(deck.name),
               });
             }}
           />
@@ -193,7 +195,7 @@ const TierList: React.FC = () => {
               className={`download-button flex h-16 flex-1 items-center justify-center border-2 border-blue-500 bg-transparent px-6 text-lg font-bold text-blue-400 transition-all hover:bg-blue-500/15 ${isExporting ? 'cursor-wait opacity-60' : ''}`}
             >
               <DownloadIcon className="h-6 w-6" />
-              <span className="ml-2 inline-block">{isExporting ? 'エクスポート中...' : '画像としてエクスポート'}</span>
+              <span className="ml-2 inline-block">{isExporting ? i18n.t('tierList.exportInProgress') : i18n.t('tierList.exportButton')}</span>
             </button>
             <a
               href={xShareUrl}
@@ -202,7 +204,7 @@ const TierList: React.FC = () => {
               className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
             >
               <Share2 className="h-4 w-4" aria-hidden="true" />
-              Xでシェア
+              {i18n.t('tierList.shareOnX')}
             </a>
             <button
               type="button"
@@ -210,7 +212,7 @@ const TierList: React.FC = () => {
               className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              初期状態に戻す
+              {i18n.t('tierList.resetButton')}
             </button>
           </div>
         </div>
