@@ -66,7 +66,7 @@ const TierItem: React.FC<TierItemProps> = ({ deck, index, tierIndex, moveDeck, m
   drag(drop(ref));
 
   return (
-    <div ref={ref} title={deckDisplayName} className={`tier-item relative m-2 cursor-grab overflow-hidden rounded-sm border border-gray-700 ${isDraggingItem ? 'border-blue-500 opacity-50' : ''}`}>
+    <div ref={ref} title={deckDisplayName} className={`tier-item relative cursor-grab overflow-hidden rounded-sm border border-gray-700 ${isDraggingItem ? 'border-blue-500 opacity-50' : ''}`}>
       <img src={deck.image} alt={deckDisplayName} className="h-[90px] w-[160px] object-cover" />
       <span className='block text-center w-full absolute left-0 bottom-0 p-1 text-sm font-bold text-white bg-[#000000cc]'>{deckDisplayName}</span>
     </div>
