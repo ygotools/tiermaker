@@ -24,6 +24,7 @@ import {
   saveTierListSnapshot,
 } from '../utils/tierListStorage';
 import { useI18n } from '../i18n';
+import { getDeckDisplayName } from '../utils/deckName';
 
 type FeedbackMessage = {
   type: 'success' | 'error';
@@ -51,7 +52,10 @@ const TierList: React.FC = () => {
   const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
   const useTouchBackend = isTouchPrimaryDevice();
   const shareUrl = createTierListShareUrl(tiers);
-  const shareText = `${i18n.t('tierList.shareIntro')}\n\n${createTierListShareText(tiers)}`;
+  const shareText = `${i18n.t('tierList.shareIntro')}\n\n${createTierListShareText(
+    tiers,
+    (deck) => getDeckDisplayName(deck, i18n.language),
+  )}`;
   const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
   useEffect(() => {
@@ -104,7 +108,7 @@ const TierList: React.FC = () => {
     setIsExporting(true);
 
     try {
-      await exportAsImage({ tiers });
+      await exportAsImage({ tiers, getDeckName: (deck) => getDeckDisplayName(deck, i18n.language) });
       setFeedbackMessage({
         type: 'success',
         text: i18n.t('tierList.exportSuccess'),
@@ -164,7 +168,7 @@ const TierList: React.FC = () => {
               }));
               setFeedbackMessage({
                 type: 'success',
-                text: i18n.t('tierList.addedTheme')(deck.name),
+                text: i18n.t('tierList.addedTheme')(getDeckDisplayName(deck, i18n.language)),
               });
             }}
           />

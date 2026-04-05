@@ -5,6 +5,7 @@ import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Deck } from '../types';
 import { matchesDeckSearch } from '../utils/deckSearch';
 import { useI18n } from '../i18n';
+import { getDeckDisplayName } from '../utils/deckName';
 
 type AvailableDecksProps = {
   decks: Deck[];
@@ -81,7 +82,10 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
       return;
     }
 
-    if (allDecks.some((deck) => normalizeDeckName(deck.name) === normalizeDeckName(normalizedName))) {
+    if (allDecks.some((deck) => (
+      normalizeDeckName(deck.name) === normalizeDeckName(normalizedName) ||
+      normalizeDeckName(deck.nameEn ?? '') === normalizeDeckName(normalizedName)
+    ))) {
       setFormError(i18n.t('availableDecks.duplicateThemeError'));
       return;
     }
@@ -335,7 +339,9 @@ const AvailableDeckItem: React.FC<{
   moveAvailableDeck: (dragIndex: number, hoverIndex: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
 }> = ({ deck, index, moveAvailableDeck, moveDeckToAvailableDecks }) => {
+  const i18n = useI18n();
   const ref = React.useRef<HTMLDivElement>(null);
+  const deckDisplayName = getDeckDisplayName(deck, i18n.language);
 
   const [, drop] = useDrop({
     accept: 'deck',
@@ -373,11 +379,11 @@ const AvailableDeckItem: React.FC<{
   return (
     <div
       ref={ref}
-      title={deck.name}
+      title={deckDisplayName}
       className={`relative inline-block cursor-grab overflow-hidden rounded-sm border border-gray-700 ${isDragging ? 'opacity-50' : ''}`}
     >
-      <img src={deck.image} alt={deck.name} className="h-24 w-40 min-w-40 max-w-40 object-cover" />
-      <span className="absolute bottom-0 left-0 block w-full bg-[#000000cc] p-1 text-center text-sm font-bold text-white">{deck.name}</span>
+      <img src={deck.image} alt={deckDisplayName} className="h-24 w-40 min-w-40 max-w-40 object-cover" />
+      <span className="absolute bottom-0 left-0 block w-full bg-[#000000cc] p-1 text-center text-sm font-bold text-white">{deckDisplayName}</span>
     </div>
   );
 };

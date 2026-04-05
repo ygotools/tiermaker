@@ -1,5 +1,67 @@
 import { Deck, Tier } from './types';
 
+const ENGLISH_DECK_NAMES: Record<string, string> = {
+  'killer-tune': 'Kewl Tune',
+  'doremi-yummy': 'Solfachord Yummy',
+  vsk9: 'VSK9',
+  dracotail: 'Dracotail',
+  malice: 'Maliss',
+  gemknight: 'Gem-Knight',
+  'mitsurugi-ryzeal': 'Mitsurugi Ryzeal',
+  skystriker: 'Sky Striker',
+  moonlight: 'Lunalight',
+  tearlaments: 'Tearlaments',
+  'onomato-ryzeal': 'Onomat Ryzeal',
+  mitsurugi: 'Mitsurugi',
+  yummy: 'Yummy',
+  orcust: 'Orcust',
+  metabeat: 'Meta Beat',
+  ryzeal: 'Ryzeal',
+  'tenpai-dragon': 'Tenpai Dragon',
+  voiceless_voice: 'Voiceless Voice',
+  'blue-eyes': 'Blue-Eyes',
+  atlantean: 'Atlantean',
+  'snake-eye': 'Snake-Eye',
+  mementotlan: 'Memento',
+  'white-forest': 'White Forest',
+  crystron: 'Crystron',
+  labrynth: 'Labrynth',
+  punk: 'P.U.N.K.',
+  'centur-ion': 'Centur-Ion',
+  unchained: 'Unchained',
+  'ritual-beast': 'Ritual Beast',
+  yubel: 'Yubel',
+  branded: 'Branded',
+  drytron: 'Drytron',
+  'ice-barrier': 'Ice Barrier',
+  eldlich: 'Eldlich',
+  dracoslayer: 'Dracoslayer',
+  '60gs': '60GS',
+  'fireking-snake-eye': 'Fire King Snake-Eye',
+  'r-ace': 'Rescue-ACE',
+  'gimmick-puppet': 'Gimmick Puppet',
+  mannadium: 'Mannadium',
+  chimera: 'Chimera',
+  'supreme-melodious': 'Supreme King Melodious',
+  lightsworn: 'Lightsworn',
+  spright: 'Spright',
+  runick: 'Runick',
+  superheavy_samurai: 'Superheavy Samurai',
+  exosister: 'Exosister',
+  ignister: '@Ignister',
+  salamangreat: 'Salamangreat',
+  mathmech: 'Mathmech',
+  purrely: 'Purrely',
+  kashtira: 'Kashtira',
+  others_01: 'Other 1',
+  others_02: 'Other 2',
+};
+
+const withEnglishName = (deck: Deck): Deck => ({
+  ...deck,
+  nameEn: ENGLISH_DECK_NAMES[deck.id] ?? deck.name,
+});
+
 export const SAMPLE_DATA: Tier[] = [
   {
     name: 'Tier1',
@@ -31,7 +93,10 @@ export const SAMPLE_DATA: Tier[] = [
       { id: 'tearlaments', name: 'ティアラメンツ', kana: 'てぃあらめんつ', image: '/static/deckimages/tearlaments.png' },
     ],
   },
-];
+].map((tier) => ({
+  ...tier,
+  decks: tier.decks.map(withEnglishName),
+}));
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { id: 'onomato-ryzeal', name: 'オノマトライゼオル', kana: 'おのまとらいぜおる', image: '/static/deckimages/onomato-ryzeal.png' },
@@ -78,4 +143,4 @@ export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { id: 'kashtira', name: 'クシャトリラ', kana: 'くしゃとりら', image: '/static/deckimages/kashtira.png' },
   { id: 'others_01', name: 'その他1', kana: 'そのたいち', image: '/static/deckimages/others_01.png' },
   { id: 'others_02', name: 'その他2', kana: 'そのたに', image: '/static/deckimages/others_02.png' },
-];
+].map(withEnglishName);

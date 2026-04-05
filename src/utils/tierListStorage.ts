@@ -166,8 +166,11 @@ export const createTierListShareUrl = (tiers: Tier[]) => {
   return shareUrl.toString();
 };
 
-export const createTierListShareText = (tiers: Tier[]) => (
+export const createTierListShareText = (
+  tiers: Tier[],
+  getDeckName: (deck: Deck) => string = (deck) => deck.name,
+) => (
   tiers
-    .map((tier) => [tier.name, ...tier.decks.map((deck) => deck.name)].join(' '))
+    .map((tier) => [tier.name, ...tier.decks.map((deck) => getDeckName(deck))].join(' '))
     .join('\n')
 );
