@@ -26,6 +26,7 @@ describe('App', () => {
     expect(screen.getAllByRole('button', { name: 'Add Theme' })).toHaveLength(2);
     expect(screen.getByText('Lunalight')).toBeInTheDocument();
     expect(screen.getByText('Maliss')).toBeInTheDocument();
+    expect(screen.getByText('2024/08: Added 【Runick】 and 【Voiceless Voice】.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true');
     expect(document.documentElement.lang).toBe('en');
   });
