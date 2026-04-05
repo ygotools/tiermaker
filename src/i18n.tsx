@@ -69,7 +69,7 @@ const translations = {
       requestThemeLink: 'テーマ追加希望はこちら',
     },
     tierList: {
-      shareIntro: 'Tier Maker で tier 表を作成しました',
+      shareIntro: 'Tier Maker で tier 表を作成しました #遊戯王マスターデュエル',
       exportSuccess: '画像を出力しました。ダウンロードされた PNG を確認してください。',
       exportError: '画像の出力に失敗しました。時間をおいて再度お試しください。',
       resetConfirmation: '現在の並び替えを破棄して初期状態に戻します。よろしいですか？',
