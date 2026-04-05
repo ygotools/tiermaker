@@ -34,11 +34,16 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
   });
 
   return (
-    <div className="flex export-md:flex-row md:flex-row flex-col tier w-full " data-tier-index={tierIndex} ref={tierDrop as unknown as React.Ref<HTMLDivElement>} style={{ minHeight: '100px' }}>
-      <div className={`tier-label ${tierColors[tierIndex]} m-2 flex h-8 w-[calc(100%-16px)] items-center justify-center rounded-sm font-bold text-white md:h-12 md:w-24 export-md:w-24 export-md:h-12`}>
+    <div
+      className="tier mb-2 flex w-full flex-col md:flex-row export-md:flex-row"
+      data-tier-index={tierIndex}
+      ref={tierDrop as unknown as React.Ref<HTMLDivElement>}
+      style={{ minHeight: '100px' }}
+    >
+      <div className={`tier-label ${tierColors[tierIndex]} m-2 flex h-8 w-[calc(100%-16px)] items-center justify-center rounded-sm font-bold text-white md:h-12 md:w-24 md:shrink-0 export-md:h-12 export-md:w-24`}>
         {tier.name}
       </div>
-      <div className="flex flex-wrap w-full">
+      <div className="flex w-full flex-wrap content-start gap-2 px-2 pb-2 md:py-2 md:pr-2">
         {tier.decks.map((deck, index) => (
           <TierItem
             key={deck.id}
@@ -51,8 +56,8 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
           />
         ))}
         {tier.decks.length === 0 && (
-          <div className='p-2 w-full'>
-            <div className="empty-placeholder w-full h-[calc(6rem-4px)] flex items-center justify-center text-gray-500 border border-dashed border-gray-300">
+          <div className="w-full">
+            <div className="empty-placeholder flex h-[calc(6rem-4px)] w-full items-center justify-center border border-dashed border-gray-300 text-gray-500">
               {i18n.t('tier.emptyPlaceholder')}
             </div>
           </div>
