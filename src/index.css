@@ -44,6 +44,10 @@ html, body {
   max-width: 816px;
 }
 
+.available-decks-container {
+  margin: 0 auto;
+}
+
 /* export-md クラス */
 .export .md\\:flex-row {
   @apply flex-row;

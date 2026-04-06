@@ -40,10 +40,10 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
       ref={tierDrop as unknown as React.Ref<HTMLDivElement>}
       style={{ minHeight: '100px' }}
     >
-      <div className={`tier-label ${tierColors[tierIndex]} m-2 flex h-8 w-[calc(100%-16px)] items-center justify-center rounded-sm font-bold text-white md:h-12 md:w-24 md:shrink-0 export-md:h-12 export-md:w-24`}>
+      <div className={`tier-label ${tierColors[tierIndex]} my-2 flex h-8 w-full items-center justify-center rounded-sm font-bold text-white md:m-2 md:h-12 md:w-24 md:shrink-0 export-md:h-12 export-md:w-24`}>
         {tier.name}
       </div>
-      <div className="flex w-full flex-wrap content-start gap-2 px-2 pb-2 md:py-2 md:pr-2">
+      <div className="flex w-full flex-wrap content-start gap-2 pb-2 md:px-2 md:py-2">
         {tier.decks.map((deck, index) => (
           <TierItem
             key={deck.id}

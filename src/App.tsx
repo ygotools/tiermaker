@@ -9,7 +9,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="container mx-auto w-full max-w-[880px] px-4 pb-8">
       <h1
-        className="mb-8 flex items-center justify-start pt-4 text-left text-4xl font-bold md:justify-center md:pt-8 md:text-center export-md:pt-8"
+        className="mb-2 flex items-center justify-start pt-4 text-left text-4xl font-bold md:mb-8 md:justify-center md:pt-8 md:text-center export-md:pt-8"
         style={{ fontFamily: 'Digital Numbers' }}
       >
         <img src="/static/logo.png" alt="Tier Maker" className="h-auto w-[112px] md:w-[225px]" />
