@@ -214,13 +214,18 @@ export const createXShareText = ({
 }: {
   intro: string;
   hashtags: string;
-  tierText: string;
+  tierText?: string;
   url: string;
 }) => {
-  const prefix = `${intro}\n${hashtags}\n\n`;
+  const normalizedTierText = tierText?.trim() ?? '';
   const suffix = `\n${url}`;
+
+  if (normalizedTierText.length === 0) {
+    return `${intro}\n${hashtags}${suffix}`;
+  }
+
+  const prefix = `${intro}\n${hashtags}\n\n`;
   const maxTierTextLength = Math.max(0, X_POST_MAX_LENGTH - (prefix.length + suffix.length - url.length + X_SHORT_URL_LENGTH));
-  const normalizedTierText = tierText.trim();
   const truncatedTierText = normalizedTierText.slice(0, maxTierTextLength);
 
   return `${prefix}${truncatedTierText}${suffix}`;

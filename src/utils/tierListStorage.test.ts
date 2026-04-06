@@ -142,6 +142,18 @@ describe('tierListStorage', () => {
     );
   });
 
+  it('creates share text for X without tier details when tier text is omitted', () => {
+    const shareText = createXShareText({
+      intro: 'TierMaker縺ｧTier陦ｨ繧剃ｽ懈・縺励∪縺励◆',
+      hashtags: '#驕頑葦邇九・繧ｹ繧ｿ繝ｼ繝・Η繧ｨ繝ｫ #TIERMAKERFORMD',
+      url: 'https://tier.ygotools.com/?tier1=blue-eyes',
+    });
+
+    expect(shareText).toBe(
+      'TierMaker縺ｧTier陦ｨ繧剃ｽ懈・縺励∪縺励◆\n#驕頑葦邇九・繧ｹ繧ｿ繝ｼ繝・Η繧ｨ繝ｫ #TIERMAKERFORMD\nhttps://tier.ygotools.com/?tier1=blue-eyes',
+    );
+  });
+
   it('truncates tier text for X to fit the post length budget', () => {
     const shareText = createXShareText({
       intro: 'TierMakerでTier表を作成しました',
