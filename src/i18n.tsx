@@ -132,7 +132,7 @@ const translations = {
     },
     tierList: {
       shareIntro: 'I made a tier list with Tier Maker',
-      shareHashtags: '#YuGiOhMasterDuel #TIERMAKERFORMD',
+      shareHashtags: '#MasterDuel #YuGiOhMasterDuel #TIERMAKERFORMD',
       exportSuccess: 'Image exported. Please check the downloaded PNG.',
       exportError: 'Failed to export the image. Please try again in a moment.',
       resetConfirmation: 'Discard the current order and restore the initial state?',
