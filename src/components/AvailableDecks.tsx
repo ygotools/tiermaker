@@ -260,7 +260,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               <button
                 type="button"
                 aria-label={i18n.t('availableDecks.closeModalAriaLabel')}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/15 text-white/70 transition-colors hover:border-white/30 hover:text-white"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-white/70 transition-colors hover:bg-white/5 hover:text-white"
                 onClick={handleCloseModal}
               >
                 <X className="h-4 w-4" aria-hidden="true" />
