@@ -11,6 +11,7 @@ const ENGLISH_DECK_NAMES: Record<string, string> = {
   skystriker: 'Sky Striker',
   moonlight: 'Lunalight',
   tearlaments: 'Tearlaments',
+  odion: 'Odion',
   'onomato-ryzeal': 'Onomat Ryzeal',
   mitsurugi: 'Mitsurugi',
   yummy: 'Yummy',
@@ -91,6 +92,7 @@ export const SAMPLE_DATA: Tier[] = [
     name: 'Tier4',
     decks: [
       { id: 'tearlaments', name: 'ティアラメンツ', kana: 'てぃあらめんつ', image: '/static/deckimages/tearlaments.png' },
+      { id: 'odion', name: 'リシド', kana: 'りしど', image: '/static/deckimages/odion.png' },
     ],
   },
 ].map((tier) => ({
