@@ -131,10 +131,6 @@ const TierList: React.FC = () => {
     }
 
     setSnapshot(createDefaultTierListSnapshot());
-    setFeedbackMessage({
-      type: 'success',
-      text: i18n.t('tierList.resetSuccess'),
-    });
   }, [i18n]);
 
   return (

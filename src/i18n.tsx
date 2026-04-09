@@ -14,7 +14,6 @@ type Translation = {
     exportSuccess: string;
     exportError: string;
     resetConfirmation: string;
-    resetSuccess: string;
     addedTheme: (themeName: string) => string;
     exportInProgress: string;
     exportButton: string;
@@ -75,7 +74,6 @@ const translations = {
       exportSuccess: '画像を出力しました。ダウンロードされた PNG を確認してください。',
       exportError: '画像の出力に失敗しました。時間をおいて再度お試しください。',
       resetConfirmation: '現在の並び替えを破棄して初期状態に戻します。よろしいですか？',
-      resetSuccess: '初期状態に戻しました。',
       addedTheme: (themeName) => `「${themeName}」を追加しました。`,
       exportInProgress: 'エクスポート中...',
       exportButton: '画像としてエクスポート',
@@ -136,7 +134,6 @@ const translations = {
       exportSuccess: 'Image exported. Please check the downloaded PNG.',
       exportError: 'Failed to export the image. Please try again in a moment.',
       resetConfirmation: 'Discard the current order and restore the initial state?',
-      resetSuccess: 'Restored the initial state.',
       addedTheme: (themeName) => `Added "${themeName}".`,
       exportInProgress: 'Exporting...',
       exportButton: 'Export as Image',
