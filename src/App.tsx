@@ -33,7 +33,6 @@ const AppContent: React.FC = () => {
 
       <div className="mx-auto mt-4 flex w-full max-w-[816px] justify-end">
         <div className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1 text-xs text-white/80">
-          <span className="px-2 uppercase tracking-[0.2em]">Language</span>
           <button
             type="button"
             onClick={() => i18n.setLanguage('ja')}
