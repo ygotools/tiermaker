@@ -223,7 +223,15 @@ export const convertRomajiToHiragana = (value: string) => {
         continue;
       }
 
-      if (!/[aiueoyn]/.test(next)) {
+      if (next === 'n') {
+        const afterNext = normalizedValue[index + 2];
+
+        result += 'ん';
+        index += afterNext && /[aiueoy]/.test(afterNext) ? 1 : 2;
+        continue;
+      }
+
+      if (!/[aiueoy]/.test(next)) {
         result += 'ん';
         index += 1;
         continue;

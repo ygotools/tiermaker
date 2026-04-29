@@ -223,9 +223,27 @@ const getStoredLocale = (): Locale | null => {
     return null;
   }
 
-  const storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  let storedLocale: string | null = null;
+
+  try {
+    storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  } catch {
+    return null;
+  }
 
   return storedLocale && isLocale(storedLocale) ? storedLocale : null;
+};
+
+const persistLocale = (locale: Locale) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, locale);
+  } catch {
+    // Persisting the preference is best-effort; keep the in-memory locale usable.
+  }
 };
 
 export const detectLocale = (): Locale => {
@@ -258,8 +276,11 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [language, setLanguage] = useState<Locale>(detectLocale);
 
   useEffect(() => {
-    document.documentElement.lang = language;
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+
+    persistLocale(language);
   }, [language]);
 
   const t = <K extends TranslationKey>(key: K): PathValue<Messages, K> => (

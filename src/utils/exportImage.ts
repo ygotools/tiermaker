@@ -69,7 +69,19 @@ const loadImage = (src: string, timeoutMs = IMAGE_LOAD_TIMEOUT_MS) => {
     return cached;
   }
 
-  const request = waitForImageLoad(src, timeoutMs);
+  const request = waitForImageLoad(src, timeoutMs).then(
+    (result) => {
+      if (!result.ok) {
+        imageCache.delete(src);
+      }
+
+      return result;
+    },
+    (error) => {
+      imageCache.delete(src);
+      throw error;
+    },
+  );
   imageCache.set(src, request);
   return request;
 };

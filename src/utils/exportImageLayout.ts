@@ -14,11 +14,15 @@ export const TIER_CARD_HEIGHT = 90;
 export const TIER_CARD_GAP = 16;
 export const TIER_CARD_TEXT_HEIGHT = 24;
 
+const normalizeCanvasWidth = (canvasWidth: number) => (
+  Number.isFinite(canvasWidth) ? canvasWidth : EXPORT_CANVAS_WIDTH
+);
+
 export const getTierCardColumns = (canvasWidth = EXPORT_CANVAS_WIDTH) => (
   Math.max(
     1,
     Math.floor(
-      (canvasWidth - (TIER_LABEL_OUTER_WIDTH + EXPORT_PADDING * 2) + TIER_CARD_GAP) /
+      (normalizeCanvasWidth(canvasWidth) - (TIER_LABEL_OUTER_WIDTH + EXPORT_PADDING * 2) + TIER_CARD_GAP) /
       (TIER_CARD_WIDTH + TIER_CARD_GAP),
     ),
   )

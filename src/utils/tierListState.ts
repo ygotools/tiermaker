@@ -114,12 +114,13 @@ export const moveDeckFromAvailableDecksState = (
     return { tiers, availableDecks };
   }
 
+  const movedDeck = availableDecks[availableDeckIndex];
   const nextAvailableDecks = removeDeckAt(availableDecks, availableDeckIndex);
   const nextTiers = tiers.map((tier, index) => (
     index === hoverTierIndex
       ? {
           ...tier,
-          decks: insertDeckAt(tier.decks, deck, hoverIndex ?? tier.decks.length),
+          decks: insertDeckAt(tier.decks, movedDeck, hoverIndex ?? tier.decks.length),
         }
       : tier
   ));
@@ -148,12 +149,14 @@ export const moveDeckToAvailableDecksState = (
     return { tiers, availableDecks };
   }
 
+  const movedDeck = sourceTier.decks[sourceDeckIndex];
+
   return {
     tiers: tiers.map((tier, index) => (
       index === sourceTierIndex
         ? { ...tier, decks: removeDeckAt(tier.decks, sourceDeckIndex) }
         : tier
     )),
-    availableDecks: insertDeckAt(availableDecks, deck, hoverIndex),
+    availableDecks: insertDeckAt(availableDecks, movedDeck, hoverIndex),
   };
 };

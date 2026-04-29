@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createXShareText,
   createTierListShareUrl,
@@ -12,6 +12,10 @@ describe('tierListStorage', () => {
   beforeEach(() => {
     window.sessionStorage.clear();
     window.history.replaceState({}, '', '/');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('restores tiers from query params with higher priority than session storage', () => {
@@ -40,6 +44,15 @@ describe('tierListStorage', () => {
     expect(restored.availableDecks).toHaveLength(defaultSnapshot.availableDecks.length + defaultSnapshot.tiers.flatMap((tier) => tier.decks).length - 1);
   });
 
+  it('restores all repeated tier query params while ignoring duplicate deck assignments', () => {
+    window.history.replaceState({}, '', '/?tier1=blue-eyes&tier1=ryzeal,malice&tier2=blue-eyes&tier2=vsk9');
+
+    const restored = loadTierListSnapshot();
+
+    expect(restored.tiers[0].decks.map((deck) => deck.id)).toEqual(['blue-eyes', 'ryzeal', 'malice']);
+    expect(restored.tiers[1].decks.map((deck) => deck.id)).toEqual(['vsk9']);
+  });
+
   it('returns the default snapshot when storage is empty', () => {
     expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
   });
@@ -50,12 +63,42 @@ describe('tierListStorage', () => {
     expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
   });
 
+  it('falls back to the default snapshot when session storage rejects reads', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('Storage is unavailable');
+    });
+
+    expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
+  });
+
   it('round-trips a saved snapshot', () => {
     const snapshot = createDefaultTierListSnapshot();
 
     saveTierListSnapshot(snapshot);
 
     expect(loadTierListSnapshot()).toEqual(snapshot);
+  });
+
+  it('does not throw when session storage quota is exceeded', () => {
+    const snapshot = createDefaultTierListSnapshot();
+
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Storage quota exceeded', 'QuotaExceededError');
+    });
+
+    expect(() => saveTierListSnapshot(snapshot)).not.toThrow();
+    expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
+  });
+
+  it('does not throw when session storage rejects writes with a generic error', () => {
+    const snapshot = createDefaultTierListSnapshot();
+
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('Storage is unavailable');
+    });
+
+    expect(() => saveTierListSnapshot(snapshot)).not.toThrow();
+    expect(loadTierListSnapshot()).toEqual(createDefaultTierListSnapshot());
   });
 
   it('keeps stored snapshots even when deck count differs from master data', () => {

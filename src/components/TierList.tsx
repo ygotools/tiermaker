@@ -7,6 +7,7 @@ import AvailableDecks from './AvailableDecks';
 import DragPreviewLayer from './DragPreviewLayer';
 import GlobalDropZone from './GlobalDropZone';
 import { DownloadIcon } from './Icon';
+import type { TierKeyboardAction } from './TierItem';
 import TierComponent from './TierComponent';
 import { Deck } from '../types';
 import { exportAsImage } from '../utils/exportImage';
@@ -48,6 +49,7 @@ const TierList: React.FC = () => {
   const [snapshot, setSnapshot] = useState(() => loadTierListSnapshot());
   const [isExporting, setIsExporting] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage | null>(null);
+  const [focusedDeckId, setFocusedDeckId] = useState<string | null>(null);
   const { tiers, availableDecks } = snapshot;
   const allDecks = [...tiers.flatMap((tier) => tier.decks), ...availableDecks];
   const useTouchBackend = isTouchPrimaryDevice();
@@ -101,6 +103,76 @@ const TierList: React.FC = () => {
     }));
   }, []);
 
+  const moveTierDeckByKeyboard = useCallback((deck: Deck, tierIndex: number, action: TierKeyboardAction) => {
+    setFocusedDeckId(deck.id);
+    setSnapshot((prevSnapshot) => {
+      const sourceTier = prevSnapshot.tiers[tierIndex];
+      const currentIndex = sourceTier?.decks.findIndex((candidate) => candidate.id === deck.id) ?? -1;
+
+      if (!sourceTier || currentIndex === -1) {
+        return prevSnapshot;
+      }
+
+      const moveWithinTier = (targetIndex: number) => {
+        if (targetIndex === currentIndex) {
+          return prevSnapshot;
+        }
+
+        return {
+          ...prevSnapshot,
+          tiers: moveDeckState(prevSnapshot.tiers, currentIndex, targetIndex, tierIndex, tierIndex),
+        };
+      };
+
+      if (action === 'move-left') {
+        return moveWithinTier(Math.max(0, currentIndex - 1));
+      }
+
+      if (action === 'move-right') {
+        return moveWithinTier(Math.min(sourceTier.decks.length - 1, currentIndex + 1));
+      }
+
+      if (action === 'move-home') {
+        return moveWithinTier(0);
+      }
+
+      if (action === 'move-end') {
+        return moveWithinTier(sourceTier.decks.length - 1);
+      }
+
+      if (action === 'move-up' || action === 'move-down') {
+        const targetTierIndex = action === 'move-up' ? tierIndex - 1 : tierIndex + 1;
+        const targetTier = prevSnapshot.tiers[targetTierIndex];
+
+        if (!targetTier) {
+          return prevSnapshot;
+        }
+
+        return {
+          ...prevSnapshot,
+          tiers: moveDeckState(
+            prevSnapshot.tiers,
+            currentIndex,
+            Math.min(currentIndex, targetTier.decks.length),
+            tierIndex,
+            targetTierIndex,
+          ),
+        };
+      }
+
+      if (action === 'move-to-available') {
+        return moveDeckToAvailableDecksState(
+          prevSnapshot.tiers,
+          prevSnapshot.availableDecks,
+          deck,
+          tierIndex,
+        );
+      }
+
+      return prevSnapshot;
+    });
+  }, []);
+
   const handleExport = useCallback(async () => {
     if (isExporting) {
       return;
@@ -150,6 +222,8 @@ const TierList: React.FC = () => {
                 moveDeck={moveDeck}
                 moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
                 moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+                moveTierDeckByKeyboard={moveTierDeckByKeyboard}
+                focusedDeckId={focusedDeckId}
               />
             ))}
           </div>
