@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
-import TierItem from './TierItem';
+import TierItem, { type TierKeyboardAction } from './TierItem';
 import { Tier, Deck } from '../types';
 import { useI18n } from '../i18n';
 
@@ -10,11 +10,21 @@ type TierComponentProps = {
   moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
   moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
+  moveTierDeckByKeyboard: (deck: Deck, tierIndex: number, action: TierKeyboardAction) => void;
+  focusedDeckId: string | null;
 }
 
 const tierColors = ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-gray-500'];
 
-const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck, moveDeckFromAvailableDecks, moveDeckToAvailableDecks }) => {
+const TierComponent: React.FC<TierComponentProps> = ({
+  tier,
+  tierIndex,
+  moveDeck,
+  moveDeckFromAvailableDecks,
+  moveDeckToAvailableDecks,
+  moveTierDeckByKeyboard,
+  focusedDeckId,
+}) => {
   const i18n = useI18n();
   const [, tierDrop] = useDrop({
     accept: 'deck',
@@ -50,9 +60,13 @@ const TierComponent: React.FC<TierComponentProps> = ({ tier, tierIndex, moveDeck
             deck={deck}
             index={index}
             tierIndex={tierIndex}
+            tierName={tier.name}
+            tierDeckCount={tier.decks.length}
             moveDeck={moveDeck}
             moveDeckFromAvailableDecks={moveDeckFromAvailableDecks}
             moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+            moveTierDeckByKeyboard={moveTierDeckByKeyboard}
+            focusedDeckId={focusedDeckId}
           />
         ))}
         {tier.decks.length === 0 && (

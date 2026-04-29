@@ -18,6 +18,10 @@ type AvailableDecksProps = {
 const DEFAULT_THEME_IMAGE = '/static/deckimages/others_01.png';
 const DECK_CARD_WIDTH_REM = 10;
 const DECK_CARD_GAP_REM = 1;
+const THEME_NAME_INPUT_ID = 'create-theme-name';
+const THEME_ICON_URL_INPUT_ID = 'create-theme-icon-url';
+const THEME_LOCAL_IMAGE_INPUT_ID = 'create-theme-local-image';
+const THEME_NAME_ERROR_ID = 'create-theme-name-error';
 
 const createDeckId = () => {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -279,18 +283,22 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
             </div>
 
             <form onSubmit={handleCreateTheme}>
-              <label className="mb-2 block text-sm">{i18n.t('availableDecks.themeNameLabel')}</label>
+              <label htmlFor={THEME_NAME_INPUT_ID} className="mb-2 block text-sm">{i18n.t('availableDecks.themeNameLabel')}</label>
               <input
+                id={THEME_NAME_INPUT_ID}
                 type="text"
                 value={newDeckName}
                 onChange={(event) => setNewDeckName(event.target.value)}
                 className="mb-3 w-full rounded-md p-2 text-black"
                 placeholder={i18n.t('availableDecks.themeNamePlaceholder')}
+                aria-invalid={formError ? 'true' : undefined}
+                aria-describedby={formError ? THEME_NAME_ERROR_ID : undefined}
                 autoFocus
               />
 
-              <label className="mb-2 block text-sm">{i18n.t('availableDecks.iconUrlLabel')}</label>
+              <label htmlFor={THEME_ICON_URL_INPUT_ID} className="mb-2 block text-sm">{i18n.t('availableDecks.iconUrlLabel')}</label>
               <input
+                id={THEME_ICON_URL_INPUT_ID}
                 type="url"
                 value={newDeckIcon}
                 onChange={(event) => setNewDeckIcon(event.target.value)}
@@ -298,8 +306,9 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
                 placeholder="https://..."
               />
 
-              <label className="mb-2 block text-sm">{i18n.t('availableDecks.localImageLabel')}</label>
+              <label htmlFor={THEME_LOCAL_IMAGE_INPUT_ID} className="mb-2 block text-sm">{i18n.t('availableDecks.localImageLabel')}</label>
               <input
+                id={THEME_LOCAL_IMAGE_INPUT_ID}
                 type="file"
                 accept="image/*"
                 onChange={handleIconFileInput}
@@ -307,7 +316,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({ decks, allDecks, moveAv
               />
 
               {formError && (
-                <p className="mb-3 text-sm text-red-300">{formError}</p>
+                <p id={THEME_NAME_ERROR_ID} role="alert" className="mb-3 text-sm text-red-300">{formError}</p>
               )}
 
               <div className="flex justify-end gap-2">

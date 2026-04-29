@@ -18,6 +18,27 @@ describe('exportImageLayout', () => {
     expect(getTierCardColumns(EXPORT_CANVAS_WIDTH)).toBe(3);
   });
 
+  it('keeps layout calculations consistent for narrower export widths', () => {
+    const narrowCanvasWidth = 464;
+
+    expect(getTierCardColumns(narrowCanvasWidth)).toBe(2);
+    expect(getTierDeckRows(5, narrowCanvasWidth)).toBe(3);
+    expect(getTierRowHeight(5, narrowCanvasWidth)).toBe(318);
+    expect(getTierCardPosition(3, 120, narrowCanvasWidth)).toEqual({
+      x: 296,
+      y: 234,
+    });
+  });
+
+  it('falls back to the default export width for non-finite widths', () => {
+    [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY].forEach((canvasWidth) => {
+      expect(getTierCardColumns(canvasWidth)).toBe(getTierCardColumns());
+      expect(getTierDeckRows(4, canvasWidth)).toBe(getTierDeckRows(4));
+      expect(getTierRowHeight(4, canvasWidth)).toBe(getTierRowHeight(4));
+      expect(getTierCardPosition(3, 120, canvasWidth)).toEqual(getTierCardPosition(3, 120));
+    });
+  });
+
   it('grows the row height once the card count wraps', () => {
     expect(getTierDeckRows(0)).toBe(0);
     expect(getTierDeckRows(3)).toBe(1);

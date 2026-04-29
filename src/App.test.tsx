@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import App from './App';
 
@@ -13,10 +14,24 @@ const setNavigatorLanguage = (language: string, languages = [language]) => {
   });
 };
 
+const getTierElement = (container: HTMLElement, tierIndex: number) => {
+  const tier = container.querySelector<HTMLElement>(`.tier[data-tier-index="${tierIndex}"]`);
+
+  expect(tier).toBeInTheDocument();
+
+  return tier as HTMLElement;
+};
+
+const getTierDeckNames = (container: HTMLElement, tierIndex: number) => (
+  Array.from(getTierElement(container, tierIndex).querySelectorAll<HTMLElement>('.tier-item'))
+    .map((item) => item.getAttribute('title'))
+);
+
 describe('App', () => {
   beforeEach(() => {
     setNavigatorLanguage('en-US');
     window.localStorage.clear();
+    window.sessionStorage.clear();
   });
 
   it('renders the English UI when the browser language is not Japanese', () => {
@@ -63,5 +78,55 @@ describe('App', () => {
 
     expect(details).toBeInTheDocument();
     expect(within(details as HTMLElement).getByText('2024/11: 【竜剣士】【マナドゥム】【キマイラ】【覇王幻奏】【暗黒界】を追加しました。')).toBeInTheDocument();
+  });
+
+  it('announces the required theme name error in the add theme dialog', async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: 'Add Theme' })[0]);
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+
+    const themeNameInput = screen.getByLabelText('Theme Name');
+    const error = screen.getByRole('alert');
+
+    expect(error).toHaveTextContent('Please enter a theme name.');
+    expect(themeNameInput).toHaveAttribute('aria-invalid', 'true');
+    expect(themeNameInput).toHaveAttribute('aria-describedby', error.id);
+  });
+
+  it('moves a tier deck within the same tier with arrow keys', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+
+    screen.getByRole('button', { name: 'Kewl Tune, Tier1, position 1 of 2' }).focus();
+    await user.keyboard('{ArrowRight}');
+
+    expect(getTierDeckNames(container, 0)).toEqual(['Solfachord Yummy', 'Kewl Tune']);
+    expect(document.activeElement).toHaveAccessibleName('Kewl Tune, Tier1, position 2 of 2');
+  });
+
+  it('moves a tier deck between tiers with arrow keys', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+
+    screen.getByRole('button', { name: 'Kewl Tune, Tier1, position 1 of 2' }).focus();
+    await user.keyboard('{ArrowDown}');
+
+    expect(getTierDeckNames(container, 0)).toEqual(['Solfachord Yummy']);
+    expect(getTierDeckNames(container, 1)).toEqual(['Kewl Tune', 'VSK9', 'Dracotail', 'Maliss', 'Gem-Knight']);
+    expect(document.activeElement).toHaveAccessibleName('Kewl Tune, Tier2, position 1 of 5');
+  });
+
+  it('returns a tier deck to available decks with Delete', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+
+    screen.getByRole('button', { name: 'Kewl Tune, Tier1, position 1 of 2' }).focus();
+    await user.keyboard('{Delete}');
+
+    expect(getTierDeckNames(container, 0)).toEqual(['Solfachord Yummy']);
+    expect(container.querySelector('.available-decks-container [title="Kewl Tune"]')).toBeInTheDocument();
   });
 });

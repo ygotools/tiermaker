@@ -18,6 +18,10 @@ const splitDeckIds = (value: string) => (
     .filter(Boolean)
 );
 
+const getTierQueryDeckIds = (params: URLSearchParams, queryKey: string) => (
+  params.getAll(queryKey).flatMap(splitDeckIds)
+);
+
 const createSnapshotFromQueryParams = (queryString: string, defaultSnapshot: TierListSnapshot): TierListSnapshot | null => {
   const params = new URLSearchParams(queryString);
   const deckById = new Map(
@@ -27,13 +31,13 @@ const createSnapshotFromQueryParams = (queryString: string, defaultSnapshot: Tie
   const usedDeckIds = new Set<string>();
 
   const tiers = defaultSnapshot.tiers.map((tier, index) => {
-    const rawValue = params.get(TIER_QUERY_KEYS[index]);
+    const deckIds = getTierQueryDeckIds(params, TIER_QUERY_KEYS[index]);
 
-    if (!rawValue) {
+    if (deckIds.length === 0) {
       return { ...tier, decks: [] };
     }
 
-    const decks = splitDeckIds(rawValue).flatMap((deckId) => {
+    const decks = deckIds.flatMap((deckId) => {
       const deck = deckById.get(deckId);
 
       if (!deck || usedDeckIds.has(deckId)) {
@@ -142,13 +146,13 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
     return querySnapshot;
   }
 
-  const rawValue = window.sessionStorage.getItem(STORAGE_KEY);
-
-  if (!rawValue) {
-    return defaultSnapshot;
-  }
-
   try {
+    const rawValue = window.sessionStorage.getItem(STORAGE_KEY);
+
+    if (!rawValue) {
+      return defaultSnapshot;
+    }
+
     const parsed = JSON.parse(rawValue) as unknown;
 
     if (!isTierListSnapshot(parsed)) {
@@ -166,7 +170,11 @@ export const saveTierListSnapshot = (snapshot: TierListSnapshot) => {
     return;
   }
 
-  window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {
+    // Storage can fail in private browsing, quota exhaustion, or restricted iframes.
+  }
 };
 
 export const createTierListShareUrl = (tiers: Tier[]) => {
