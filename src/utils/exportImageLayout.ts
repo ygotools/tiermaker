@@ -14,21 +14,25 @@ export const TIER_CARD_HEIGHT = 90;
 export const TIER_CARD_GAP = 16;
 export const TIER_CARD_TEXT_HEIGHT = 24;
 
-export const getTierCardColumns = (canvasWidth = EXPORT_CANVAS_WIDTH) => (
-  Math.max(
-    1,
-    Math.floor(
-      (canvasWidth - (TIER_LABEL_OUTER_WIDTH + EXPORT_PADDING * 2) + TIER_CARD_GAP) /
-      (TIER_CARD_WIDTH + TIER_CARD_GAP),
-    ),
-  )
+const getFiniteCanvasWidth = (canvasWidth: number) => (
+  Number.isFinite(canvasWidth) ? canvasWidth : EXPORT_CANVAS_WIDTH
 );
+
+export const getTierCardColumns = (canvasWidth = EXPORT_CANVAS_WIDTH) => {
+  const finiteCanvasWidth = getFiniteCanvasWidth(canvasWidth);
+  const rawColumns = Math.floor(
+    (finiteCanvasWidth - (TIER_LABEL_OUTER_WIDTH + EXPORT_PADDING * 2) + TIER_CARD_GAP) /
+    (TIER_CARD_WIDTH + TIER_CARD_GAP),
+  );
+
+  return Math.max(1, rawColumns);
+};
 
 export const getTierDeckRows = (
   deckCount: number,
   canvasWidth = EXPORT_CANVAS_WIDTH,
 ) => {
-  if (deckCount <= 0) {
+  if (!Number.isFinite(deckCount) || deckCount <= 0) {
     return 0;
   }
 

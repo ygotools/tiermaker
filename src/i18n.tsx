@@ -17,6 +17,9 @@ type Translation = {
     addedTheme: (themeName: string) => string;
     exportInProgress: string;
     exportButton: string;
+    copyShareUrl: string;
+    copyShareUrlSuccess: string;
+    copyShareUrlError: string;
     shareOnX: string;
     resetButton: string;
   };
@@ -40,9 +43,13 @@ type Translation = {
     addButton: string;
     requiredThemeNameError: string;
     duplicateThemeError: string;
+    localImageTooLargeError: string;
+    localImageReadError: string;
+    keyboardDragDescription: string;
   };
   tier: {
     emptyPlaceholder: string;
+    keyboardDragDescription: string;
   };
 };
 
@@ -77,6 +84,9 @@ const translations = {
       addedTheme: (themeName) => `「${themeName}」を追加しました。`,
       exportInProgress: 'エクスポート中...',
       exportButton: '画像としてエクスポート',
+      copyShareUrl: 'URLをコピー',
+      copyShareUrlSuccess: '共有 URL をコピーしました。',
+      copyShareUrlError: '共有 URL をコピーできませんでした。ブラウザの権限設定を確認してください。',
       shareOnX: 'Xでシェア',
       resetButton: '初期状態に戻す',
     },
@@ -102,9 +112,13 @@ const translations = {
       addButton: '追加',
       requiredThemeNameError: 'テーマ名を入力してください。',
       duplicateThemeError: '同じ名前のテーマはすでに存在します。',
+      localImageTooLargeError: 'ローカル画像は 1MB 以下のファイルを選択してください。',
+      localImageReadError: 'ローカル画像を読み込めませんでした。別の画像を選択してください。',
+      keyboardDragDescription: 'キーボード操作: 左右矢印キー、Home キー、End キーで候補内を並び替え、上矢印キーで最後の Tier へ移動できます。',
     },
     tier: {
       emptyPlaceholder: 'ドラッグしてここにデッキを追加',
+      keyboardDragDescription: 'キーボード操作: 左右矢印キー、Home キー、End キーでこの Tier 内を移動できます。上下矢印キーで Tier 間を移動し、Delete キーまたは Backspace キーで候補に戻せます。',
     },
   },
   en: {
@@ -137,6 +151,9 @@ const translations = {
       addedTheme: (themeName) => `Added "${themeName}".`,
       exportInProgress: 'Exporting...',
       exportButton: 'Export as Image',
+      copyShareUrl: 'Copy URL',
+      copyShareUrlSuccess: 'Share URL copied.',
+      copyShareUrlError: 'Could not copy the share URL. Please check your browser permissions.',
       shareOnX: 'Share on X',
       resetButton: 'Reset to Default',
     },
@@ -162,9 +179,13 @@ const translations = {
       addButton: 'Add',
       requiredThemeNameError: 'Please enter a theme name.',
       duplicateThemeError: 'A theme with the same name already exists.',
+      localImageTooLargeError: 'Please choose a local image that is 1 MB or smaller.',
+      localImageReadError: 'Could not read the local image. Please choose another image.',
+      keyboardDragDescription: 'Keyboard controls: Use ArrowLeft, ArrowRight, Home, and End to reorder within available decks. Use ArrowUp to move to the last tier.',
     },
     tier: {
       emptyPlaceholder: 'Drag a deck here to add it',
+      keyboardDragDescription: 'Keyboard controls: Use ArrowLeft, ArrowRight, Home, and End to move within this tier. Use ArrowUp and ArrowDown to move between tiers. Use Delete or Backspace to return to available decks.',
     },
   },
 } as const satisfies Record<Locale, Translation>;
@@ -218,14 +239,46 @@ const LANGUAGE_STORAGE_KEY = 'tier-maker-language';
 
 const isLocale = (value: string): value is Locale => value === 'ja' || value === 'en';
 
-const getStoredLocale = (): Locale | null => {
+const getLocalStorage = (): Storage | null => {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  const storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+};
 
-  return storedLocale && isLocale(storedLocale) ? storedLocale : null;
+const getStoredLocale = (): Locale | null => {
+  const localStorage = getLocalStorage();
+
+  if (!localStorage) {
+    return null;
+  }
+
+  try {
+    const storedLocale = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+
+    return storedLocale && isLocale(storedLocale) ? storedLocale : null;
+  } catch {
+    return null;
+  }
+};
+
+const persistLocale = (language: Locale) => {
+  const localStorage = getLocalStorage();
+
+  if (!localStorage) {
+    return;
+  }
+
+  try {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // Ignore storage failures so language switching still works in restricted contexts.
+  }
 };
 
 export const detectLocale = (): Locale => {
@@ -258,8 +311,11 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [language, setLanguage] = useState<Locale>(detectLocale);
 
   useEffect(() => {
-    document.documentElement.lang = language;
-    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+
+    persistLocale(language);
   }, [language]);
 
   const t = <K extends TranslationKey>(key: K): PathValue<Messages, K> => (

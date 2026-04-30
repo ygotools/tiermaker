@@ -7,6 +7,7 @@ type TierListState = {
 
 const clampIndex = (index: number, length: number) => Math.max(0, Math.min(index, length));
 const findDeckIndexById = (decks: Deck[], deckId: string) => decks.findIndex((candidate) => candidate.id === deckId);
+const hasDeckId = (decks: Deck[], deckId: string) => findDeckIndexById(decks, deckId) !== -1;
 const removeDeckAt = (decks: Deck[], index: number) => decks.filter((_, deckIndex) => deckIndex !== index);
 
 const insertDeckAt = (decks: Deck[], deck: Deck, index: number) => {
@@ -114,12 +115,15 @@ export const moveDeckFromAvailableDecksState = (
     return { tiers, availableDecks };
   }
 
+  const sourceDeck = availableDecks[availableDeckIndex];
   const nextAvailableDecks = removeDeckAt(availableDecks, availableDeckIndex);
   const nextTiers = tiers.map((tier, index) => (
     index === hoverTierIndex
       ? {
           ...tier,
-          decks: insertDeckAt(tier.decks, deck, hoverIndex ?? tier.decks.length),
+          decks: hasDeckId(tier.decks, sourceDeck.id)
+            ? tier.decks
+            : insertDeckAt(tier.decks, sourceDeck, hoverIndex ?? tier.decks.length),
         }
       : tier
   ));
@@ -148,12 +152,16 @@ export const moveDeckToAvailableDecksState = (
     return { tiers, availableDecks };
   }
 
+  const sourceDeck = sourceTier.decks[sourceDeckIndex];
+
   return {
     tiers: tiers.map((tier, index) => (
       index === sourceTierIndex
         ? { ...tier, decks: removeDeckAt(tier.decks, sourceDeckIndex) }
         : tier
     )),
-    availableDecks: insertDeckAt(availableDecks, deck, hoverIndex),
+    availableDecks: hasDeckId(availableDecks, sourceDeck.id)
+      ? availableDecks
+      : insertDeckAt(availableDecks, sourceDeck, hoverIndex),
   };
 };

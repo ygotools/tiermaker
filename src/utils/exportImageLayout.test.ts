@@ -26,6 +26,27 @@ describe('exportImageLayout', () => {
     expect(getTierRowHeight(4)).toBeGreaterThan(getTierRowHeight(3));
   });
 
+  it('keeps at least one card column for narrow canvas widths', () => {
+    expect(getTierCardColumns(0)).toBe(1);
+    expect(getTierCardColumns(-100)).toBe(1);
+  });
+
+  it('falls back to the default canvas width for non-finite canvas widths', () => {
+    const defaultPosition = getTierCardPosition(2, 120);
+
+    expect(getTierCardColumns(Number.NaN)).toBe(getTierCardColumns());
+    expect(getTierCardColumns(Number.POSITIVE_INFINITY)).toBe(getTierCardColumns());
+    expect(getTierCardColumns(Number.NEGATIVE_INFINITY)).toBe(getTierCardColumns());
+    expect(getTierDeckRows(4, Number.NaN)).toBe(getTierDeckRows(4));
+    expect(getTierRowHeight(4, Number.POSITIVE_INFINITY)).toBe(getTierRowHeight(4));
+    expect(getTierCardPosition(2, 120, Number.NaN)).toEqual(defaultPosition);
+  });
+
+  it('keeps layout calculations finite for non-finite deck counts', () => {
+    expect(getTierDeckRows(Number.NaN)).toBe(0);
+    expect(getTierRowHeight(Number.POSITIVE_INFINITY)).toBe(TIER_MIN_HEIGHT);
+  });
+
   it('positions cards on a three-column grid', () => {
     const first = getTierCardPosition(0, 120);
     const fourth = getTierCardPosition(3, 120);

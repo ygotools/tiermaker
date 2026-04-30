@@ -6,11 +6,13 @@ describe('deckSearch', () => {
     expect(convertRomajiToHiragana('raizeoru')).toBe('らいぜおる');
     expect(convertRomajiToHiragana('shukusei')).toBe('しゅくせい');
     expect(convertRomajiToHiragana('attoigunisuta')).toBe('あっといぐにすた');
+    expect(convertRomajiToHiragana('jinrai')).toBe('じんらい');
   });
 
   it('matches kana when the user searches in romaji', () => {
     expect(matchesDeckSearch({ id: 'ryzeal', name: 'ライゼオル', kana: 'らいぜおる', image: '/ryzeal.png' }, 'raizeoru')).toBe(true);
     expect(matchesDeckSearch({ id: 'ignister', name: '＠イグニスター', kana: 'あっといぐにすたー', image: '/ignister.png' }, 'attoigunisuta')).toBe(true);
+    expect(matchesDeckSearch({ id: 'jinrai', name: '迅雷', kana: 'じんらい', image: '/jinrai.png' }, 'jinrai')).toBe(true);
   });
 
   it('matches kana even when the stored reading uses long vowel marks', () => {

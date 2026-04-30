@@ -45,6 +45,28 @@ describe('tierListState', () => {
     expect(result.availableDecks).toEqual([]);
   });
 
+  it('uses the current available deck when the dragged payload is stale', () => {
+    const currentDeck: Deck = { id: 'custom-theme', name: 'Current Name', image: '/current.png' };
+    const stalePayload: Deck = { id: 'custom-theme', name: 'Old Name', image: '/old.png' };
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [] }];
+    const availableDecks = [currentDeck];
+
+    const result = moveDeckFromAvailableDecksState(tiers, availableDecks, stalePayload, 0);
+
+    expect(result.tiers[0].decks).toEqual([currentDeck]);
+    expect(result.availableDecks).toEqual([]);
+  });
+
+  it('does not insert a duplicate id when moving from available decks into a tier', () => {
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [sampleDeck] }];
+    const availableDecks = [sampleDeck];
+
+    const result = moveDeckFromAvailableDecksState(tiers, availableDecks, sampleDeck, 0);
+
+    expect(result.tiers[0].decks).toEqual([sampleDeck]);
+    expect(result.availableDecks).toEqual([]);
+  });
+
   it('reorders available decks by hovered index', () => {
     const availableDecks = [sampleDeck, otherDeck, thirdDeck];
 
@@ -76,6 +98,27 @@ describe('tierListState', () => {
     const result = moveDeckToAvailableDecksState(tiers, [], sampleDeck, 0);
 
     expect(result.tiers[0].decks).toEqual([duplicateNameDeck]);
+    expect(result.availableDecks).toEqual([sampleDeck]);
+  });
+
+  it('uses the current tier deck when the dragged payload is stale', () => {
+    const currentDeck: Deck = { id: 'custom-theme', name: 'Current Name', image: '/current.png' };
+    const stalePayload: Deck = { id: 'custom-theme', name: 'Old Name', image: '/old.png' };
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [currentDeck] }];
+
+    const result = moveDeckToAvailableDecksState(tiers, [], stalePayload, 0);
+
+    expect(result.tiers[0].decks).toEqual([]);
+    expect(result.availableDecks).toEqual([currentDeck]);
+  });
+
+  it('does not insert a duplicate id when moving from a tier to available decks', () => {
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [sampleDeck] }];
+    const availableDecks = [sampleDeck];
+
+    const result = moveDeckToAvailableDecksState(tiers, availableDecks, sampleDeck, 0);
+
+    expect(result.tiers[0].decks).toEqual([]);
     expect(result.availableDecks).toEqual([sampleDeck]);
   });
 });
