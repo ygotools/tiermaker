@@ -10,3 +10,9 @@ export type Tier = {
   name: string;
   decks: Deck[];
 }
+
+export type DeckDragItem = {
+  deck: Deck;
+  index: number;
+  tierIndex: number;
+}

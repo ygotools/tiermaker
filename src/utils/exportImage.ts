@@ -34,6 +34,8 @@ const IMAGE_LOAD_TIMEOUT_MS = 15000;
 
 const imageCache = new Map<string, Promise<LoadImageResult>>();
 
+const isDataUrl = (src: string) => /^data:/i.test(src);
+
 const waitForImageLoad = (src: string, timeoutMs: number): Promise<LoadImageResult> => new Promise((resolve) => {
   const image = new Image();
   let settled = false;
@@ -49,6 +51,10 @@ const waitForImageLoad = (src: string, timeoutMs: number): Promise<LoadImageResu
     settled = true;
     window.clearTimeout(timeoutId);
     resolve(result);
+  }
+
+  if (!isDataUrl(src) && 'crossOrigin' in image) {
+    image.crossOrigin = 'anonymous';
   }
 
   image.decoding = 'async';
@@ -69,19 +75,13 @@ const loadImage = (src: string, timeoutMs = IMAGE_LOAD_TIMEOUT_MS) => {
     return cached;
   }
 
-  const request = waitForImageLoad(src, timeoutMs).then(
-    (result) => {
-      if (!result.ok) {
-        imageCache.delete(src);
-      }
-
-      return result;
-    },
-    (error) => {
+  const request = waitForImageLoad(src, timeoutMs).then((result) => {
+    if (!result.ok) {
       imageCache.delete(src);
-      throw error;
-    },
-  );
+    }
+
+    return result;
+  });
   imageCache.set(src, request);
   return request;
 };
@@ -114,6 +114,22 @@ const drawRoundedRect = (
   context.closePath();
 };
 
+const tryDrawImage = (
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) => {
+  try {
+    context.drawImage(image, x, y, width, height);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const trimText = (
   context: CanvasRenderingContext2D,
   text: string,
@@ -143,9 +159,9 @@ const drawDeckCard = (
   drawRoundedRect(context, x, y, TIER_CARD_WIDTH, TIER_CARD_HEIGHT, 4);
   context.clip();
 
-  if (image) {
-    context.drawImage(image, x, y, TIER_CARD_WIDTH, TIER_CARD_HEIGHT);
-  } else {
+  const drewImage = image ? tryDrawImage(context, image, x, y, TIER_CARD_WIDTH, TIER_CARD_HEIGHT) : false;
+
+  if (!drewImage) {
     context.fillStyle = '#2b2b2b';
     context.fillRect(x, y, TIER_CARD_WIDTH, TIER_CARD_HEIGHT);
     context.strokeStyle = '#4b5563';
@@ -189,14 +205,18 @@ const drawTitle = async (context: CanvasRenderingContext2D) => {
   if (logo.ok && logo.image) {
     const width = 225;
     const height = 35.5;
-    context.drawImage(
+    const drewLogo = tryDrawImage(
+      context,
       logo.image,
       (EXPORT_CANVAS_WIDTH - width) / 2,
       (EXPORT_TITLE_HEIGHT - height) / 2,
       width,
       height,
     );
-    return;
+
+    if (drewLogo) {
+      return;
+    }
   }
 
   context.font = 'bold 28px sans-serif';
@@ -221,7 +241,8 @@ const drawFooter = async (
   if (badge.ok && badge.image) {
     const badgeWidth = 80;
     const badgeHeight = (badge.image.naturalHeight / badge.image.naturalWidth) * badgeWidth;
-    context.drawImage(
+    tryDrawImage(
+      context,
       badge.image,
       EXPORT_CANVAS_WIDTH - EXPORT_PADDING - badgeWidth,
       footerTop + (EXPORT_FOOTER_HEIGHT - badgeHeight) / 2,

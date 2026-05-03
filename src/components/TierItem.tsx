@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { Deck } from '../types';
+import { Deck, type DeckDragItem } from '../types';
 import { useI18n } from '../i18n';
 import { getDeckDisplayName } from '../utils/deckName';
 
@@ -11,7 +11,13 @@ type TierItemProps = {
   tierIndex: number;
   tierName: string;
   tierDeckCount: number;
-  moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
+  moveDeck: (
+    dragIndex: number,
+    hoverIndex: number,
+    dragTierIndex: number,
+    hoverTierIndex: number,
+    deckId?: string,
+  ) => void;
   moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
   moveTierDeckByKeyboard: (deck: Deck, tierIndex: number, action: TierKeyboardAction) => void;
@@ -64,10 +70,12 @@ const TierItem: React.FC<TierItemProps> = ({
   const i18n = useI18n();
   const ref = React.useRef<HTMLDivElement>(null);
   const deckDisplayName = getDeckDisplayName(deck, i18n.language);
+  const generatedId = React.useId().replace(/[^A-Za-z0-9_-]/g, '-');
+  const keyboardDescriptionId = `tier-item-keyboard-description-${generatedId}`;
   const [, drop] = useDrop({
     accept: 'deck',
     drop: () => ({ moved: true }),
-    hover(item: { deck: Deck; index: number; tierIndex: number }) {
+    hover(item: DeckDragItem) {
       if (!ref.current) {
         return;
       }
@@ -83,7 +91,7 @@ const TierItem: React.FC<TierItemProps> = ({
       if (dragTierIndex === -1) {
         moveDeckFromAvailableDecks(item.deck, hoverTierIndex, hoverIndex);
       } else {
-        moveDeck(dragIndex, hoverIndex, dragTierIndex, hoverTierIndex);
+        moveDeck(dragIndex, hoverIndex, dragTierIndex, hoverTierIndex, item.deck.id);
       }
 
       item.index = hoverIndex;
@@ -93,14 +101,14 @@ const TierItem: React.FC<TierItemProps> = ({
 
   const [{ isDraggingItem }, drag, preview] = useDrag({
     type: 'deck',
-    item: { deck, index, tierIndex },
+    item: { deck, index, tierIndex } satisfies DeckDragItem,
     collect: (monitor) => ({
       isDraggingItem: monitor.isDragging(),
     }),
     end: (item, monitor) => {
       const didDrop = monitor.didDrop();
-      if (!didDrop && item.tierIndex === tierIndex) {
-        moveDeckToAvailableDecks(item.deck, tierIndex);
+      if (!didDrop && item.tierIndex >= 0) {
+        moveDeckToAvailableDecks(item.deck, item.tierIndex);
       }
     },
   });
@@ -132,13 +140,17 @@ const TierItem: React.FC<TierItemProps> = ({
     <div
       ref={ref}
       title={deckDisplayName}
-      role="button"
+      role="listitem"
       tabIndex={0}
       aria-label={`${deckDisplayName}, ${tierName}, position ${index + 1} of ${tierDeckCount}`}
+      aria-describedby={keyboardDescriptionId}
       aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home End Delete Backspace"
       onKeyDown={handleKeyDown}
       className={`tier-item relative cursor-grab overflow-hidden rounded-sm border border-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300 ${isDraggingItem ? 'border-blue-500 opacity-50' : ''}`}
     >
+      <span id={keyboardDescriptionId} className="sr-only">
+        {i18n.t('tier.keyboardDragDescription')}
+      </span>
       <img src={deck.image} alt={deckDisplayName} className="h-[90px] w-[160px] object-cover" />
       <span className='block text-center w-full absolute left-0 bottom-0 p-1 text-sm font-bold text-white bg-[#000000cc]'>{deckDisplayName}</span>
     </div>

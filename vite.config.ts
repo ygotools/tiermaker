@@ -23,7 +23,8 @@ export default defineConfig({
     }),
   ],
   build: {
-    minify: false,
+    minify: 'esbuild',
+    cssMinify: false,
   },
   test: {
     environment: 'jsdom',

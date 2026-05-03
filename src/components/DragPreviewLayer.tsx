@@ -1,12 +1,8 @@
 import React from 'react';
 import { useDragLayer } from 'react-dnd';
-import { Deck } from '../types';
+import { type DeckDragItem } from '../types';
 import { useI18n } from '../i18n';
 import { getDeckDisplayName } from '../utils/deckName';
-
-type DragItem = {
-  deck: Deck;
-};
 
 const layerStyles: React.CSSProperties = {
   position: 'fixed',
@@ -19,7 +15,7 @@ const layerStyles: React.CSSProperties = {
 const DragPreviewLayer: React.FC = () => {
   const i18n = useI18n();
   const { isDragging, item, currentOffset } = useDragLayer((monitor) => ({
-    item: monitor.getItem() as DragItem | null,
+    item: monitor.getItem() as DeckDragItem | null,
     currentOffset: monitor.getClientOffset(),
     isDragging: monitor.isDragging(),
   }));

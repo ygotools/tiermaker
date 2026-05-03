@@ -8,8 +8,18 @@ type TierListSnapshot = {
 
 const STORAGE_KEY = 'tiermaker:tier-list';
 const TIER_QUERY_KEYS = ['tier1', 'tier2', 'tier3', 'tier4'] as const;
-const X_POST_MAX_LENGTH = 280;
-const X_SHORT_URL_LENGTH = 23;
+const CUSTOM_DECKS_QUERY_KEY = 'customDecks';
+const DEFAULT_CUSTOM_DECK_IMAGE = '/static/deckimages/others_01.png';
+const MAX_CUSTOM_DECK_ID_LENGTH = 128;
+const MAX_CUSTOM_DECK_NAME_LENGTH = 120;
+const TIER_DECK_ID_SEPARATOR = ',';
+const hasControlCharacter = (value: string) => (
+  Array.from(value).some((character) => {
+    const characterCode = character.charCodeAt(0);
+
+    return characterCode <= 0x1F || characterCode === 0x7F;
+  })
+);
 
 const splitDeckIds = (value: string) => (
   value
@@ -18,20 +28,187 @@ const splitDeckIds = (value: string) => (
     .filter(Boolean)
 );
 
-const getTierQueryDeckIds = (params: URLSearchParams, queryKey: string) => (
+const getDeckIdsFromQueryParams = (params: URLSearchParams, queryKey: string) => (
   params.getAll(queryKey).flatMap(splitDeckIds)
+);
+
+const getAllDeckIdsFromTierQueryParams = (params: URLSearchParams) => (
+  TIER_QUERY_KEYS.flatMap((queryKey) => getDeckIdsFromQueryParams(params, queryKey))
+);
+
+const isSafeCustomDeckQueryId = (id: string) => (
+  !id.includes(TIER_DECK_ID_SEPARATOR) &&
+  !hasControlCharacter(id)
+);
+
+export const hasTierListShareQuery = (queryString = typeof window === 'undefined' ? '' : window.location.search) => {
+  try {
+    const params = new URLSearchParams(queryString);
+
+    return TIER_QUERY_KEYS.some((queryKey) => params.has(queryKey));
+  } catch {
+    return false;
+  }
+};
+
+export const clearTierListShareQuery = () => {
+  if (typeof window === 'undefined' || !hasTierListShareQuery()) {
+    return;
+  }
+
+  try {
+    const url = new URL(window.location.href);
+
+    TIER_QUERY_KEYS.forEach((queryKey) => url.searchParams.delete(queryKey));
+    url.searchParams.delete(CUSTOM_DECKS_QUERY_KEY);
+
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  } catch {
+    // Keep the current URL if the environment cannot parse or replace it.
+  }
+};
+
+type CustomDeckQueryValue = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+};
+
+export const normalizeCustomDeckImage = (imageUrl: string | undefined) => {
+  const trimmedImageUrl = imageUrl?.trim() ?? '';
+
+  if (!trimmedImageUrl) {
+    return DEFAULT_CUSTOM_DECK_IMAGE;
+  }
+
+  try {
+    const parsedUrl = new URL(trimmedImageUrl);
+
+    if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+      return trimmedImageUrl;
+    }
+  } catch {
+    return DEFAULT_CUSTOM_DECK_IMAGE;
+  }
+
+  return DEFAULT_CUSTOM_DECK_IMAGE;
+};
+
+const normalizeCustomDeckQueryValue = (value: unknown): Deck | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const deck = value as Record<string, unknown>;
+
+  if (
+    typeof deck.id !== 'string' ||
+    typeof deck.name !== 'string' ||
+    (typeof deck.imageUrl !== 'undefined' && typeof deck.imageUrl !== 'string')
+  ) {
+    return null;
+  }
+
+  const id = deck.id.trim();
+  const name = deck.name.trim();
+
+  if (
+    id.length === 0 ||
+    name.length === 0 ||
+    !isSafeCustomDeckQueryId(id) ||
+    id.length > MAX_CUSTOM_DECK_ID_LENGTH ||
+    name.length > MAX_CUSTOM_DECK_NAME_LENGTH
+  ) {
+    return null;
+  }
+
+  return {
+    id,
+    name,
+    image: normalizeCustomDeckImage(deck.imageUrl),
+  };
+};
+
+const createCustomDeckQueryValue = (deck: Deck): CustomDeckQueryValue | null => {
+  const id = deck.id.trim();
+  const name = deck.name.trim();
+
+  if (
+    id.length === 0 ||
+    name.length === 0 ||
+    !isSafeCustomDeckQueryId(id) ||
+    id.length > MAX_CUSTOM_DECK_ID_LENGTH ||
+    name.length > MAX_CUSTOM_DECK_NAME_LENGTH
+  ) {
+    return null;
+  }
+
+  const customDeckQueryValue: CustomDeckQueryValue = {
+    id,
+    name,
+  };
+  const imageUrl = deck.image.trim();
+
+  if (imageUrl && !imageUrl.startsWith('data:')) {
+    try {
+      const parsedUrl = new URL(imageUrl);
+
+      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+        customDeckQueryValue.imageUrl = imageUrl;
+      }
+    } catch {
+      // Omit invalid image URLs; restore will use the default custom deck image.
+    }
+  }
+
+  return customDeckQueryValue;
+};
+
+const getCustomDecksFromQueryParams = (
+  params: URLSearchParams,
+  referencedDeckIds: Set<string>,
+  knownDeckIds: Set<string>,
+): Deck[] => (
+  params.getAll(CUSTOM_DECKS_QUERY_KEY).flatMap((rawValue) => {
+    try {
+      const parsed = JSON.parse(rawValue) as unknown;
+      const values = Array.isArray(parsed) ? parsed : [parsed];
+
+      return values.flatMap((value) => {
+        const customDeck = normalizeCustomDeckQueryValue(value);
+
+        if (!customDeck || knownDeckIds.has(customDeck.id) || !referencedDeckIds.has(customDeck.id)) {
+          return [];
+        }
+
+        return [customDeck];
+      });
+    } catch {
+      return [];
+    }
+  })
 );
 
 const createSnapshotFromQueryParams = (queryString: string, defaultSnapshot: TierListSnapshot): TierListSnapshot | null => {
   const params = new URLSearchParams(queryString);
+
+  if (!hasTierListShareQuery(queryString)) {
+    return null;
+  }
+
+  const knownDecks = [...defaultSnapshot.tiers.flatMap((tier) => tier.decks), ...defaultSnapshot.availableDecks];
+  const referencedDeckIds = new Set(getAllDeckIdsFromTierQueryParams(params));
+  const knownDeckIds = new Set(knownDecks.map((deck) => deck.id));
+  const customDecks = getCustomDecksFromQueryParams(params, referencedDeckIds, knownDeckIds);
   const deckById = new Map(
-    [...defaultSnapshot.tiers.flatMap((tier) => tier.decks), ...defaultSnapshot.availableDecks]
+    [...knownDecks, ...customDecks]
       .map((deck) => [deck.id, deck]),
   );
   const usedDeckIds = new Set<string>();
 
   const tiers = defaultSnapshot.tiers.map((tier, index) => {
-    const deckIds = getTierQueryDeckIds(params, TIER_QUERY_KEYS[index]);
+    const queryKey = TIER_QUERY_KEYS[index];
+    const deckIds = queryKey ? getDeckIdsFromQueryParams(params, queryKey) : [];
 
     if (deckIds.length === 0) {
       return { ...tier, decks: [] };
@@ -53,10 +230,6 @@ const createSnapshotFromQueryParams = (queryString: string, defaultSnapshot: Tie
       decks,
     };
   });
-
-  if (usedDeckIds.size === 0) {
-    return null;
-  }
 
   return {
     tiers,
@@ -128,6 +301,26 @@ const hydrateSnapshotDeckNames = (snapshot: TierListSnapshot, defaultSnapshot: T
   };
 };
 
+const deduplicateSnapshotDecks = (snapshot: TierListSnapshot): TierListSnapshot => {
+  const usedDeckIds = new Set<string>();
+  const getUniqueDecks = (decks: Deck[]) => decks.filter((deck) => {
+    if (usedDeckIds.has(deck.id)) {
+      return false;
+    }
+
+    usedDeckIds.add(deck.id);
+    return true;
+  });
+
+  return {
+    tiers: snapshot.tiers.map((tier) => ({
+      ...tier,
+      decks: getUniqueDecks(tier.decks),
+    })),
+    availableDecks: getUniqueDecks(snapshot.availableDecks),
+  };
+};
+
 export const createDefaultTierListSnapshot = (): TierListSnapshot => ({
   tiers: SAMPLE_DATA.map(cloneTier),
   availableDecks: INITIAL_AVAILABLE_DECKS.map(cloneDeck),
@@ -140,26 +333,38 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
     return defaultSnapshot;
   }
 
-  const querySnapshot = createSnapshotFromQueryParams(window.location.search, defaultSnapshot);
+  let querySnapshot: TierListSnapshot | null = null;
+
+  try {
+    querySnapshot = createSnapshotFromQueryParams(window.location.search, defaultSnapshot);
+  } catch {
+    querySnapshot = null;
+  }
 
   if (querySnapshot) {
     return querySnapshot;
   }
 
+  let rawValue: string | null = null;
+
   try {
-    const rawValue = window.sessionStorage.getItem(STORAGE_KEY);
+    rawValue = window.sessionStorage.getItem(STORAGE_KEY);
+  } catch {
+    return defaultSnapshot;
+  }
 
-    if (!rawValue) {
-      return defaultSnapshot;
-    }
+  if (!rawValue) {
+    return defaultSnapshot;
+  }
 
+  try {
     const parsed = JSON.parse(rawValue) as unknown;
 
     if (!isTierListSnapshot(parsed)) {
       return defaultSnapshot;
     }
 
-    return hydrateSnapshotDeckNames(parsed, defaultSnapshot);
+    return hydrateSnapshotDeckNames(deduplicateSnapshotDecks(parsed), defaultSnapshot);
   } catch {
     return defaultSnapshot;
   }
@@ -173,12 +378,19 @@ export const saveTierListSnapshot = (snapshot: TierListSnapshot) => {
   try {
     window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
   } catch {
-    // Storage can fail in private browsing, quota exhaustion, or restricted iframes.
+    // Ignore unavailable or full session storage so the tier list remains usable.
   }
 };
 
 export const createTierListShareUrl = (tiers: Tier[]) => {
   const params = new URLSearchParams();
+  const defaultSnapshot = createDefaultTierListSnapshot();
+  const knownDeckIds = new Set(
+    [...defaultSnapshot.tiers.flatMap((tier) => tier.decks), ...defaultSnapshot.availableDecks]
+      .map((deck) => deck.id),
+  );
+  const customDecksById = new Map<string, CustomDeckQueryValue>();
+  const sharedDeckIds = new Set<string>();
 
   tiers.forEach((tier, index) => {
     const queryKey = TIER_QUERY_KEYS[index];
@@ -187,8 +399,43 @@ export const createTierListShareUrl = (tiers: Tier[]) => {
       return;
     }
 
-    params.set(queryKey, tier.decks.map((deck) => deck.id).join(','));
+    const deckIds = tier.decks.flatMap((deck) => {
+      let shareDeckId: string | null = null;
+
+      if (knownDeckIds.has(deck.id)) {
+        shareDeckId = deck.id;
+      } else {
+        const customDeckQueryValue = createCustomDeckQueryValue(deck);
+
+        if (!customDeckQueryValue) {
+          return [];
+        }
+
+        shareDeckId = customDeckQueryValue.id;
+
+        if (!knownDeckIds.has(customDeckQueryValue.id) && !customDecksById.has(customDeckQueryValue.id)) {
+          customDecksById.set(customDeckQueryValue.id, customDeckQueryValue);
+        }
+      }
+
+      if (sharedDeckIds.has(shareDeckId)) {
+        return [];
+      }
+
+      sharedDeckIds.add(shareDeckId);
+      return [shareDeckId];
+    });
+
+    if (deckIds.length === 0) {
+      return;
+    }
+
+    params.set(queryKey, deckIds.join(','));
   });
+
+  if (customDecksById.size > 0) {
+    params.set(CUSTOM_DECKS_QUERY_KEY, JSON.stringify([...customDecksById.values()]));
+  }
 
   const queryString = params.toString();
 
@@ -217,24 +464,9 @@ export const createTierListShareText = (
 export const createXShareText = ({
   intro,
   hashtags,
-  tierText,
   url,
 }: {
   intro: string;
   hashtags: string;
-  tierText?: string;
   url: string;
-}) => {
-  const normalizedTierText = tierText?.trim() ?? '';
-  const suffix = `\n${url}`;
-
-  if (normalizedTierText.length === 0) {
-    return `${intro}\n${hashtags}${suffix}`;
-  }
-
-  const prefix = `${intro}\n${hashtags}\n\n`;
-  const maxTierTextLength = Math.max(0, X_POST_MAX_LENGTH - (prefix.length + suffix.length - url.length + X_SHORT_URL_LENGTH));
-  const truncatedTierText = normalizedTierText.slice(0, maxTierTextLength);
-
-  return `${prefix}${truncatedTierText}${suffix}`;
-};
+}) => `${intro}\n${hashtags}\n${url}`;

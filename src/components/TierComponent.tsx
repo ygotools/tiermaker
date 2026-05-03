@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import TierItem, { type TierKeyboardAction } from './TierItem';
-import { Tier, Deck } from '../types';
+import { Tier, Deck, type DeckDragItem } from '../types';
 import { useI18n } from '../i18n';
 
 type TierComponentProps = {
   tier: Tier;
   tierIndex: number;
-  moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
+  moveDeck: (
+    dragIndex: number,
+    hoverIndex: number,
+    dragTierIndex: number,
+    hoverTierIndex: number,
+    deckId?: string,
+  ) => void;
   moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
   moveTierDeckByKeyboard: (deck: Deck, tierIndex: number, action: TierKeyboardAction) => void;
@@ -26,9 +32,10 @@ const TierComponent: React.FC<TierComponentProps> = ({
   focusedDeckId,
 }) => {
   const i18n = useI18n();
-  const [, tierDrop] = useDrop({
+  const tierDropRef = useRef<HTMLDivElement>(null);
+  const [, tierDrop] = useDrop<DeckDragItem>({
     accept: 'deck',
-    drop: (item: { deck: Deck, index: number; tierIndex: number }, monitor) => {
+    drop: (item, monitor) => {
       if (monitor.didDrop()) {
         return;
       }
@@ -36,24 +43,25 @@ const TierComponent: React.FC<TierComponentProps> = ({
       if (item.tierIndex === -1) { // AvailableDecksからのドロップ
         moveDeckFromAvailableDecks(item.deck, tierIndex);
       } else if (item.tierIndex !== tierIndex) {
-        moveDeck(item.index, tier.decks.length, item.tierIndex, tierIndex);
+        moveDeck(item.index, tier.decks.length, item.tierIndex, tierIndex, item.deck.id);
       } else if (tier.decks.length === 0) {
-        moveDeck(item.index, 0, item.tierIndex, tierIndex);
+        moveDeck(item.index, 0, item.tierIndex, tierIndex, item.deck.id);
       }
     },
   });
+  tierDrop(tierDropRef);
 
   return (
     <div
       className="tier mb-2 flex w-full flex-col md:flex-row export-md:flex-row"
       data-tier-index={tierIndex}
-      ref={tierDrop as unknown as React.Ref<HTMLDivElement>}
+      ref={tierDropRef}
       style={{ minHeight: '100px' }}
     >
       <div className={`tier-label ${tierColors[tierIndex]} my-2 flex h-8 w-full items-center justify-center rounded-sm font-bold text-white md:m-2 md:h-12 md:w-24 md:shrink-0 export-md:h-12 export-md:w-24`}>
         {tier.name}
       </div>
-      <div className="flex w-full flex-wrap content-start gap-2 pb-2 md:px-2 md:py-2">
+      <div role="list" className="flex w-full flex-wrap content-start gap-2 pb-2 md:px-2 md:py-2">
         {tier.decks.map((deck, index) => (
           <TierItem
             key={deck.id}

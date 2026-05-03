@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle, RotateCcw, Share2 } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AlertCircle, CheckCircle, Copy, RotateCcw, Share2 } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
-import AvailableDecks from './AvailableDecks';
+import AvailableDecks, { type AvailableDeckKeyboardAction } from './AvailableDecks';
 import DragPreviewLayer from './DragPreviewLayer';
 import GlobalDropZone from './GlobalDropZone';
 import { DownloadIcon } from './Icon';
@@ -18,9 +18,11 @@ import {
   moveDeckToAvailableDecksState,
 } from '../utils/tierListState';
 import {
+  clearTierListShareQuery,
   createXShareText,
   createDefaultTierListSnapshot,
   createTierListShareUrl,
+  hasTierListShareQuery,
   loadTierListSnapshot,
   saveTierListSnapshot,
 } from '../utils/tierListStorage';
@@ -47,6 +49,7 @@ const isTouchPrimaryDevice = () => {
 const TierList: React.FC = () => {
   const i18n = useI18n();
   const [snapshot, setSnapshot] = useState(() => loadTierListSnapshot());
+  const skipInitialSave = useRef(hasTierListShareQuery());
   const [isExporting, setIsExporting] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState<FeedbackMessage | null>(null);
   const [focusedDeckId, setFocusedDeckId] = useState<string | null>(null);
@@ -62,6 +65,12 @@ const TierList: React.FC = () => {
   const xShareUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
 
   useEffect(() => {
+    if (skipInitialSave.current) {
+      skipInitialSave.current = false;
+      return;
+    }
+
+    clearTierListShareQuery();
     saveTierListSnapshot(snapshot);
   }, [snapshot]);
 
@@ -77,10 +86,16 @@ const TierList: React.FC = () => {
     return () => window.clearTimeout(timeoutId);
   }, [feedbackMessage]);
 
-  const moveDeck = useCallback((dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => {
+  const moveDeck = useCallback((
+    dragIndex: number,
+    hoverIndex: number,
+    dragTierIndex: number,
+    hoverTierIndex: number,
+    deckId?: string,
+  ) => {
     setSnapshot((prevSnapshot) => ({
       ...prevSnapshot,
-      tiers: moveDeckState(prevSnapshot.tiers, dragIndex, hoverIndex, dragTierIndex, hoverTierIndex),
+      tiers: moveDeckState(prevSnapshot.tiers, dragIndex, hoverIndex, dragTierIndex, hoverTierIndex, deckId),
     }));
   }, []);
 
@@ -103,6 +118,65 @@ const TierList: React.FC = () => {
     }));
   }, []);
 
+  const moveAvailableDeckByKeyboard = useCallback((
+    deck: Deck,
+    index: number,
+    action: AvailableDeckKeyboardAction,
+    targetAvailableDeckIndex?: number,
+  ) => {
+    setFocusedDeckId(deck.id);
+    setSnapshot((prevSnapshot) => {
+      const availableDeckIndex = prevSnapshot.availableDecks.findIndex((candidate) => candidate.id === deck.id);
+      const sourceIndex = availableDeckIndex === -1 ? index : availableDeckIndex;
+
+      if (sourceIndex < 0 || sourceIndex >= prevSnapshot.availableDecks.length) {
+        return prevSnapshot;
+      }
+
+      const moveWithinAvailableDecks = () => {
+        if (
+          targetAvailableDeckIndex === undefined ||
+          targetAvailableDeckIndex < 0 ||
+          targetAvailableDeckIndex >= prevSnapshot.availableDecks.length ||
+          targetAvailableDeckIndex === sourceIndex
+        ) {
+          return prevSnapshot;
+        }
+
+        return {
+          ...prevSnapshot,
+          availableDecks: moveAvailableDeckState(prevSnapshot.availableDecks, sourceIndex, targetAvailableDeckIndex),
+        };
+      };
+
+      if (
+        action === 'move-left' ||
+        action === 'move-right' ||
+        action === 'move-home' ||
+        action === 'move-end'
+      ) {
+        return moveWithinAvailableDecks();
+      }
+
+      if (action === 'move-to-last-tier') {
+        const targetTierIndex = prevSnapshot.tiers.length - 1;
+
+        if (targetTierIndex < 0) {
+          return prevSnapshot;
+        }
+
+        return moveDeckFromAvailableDecksState(
+          prevSnapshot.tiers,
+          prevSnapshot.availableDecks,
+          prevSnapshot.availableDecks[sourceIndex],
+          targetTierIndex,
+        );
+      }
+
+      return prevSnapshot;
+    });
+  }, []);
+
   const moveTierDeckByKeyboard = useCallback((deck: Deck, tierIndex: number, action: TierKeyboardAction) => {
     setFocusedDeckId(deck.id);
     setSnapshot((prevSnapshot) => {
@@ -120,7 +194,7 @@ const TierList: React.FC = () => {
 
         return {
           ...prevSnapshot,
-          tiers: moveDeckState(prevSnapshot.tiers, currentIndex, targetIndex, tierIndex, tierIndex),
+          tiers: moveDeckState(prevSnapshot.tiers, currentIndex, targetIndex, tierIndex, tierIndex, deck.id),
         };
       };
 
@@ -156,6 +230,7 @@ const TierList: React.FC = () => {
             Math.min(currentIndex, targetTier.decks.length),
             tierIndex,
             targetTierIndex,
+            deck.id,
           ),
         };
       }
@@ -197,6 +272,29 @@ const TierList: React.FC = () => {
     }
   }, [i18n, isExporting, tiers]);
 
+  const handleCopyShareUrl = useCallback(async () => {
+    if (typeof navigator === 'undefined' || typeof navigator.clipboard?.writeText !== 'function') {
+      setFeedbackMessage({
+        type: 'error',
+        text: i18n.t('tierList.copyShareUrlError'),
+      });
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setFeedbackMessage({
+        type: 'success',
+        text: i18n.t('tierList.copyShareUrlSuccess'),
+      });
+    } catch {
+      setFeedbackMessage({
+        type: 'error',
+        text: i18n.t('tierList.copyShareUrlError'),
+      });
+    }
+  }, [i18n, shareUrl]);
+
   const handleReset = useCallback(() => {
     if (typeof window !== 'undefined' && !window.confirm(i18n.t('tierList.resetConfirmation'))) {
       return;
@@ -230,8 +328,10 @@ const TierList: React.FC = () => {
           <AvailableDecks
             decks={availableDecks}
             allDecks={allDecks}
+            focusedDeckId={focusedDeckId}
             moveAvailableDeck={moveAvailableDeck}
             moveDeckToAvailableDecks={moveDeckToAvailableDecks}
+            moveAvailableDeckByKeyboard={moveAvailableDeckByKeyboard}
             addDeck={(deck) => {
               setSnapshot((prevSnapshot) => ({
                 ...prevSnapshot,
@@ -247,8 +347,8 @@ const TierList: React.FC = () => {
         <div className="mx-auto w-full max-w-[816px]">
           {feedbackMessage && (
             <p
-              role="status"
-              aria-live="polite"
+              role={feedbackMessage.type === 'error' ? 'alert' : 'status'}
+              aria-live={feedbackMessage.type === 'error' ? 'assertive' : 'polite'}
               className={`mt-4 flex items-center gap-2 rounded-md border px-4 py-3 text-sm ${
                 feedbackMessage.type === 'error'
                   ? 'border-red-400/50 bg-red-500/10 text-red-100'
@@ -272,12 +372,20 @@ const TierList: React.FC = () => {
               <DownloadIcon className="h-6 w-6" />
               <span className="ml-2 inline-block">{isExporting ? i18n.t('tierList.exportInProgress') : i18n.t('tierList.exportButton')}</span>
             </button>
-            <div className="grid grid-cols-2 gap-3 md:flex md:w-auto">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:flex md:w-auto">
+              <button
+                type="button"
+                onClick={handleCopyShareUrl}
+                className="inline-flex min-h-16 min-w-0 items-center justify-center gap-2 whitespace-normal border border-white/20 px-4 py-3 text-center text-sm font-medium leading-tight text-white/80 transition-colors hover:border-white/40 hover:text-white md:px-6 md:py-0"
+              >
+                <Copy className="h-4 w-4" aria-hidden="true" />
+                {i18n.t('tierList.copyShareUrl')}
+              </button>
               <a
                 href={xShareUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                className="inline-flex min-h-16 min-w-0 items-center justify-center gap-2 whitespace-normal border border-white/20 px-4 py-3 text-center text-sm font-medium leading-tight text-white/80 transition-colors hover:border-white/40 hover:text-white md:px-6 md:py-0"
               >
                 <Share2 className="h-4 w-4" aria-hidden="true" />
                 {i18n.t('tierList.shareOnX')}
@@ -285,7 +393,7 @@ const TierList: React.FC = () => {
               <button
                 type="button"
                 onClick={handleReset}
-                className="inline-flex h-16 items-center justify-center gap-2 border border-white/20 px-6 text-sm font-medium text-white/80 transition-colors hover:border-white/40 hover:text-white"
+                className="inline-flex min-h-16 min-w-0 items-center justify-center gap-2 whitespace-normal border border-white/20 px-4 py-3 text-center text-sm font-medium leading-tight text-white/80 transition-colors hover:border-white/40 hover:text-white md:px-6 md:py-0"
               >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 {i18n.t('tierList.resetButton')}

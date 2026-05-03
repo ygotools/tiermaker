@@ -45,14 +45,25 @@ describe('tierListState', () => {
     expect(result.availableDecks).toEqual([]);
   });
 
-  it('moves the current available deck state when the drag payload is stale', () => {
-    const currentDeck: Deck = { ...thirdDeck, name: 'Current Red-Eyes' };
-    const stalePayload: Deck = { ...thirdDeck, name: 'Stale Red-Eyes' };
+  it('uses the current available deck when the dragged payload is stale', () => {
+    const currentDeck: Deck = { id: 'custom-theme', name: 'Current Name', image: '/current.png' };
+    const stalePayload: Deck = { id: 'custom-theme', name: 'Old Name', image: '/old.png' };
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [] }];
     const availableDecks = [currentDeck];
 
-    const result = moveDeckFromAvailableDecksState(sampleTiers, availableDecks, stalePayload, 1, 0);
+    const result = moveDeckFromAvailableDecksState(tiers, availableDecks, stalePayload, 0);
 
-    expect(result.tiers[1].decks).toEqual([currentDeck, otherDeck]);
+    expect(result.tiers[0].decks).toEqual([currentDeck]);
+    expect(result.availableDecks).toEqual([]);
+  });
+
+  it('does not insert a duplicate id when moving from available decks into a tier', () => {
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [sampleDeck] }];
+    const availableDecks = [sampleDeck];
+
+    const result = moveDeckFromAvailableDecksState(tiers, availableDecks, sampleDeck, 0);
+
+    expect(result.tiers[0].decks).toEqual([sampleDeck]);
     expect(result.availableDecks).toEqual([]);
   });
 
@@ -77,6 +88,29 @@ describe('tierListState', () => {
     expect(tiers[0].decks).toEqual([sampleDeck, otherDeck]);
   });
 
+  it('uses the current deck id when moving with a stale drag index', () => {
+    const tiers: Tier[] = [
+      { name: 'Tier1', decks: [sampleDeck, otherDeck, thirdDeck] },
+      { name: 'Tier2', decks: [] },
+    ];
+
+    const result = moveDeckState(tiers, 0, 0, 0, 1, otherDeck.id);
+
+    expect(result[0].decks).toEqual([sampleDeck, thirdDeck]);
+    expect(result[1].decks).toEqual([otherDeck]);
+  });
+
+  it('ignores stale deck ids that are no longer in the source tier', () => {
+    const tiers: Tier[] = [
+      { name: 'Tier1', decks: [sampleDeck, otherDeck] },
+      { name: 'Tier2', decks: [] },
+    ];
+
+    const result = moveDeckState(tiers, 0, 0, 0, 1, thirdDeck.id);
+
+    expect(result).toBe(tiers);
+  });
+
   it('moves only the matching deck id when names are duplicated', () => {
     const duplicateNameDeck: Deck = { id: 'blue-eyes-alt', name: 'Blue-Eyes', image: '/blue-eyes-alt.png' };
     const tiers: Tier[] = [
@@ -90,17 +124,24 @@ describe('tierListState', () => {
     expect(result.availableDecks).toEqual([sampleDeck]);
   });
 
-  it('moves the current tier deck state when the drag payload is stale', () => {
-    const currentDeck: Deck = { ...sampleDeck, name: 'Current Blue-Eyes' };
-    const stalePayload: Deck = { ...sampleDeck, name: 'Stale Blue-Eyes' };
-    const tiers: Tier[] = [
-      { name: 'Tier1', decks: [currentDeck] },
-      { name: 'Tier2', decks: [] },
-    ];
+  it('uses the current tier deck when the dragged payload is stale', () => {
+    const currentDeck: Deck = { id: 'custom-theme', name: 'Current Name', image: '/current.png' };
+    const stalePayload: Deck = { id: 'custom-theme', name: 'Old Name', image: '/old.png' };
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [currentDeck] }];
 
     const result = moveDeckToAvailableDecksState(tiers, [], stalePayload, 0);
 
     expect(result.tiers[0].decks).toEqual([]);
     expect(result.availableDecks).toEqual([currentDeck]);
+  });
+
+  it('does not insert a duplicate id when moving from a tier to available decks', () => {
+    const tiers: Tier[] = [{ name: 'Tier1', decks: [sampleDeck] }];
+    const availableDecks = [sampleDeck];
+
+    const result = moveDeckToAvailableDecksState(tiers, availableDecks, sampleDeck, 0);
+
+    expect(result.tiers[0].decks).toEqual([]);
+    expect(result.availableDecks).toEqual([sampleDeck]);
   });
 });

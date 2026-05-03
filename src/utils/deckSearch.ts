@@ -65,6 +65,7 @@ const ROMAJI_TO_HIRAGANA: Record<string, string> = {
   che: 'ちぇ',
   she: 'しぇ',
   je: 'じぇ',
+  ji: 'じ',
   ti: 'てぃ',
   tu: 'とぅ',
   di: 'でぃ',
