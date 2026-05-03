@@ -187,6 +187,39 @@ describe('tierListStorage', () => {
     expect(restored.availableDecks).toHaveLength(defaultSnapshot.availableDecks.length + defaultSnapshot.tiers.flatMap((tier) => tier.decks).length - 2);
   });
 
+  it('restores a single custom theme object from query params', () => {
+    const params = new URLSearchParams({
+      tier1: 'custom-theme',
+      customDecks: JSON.stringify({ id: 'custom-theme', name: 'Custom Theme', imageUrl: 'https://example.com/custom-theme.png' }),
+    });
+
+    window.history.replaceState({}, '', `/?${params.toString()}`);
+
+    expect(loadTierListSnapshot().tiers[0].decks).toEqual([
+      { id: 'custom-theme', name: 'Custom Theme', image: 'https://example.com/custom-theme.png' },
+    ]);
+  });
+
+  it('restores custom themes from repeated custom deck query params', () => {
+    const params = new URLSearchParams({
+      tier1: 'custom-theme-a,custom-theme-b',
+    });
+
+    params.append('customDecks', JSON.stringify([
+      { id: 'custom-theme-a', name: 'Custom Theme A', imageUrl: 'https://example.com/custom-theme-a.png' },
+    ]));
+    params.append('customDecks', JSON.stringify([
+      { id: 'custom-theme-b', name: 'Custom Theme B', imageUrl: 'https://example.com/custom-theme-b.png' },
+    ]));
+
+    window.history.replaceState({}, '', `/?${params.toString()}`);
+
+    expect(loadTierListSnapshot().tiers[0].decks).toEqual([
+      { id: 'custom-theme-a', name: 'Custom Theme A', image: 'https://example.com/custom-theme-a.png' },
+      { id: 'custom-theme-b', name: 'Custom Theme B', image: 'https://example.com/custom-theme-b.png' },
+    ]);
+  });
+
   it('normalizes custom theme query ids and names and defaults blank images', () => {
     const params = new URLSearchParams({
       tier1: 'custom-theme',
@@ -217,6 +250,23 @@ describe('tierListStorage', () => {
     window.history.replaceState({}, '', `/?${params.toString()}`);
 
     expect(loadTierListSnapshot().tiers[0].decks).toEqual([]);
+  });
+
+  it('allows custom theme query ids and names at their maximum lengths', () => {
+    const maxLengthId = 'i'.repeat(128);
+    const maxLengthName = 'n'.repeat(120);
+    const params = new URLSearchParams({
+      tier1: maxLengthId,
+      customDecks: JSON.stringify([
+        { id: maxLengthId, name: maxLengthName, imageUrl: 'https://example.com/custom-theme.png' },
+      ]),
+    });
+
+    window.history.replaceState({}, '', `/?${params.toString()}`);
+
+    expect(loadTierListSnapshot().tiers[0].decks).toEqual([
+      { id: maxLengthId, name: maxLengthName, image: 'https://example.com/custom-theme.png' },
+    ]);
   });
 
   it('ignores custom themes with control characters in query ids', () => {

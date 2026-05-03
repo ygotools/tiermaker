@@ -7,14 +7,20 @@ type GlobalDropZoneProps = {
   children: React.ReactNode;
 }
 
+type DeckDropItem = {
+  deck: Deck;
+  index: number;
+  tierIndex: number;
+}
+
 const GlobalDropZone: React.FC<GlobalDropZoneProps> = ({ moveDeckToAvailableDecks, children }) => {
   const globalDropRef = useRef<HTMLDivElement>(null);
 
-  const [, drop] = useDrop({
+  const [, drop] = useDrop<DeckDropItem>({
     accept: 'deck',
     drop: (item, monitor) => {
       if (!monitor.didDrop()) {
-        const { deck, tierIndex } = item as { deck: Deck; tierIndex: number };
+        const { deck, tierIndex } = item;
         if (tierIndex >= 0) {
           moveDeckToAvailableDecks(deck, tierIndex);
         }

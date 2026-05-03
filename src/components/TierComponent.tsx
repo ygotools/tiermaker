@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import TierItem, { type TierKeyboardAction } from './TierItem';
 import { Tier, Deck } from '../types';
@@ -20,6 +20,12 @@ type TierComponentProps = {
   focusedDeckId: string | null;
 }
 
+type DeckDropItem = {
+  deck: Deck;
+  index: number;
+  tierIndex: number;
+}
+
 const tierColors = ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-gray-500'];
 
 const TierComponent: React.FC<TierComponentProps> = ({
@@ -32,9 +38,10 @@ const TierComponent: React.FC<TierComponentProps> = ({
   focusedDeckId,
 }) => {
   const i18n = useI18n();
-  const [, tierDrop] = useDrop({
+  const tierDropRef = useRef<HTMLDivElement>(null);
+  const [, tierDrop] = useDrop<DeckDropItem>({
     accept: 'deck',
-    drop: (item: { deck: Deck, index: number; tierIndex: number }, monitor) => {
+    drop: (item, monitor) => {
       if (monitor.didDrop()) {
         return;
       }
@@ -48,12 +55,13 @@ const TierComponent: React.FC<TierComponentProps> = ({
       }
     },
   });
+  tierDrop(tierDropRef);
 
   return (
     <div
       className="tier mb-2 flex w-full flex-col md:flex-row export-md:flex-row"
       data-tier-index={tierIndex}
-      ref={tierDrop as unknown as React.Ref<HTMLDivElement>}
+      ref={tierDropRef}
       style={{ minHeight: '100px' }}
     >
       <div className={`tier-label ${tierColors[tierIndex]} my-2 flex h-8 w-full items-center justify-center rounded-sm font-bold text-white md:m-2 md:h-12 md:w-24 md:shrink-0 export-md:h-12 export-md:w-24`}>

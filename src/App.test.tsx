@@ -375,6 +375,49 @@ describe('App', () => {
     expect(readAsDataURL).toHaveBeenCalledOnce();
   });
 
+  it('uses a successfully read local image data URL for the preview and added deck image', async () => {
+    const user = userEvent.setup();
+    const customDeckName = 'Local Image Theme';
+    const customDeckImageDataUrl = 'data:image/png;base64,bG9jYWwtaW1hZ2U=';
+    const readAsDataURL = vi.fn(function readAsDataURL(this: FileReaderStub) {
+      this.result = customDeckImageDataUrl;
+      this.onload?.(new ProgressEvent('load') as ProgressEvent<FileReader>);
+    });
+    const FileReaderMock = vi.fn((): FileReaderStub => ({
+      result: null,
+      onload: null,
+      onerror: null,
+      readAsDataURL,
+    }));
+    vi.stubGlobal('FileReader', FileReaderMock);
+    const { container } = render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: 'Add Theme' })[0]);
+    await user.type(screen.getByLabelText('Theme Name'), customDeckName);
+    await user.upload(
+      screen.getByLabelText('Or choose a local image'),
+      new File(['local image'], 'local.png', { type: 'image/png' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('img', { name: 'Preview of the new theme' })).toHaveAttribute(
+        'src',
+        customDeckImageDataUrl,
+      );
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+
+    const customDeck = screen.getByRole('listitem', { name: customDeckName });
+    expect(customDeck).toBeInTheDocument();
+    expect(within(customDeck).getByRole('img', { name: customDeckName })).toHaveAttribute(
+      'src',
+      customDeckImageDataUrl,
+    );
+    expect(getAvailableDeckNames(container)).toContain(customDeckName);
+    expect(readAsDataURL).toHaveBeenCalledOnce();
+  });
+
   it('does not add a deck after a local image read error when Add is pressed', async () => {
     const user = userEvent.setup();
     const readAsDataURL = vi.fn(function readAsDataURL(this: FileReaderStub) {
@@ -595,10 +638,12 @@ describe('App', () => {
 
     const shareLink = screen.getByRole('link', { name: 'Share on X' });
     const shareText = new URL(shareLink.getAttribute('href') ?? '').searchParams.get('text') ?? '';
+    const shareTextLines = shareText.split('\n');
 
-    expect(shareText).toContain('I made a tier list with Tier Maker');
-    expect(shareText).toContain('#MasterDuel #YuGiOhMasterDuel #TIERMAKERFORMD');
-    expect(shareText).toContain('http://localhost:3000/?tier1=');
+    expect(shareTextLines).toHaveLength(3);
+    expect(shareTextLines[0]).toBe('I made a tier list with Tier Maker');
+    expect(shareTextLines[1]).toBe('#MasterDuel #YuGiOhMasterDuel #TIERMAKERFORMD');
+    expect(new URL(shareTextLines[2]).searchParams.has('tier1')).toBe(true);
     expect(shareText).not.toContain('Tier1');
     expect(shareText).not.toContain('Kewl Tune');
     expect(shareText).not.toContain('Solfachord Yummy');
@@ -688,6 +733,33 @@ describe('App', () => {
 
     const availableDeckNames = getAvailableDeckNames(container);
     expect(availableDeckNames.indexOf('Onomat Ryzeal')).toBe(availableDeckNames.indexOf('Ryzeal') + 1);
+  });
+
+  it('shows no matching themes and clears the search through the clear button', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+
+    const searchInput = screen.getByRole('textbox', { name: 'Filter by theme name' });
+
+    await user.type(searchInput, 'definitely no such theme');
+
+    expect(searchInput).toHaveValue('definitely no such theme');
+    expect(screen.getByText('No matching themes found.')).toBeInTheDocument();
+    expect(screen.getByText(/^Showing 0 \/ \d+$/)).toBeInTheDocument();
+    expect(getAvailableDeckNames(container)).toEqual([]);
+
+    const clearButton = screen
+      .getAllByRole('button', { name: 'Clear search' })
+      .find((button) => !button.hasAttribute('disabled'));
+
+    expect(clearButton).toBeInTheDocument();
+
+    await user.click(clearButton as HTMLElement);
+
+    expect(searchInput).toHaveValue('');
+    expect(screen.queryByText('No matching themes found.')).not.toBeInTheDocument();
+    expect(screen.getByText(/\d+ themes/)).toBeInTheDocument();
+    expect(getAvailableDeckNames(container).length).toBeGreaterThan(0);
   });
 
   it('moves an available deck to the end of Tier4 with ArrowUp and restores focus', async () => {

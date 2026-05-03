@@ -7,6 +7,7 @@ describe('deckSearch', () => {
     expect(convertRomajiToHiragana('shukusei')).toBe('しゅくせい');
     expect(convertRomajiToHiragana('attoigunisuta')).toBe('あっといぐにすた');
     expect(convertRomajiToHiragana('jinrai')).toBe('じんらい');
+    expect(convertRomajiToHiragana('n\'kko')).toBe('んっこ');
   });
 
   it('matches kana when the user searches in romaji', () => {
@@ -22,10 +23,19 @@ describe('deckSearch', () => {
   it('still matches direct name and kana input', () => {
     const deck = { id: 'runick', name: '神碑', kana: 'るーん', image: '/runick.png' };
 
+    expect(matchesDeckSearch(deck, '')).toBe(true);
     expect(matchesDeckSearch(deck, '神碑')).toBe(true);
     expect(matchesDeckSearch(deck, 'るーん')).toBe(true);
     expect(matchesDeckSearch(deck, 'runick')).toBe(true);
     expect(matchesDeckSearch(deck, 'unknown')).toBe(false);
+  });
+
+  it('normalizes full-width roman text and mixed separators', () => {
+    const deck = { id: 'r-ace', name: 'R-ACE', nameEn: 'Rescue-ACE', kana: 'れすきゅーえーす', image: '/static/deckimages/r-ace.png' };
+
+    expect(matchesDeckSearch(deck, 'Ｒ－ＡＣＥ')).toBe(true);
+    expect(matchesDeckSearch(deck, 'rescue_ace')).toBe(true);
+    expect(matchesDeckSearch(deck, 'rescue/ace')).toBe(true);
   });
 
   it('matches the image filename without the extension for english input', () => {

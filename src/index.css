@@ -8,6 +8,17 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+:where(a, button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.28);
+}
+
+:where(input, select, textarea)[aria-invalid="true"] {
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 1px rgba(248, 113, 113, 0.42);
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0.0;
@@ -100,5 +111,31 @@ html, body {
 @keyframes shine {
   100% {
     left: 125%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .download-button:hover svg,
+  #share-button:hover a::before {
+    animation: none;
+  }
+
+  #share-button a::before {
+    display: none;
   }
 }
