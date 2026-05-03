@@ -86,10 +86,16 @@ const TierList: React.FC = () => {
     return () => window.clearTimeout(timeoutId);
   }, [feedbackMessage]);
 
-  const moveDeck = useCallback((dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => {
+  const moveDeck = useCallback((
+    dragIndex: number,
+    hoverIndex: number,
+    dragTierIndex: number,
+    hoverTierIndex: number,
+    deckId?: string,
+  ) => {
     setSnapshot((prevSnapshot) => ({
       ...prevSnapshot,
-      tiers: moveDeckState(prevSnapshot.tiers, dragIndex, hoverIndex, dragTierIndex, hoverTierIndex),
+      tiers: moveDeckState(prevSnapshot.tiers, dragIndex, hoverIndex, dragTierIndex, hoverTierIndex, deckId),
     }));
   }, []);
 
@@ -188,7 +194,7 @@ const TierList: React.FC = () => {
 
         return {
           ...prevSnapshot,
-          tiers: moveDeckState(prevSnapshot.tiers, currentIndex, targetIndex, tierIndex, tierIndex),
+          tiers: moveDeckState(prevSnapshot.tiers, currentIndex, targetIndex, tierIndex, tierIndex, deck.id),
         };
       };
 
@@ -224,6 +230,7 @@ const TierList: React.FC = () => {
             Math.min(currentIndex, targetTier.decks.length),
             tierIndex,
             targetTierIndex,
+            deck.id,
           ),
         };
       }

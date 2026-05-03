@@ -36,6 +36,7 @@ const MAX_LOCAL_THEME_IMAGE_BYTES = 1024 * 1024;
 const THEME_NAME_INPUT_ID = 'create-theme-name';
 const THEME_ICON_URL_INPUT_ID = 'create-theme-icon-url';
 const THEME_LOCAL_IMAGE_INPUT_ID = 'create-theme-local-image';
+const THEME_CREATE_DESCRIPTION_ID = 'create-theme-description';
 const THEME_NAME_ERROR_ID = 'create-theme-name-error';
 const THEME_LOCAL_IMAGE_ERROR_ID = 'create-theme-local-image-error';
 const AVAILABLE_DECK_KEYBOARD_DESCRIPTION_ID = 'available-deck-keyboard-description';
@@ -91,6 +92,8 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
   const i18n = useI18n();
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const modalOpenerRef = React.useRef<HTMLButtonElement | null>(null);
+  const themeNameInputRef = React.useRef<HTMLInputElement>(null);
+  const localImageInputRef = React.useRef<HTMLInputElement>(null);
   const [inputThemeName, setInputThemeName] = React.useState('');
   const [isSearchFocused, setIsSearchFocused] = React.useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
@@ -181,6 +184,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
     const normalizedName = newDeckName.trim();
     if (!normalizedName) {
       setThemeNameError(i18n.t('availableDecks.requiredThemeNameError'));
+      themeNameInputRef.current?.focus();
       return;
     }
 
@@ -189,12 +193,14 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
       normalizeDeckName(deck.nameEn ?? '') === normalizeDeckName(normalizedName)
     ))) {
       setThemeNameError(i18n.t('availableDecks.duplicateThemeError'));
+      themeNameInputRef.current?.focus();
       return;
     }
 
     setThemeNameError(null);
 
     if (localImageError) {
+      localImageInputRef.current?.focus();
       return;
     }
 
@@ -282,7 +288,9 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
               {i18n.t('availableDecks.addTheme')}
             </button>
             <p className="text-sm text-gray-300">
-              {i18n.t('availableDecks.countLabel')(filteredDecks.length, decks.length)}
+              <span aria-live="polite" aria-atomic="true">
+                {i18n.t('availableDecks.countLabel')(filteredDecks.length, decks.length)}
+              </span>
             </p>
           </div>
           <div
@@ -299,6 +307,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
                 onChange={handleInputThemeName}
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setIsSearchFocused(false)}
+                aria-label={i18n.t('availableDecks.searchPlaceholder')}
                 className="w-full rounded-md border border-transparent p-2 pl-10 pr-10 text-black"
                 placeholder={i18n.t('availableDecks.searchPlaceholder')}
               />
@@ -394,12 +403,15 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
             role="dialog"
             aria-modal="true"
             aria-labelledby="create-theme-title"
+            aria-describedby={THEME_CREATE_DESCRIPTION_ID}
             className="w-full max-w-md rounded-md border border-gray-600 bg-gray-800 p-5 text-white shadow-xl"
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <h2 id="create-theme-title" className="text-lg font-bold">{i18n.t('availableDecks.createThemeTitle')}</h2>
-                <p className="mt-1 text-sm text-gray-300">{i18n.t('availableDecks.createThemeDescription')}</p>
+                <p id={THEME_CREATE_DESCRIPTION_ID} className="mt-1 text-sm text-gray-300">
+                  {i18n.t('availableDecks.createThemeDescription')}
+                </p>
               </div>
               <button
                 type="button"
@@ -426,6 +438,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
               <label htmlFor={THEME_NAME_INPUT_ID} className="mb-2 block text-sm">{i18n.t('availableDecks.themeNameLabel')}</label>
               <input
                 id={THEME_NAME_INPUT_ID}
+                ref={themeNameInputRef}
                 type="text"
                 value={newDeckName}
                 onChange={handleNewDeckNameChange}
@@ -452,6 +465,7 @@ const AvailableDecks: React.FC<AvailableDecksProps> = ({
               <label htmlFor={THEME_LOCAL_IMAGE_INPUT_ID} className="mb-2 block text-sm">{i18n.t('availableDecks.localImageLabel')}</label>
               <input
                 id={THEME_LOCAL_IMAGE_INPUT_ID}
+                ref={localImageInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleIconFileInput}
@@ -540,6 +554,10 @@ const AvailableDeckItem: React.FC<{
       }
 
       if (item.tierIndex === -1) {
+        if (item.index === index) {
+          return;
+        }
+
         moveAvailableDeck(item.index, index);
       } else {
         moveDeckToAvailableDecks(item.deck, item.tierIndex, index);

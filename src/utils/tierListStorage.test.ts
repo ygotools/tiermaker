@@ -463,6 +463,42 @@ describe('tierListStorage', () => {
     expect(restored.availableDecks[0].nameEn).toBe('Ryzeal');
   });
 
+  it('deduplicates stored deck ids across tiers and available decks', () => {
+    const snapshot = {
+      tiers: [
+        {
+          name: 'Tier1',
+          decks: [
+            { id: 'blue-eyes', name: '青眼', image: '/blue-eyes.png' },
+            { id: 'ryzeal', name: 'ライゼオル', image: '/ryzeal.png' },
+            { id: 'blue-eyes', name: 'Duplicate Blue-Eyes', image: '/duplicate-blue-eyes.png' },
+          ],
+        },
+        {
+          name: 'Tier2',
+          decks: [
+            { id: 'ryzeal', name: 'Duplicate Ryzeal', image: '/duplicate-ryzeal.png' },
+            { id: 'custom-theme', name: 'Custom Theme', image: '/custom-theme.png' },
+          ],
+        },
+      ],
+      availableDecks: [
+        { id: 'custom-theme', name: 'Duplicate Custom Theme', image: '/duplicate-custom-theme.png' },
+        { id: 'malice', name: 'M∀LICE', image: '/malice.png' },
+      ],
+    };
+
+    window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify(snapshot));
+
+    const restored = loadTierListSnapshot();
+
+    expect(restored.tiers[0].decks.map((deck) => deck.id)).toEqual(['blue-eyes', 'ryzeal']);
+    expect(restored.tiers[1].decks.map((deck) => deck.id)).toEqual(['custom-theme']);
+    expect(restored.availableDecks.map((deck) => deck.id)).toEqual(['malice']);
+    expect(restored.tiers[0].decks[0].name).toBe('青眼');
+    expect(restored.tiers[1].decks[0].name).toBe('Custom Theme');
+  });
+
   it('falls back when the stored shape does not match the snapshot schema', () => {
     window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify({
       tiers: [{ name: 'Tier1', decks: [{ name: 'Blue-Eyes' }] }],

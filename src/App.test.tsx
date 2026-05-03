@@ -64,7 +64,8 @@ describe('App', () => {
   it('renders the English UI when the browser language is not Japanese', () => {
     render(<App />);
 
-    expect(screen.getByPlaceholderText('Filter by theme name')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Filter by theme name' })).toBeInTheDocument();
+    expect(screen.getByText(/\d+ themes/)).toHaveAttribute('aria-live', 'polite');
     expect(screen.getAllByRole('button', { name: 'Add Theme' })).toHaveLength(2);
     expect(screen.getByText('Lunalight')).toBeInTheDocument();
     expect(screen.getByText('Maliss')).toBeInTheDocument();
@@ -85,7 +86,7 @@ describe('App', () => {
     setNavigatorLanguage('ja-JP');
     render(<App />);
 
-    expect(screen.getByPlaceholderText('テーマ名で絞り込む')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'テーマ名で絞り込む' })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'テーマを追加' })).toHaveLength(2);
     expect(screen.getByText('月光')).toBeInTheDocument();
     expect(screen.getByText('M∀LICE')).toBeInTheDocument();
@@ -174,6 +175,7 @@ describe('App', () => {
     expect(error).toHaveTextContent('Please enter a theme name.');
     expect(themeNameInput).toHaveAttribute('aria-invalid', 'true');
     expect(themeNameInput).toHaveAttribute('aria-describedby', error.id);
+    expect(themeNameInput).toHaveFocus();
   });
 
   it('clears the required theme name error when the theme name changes', async () => {
@@ -195,6 +197,24 @@ describe('App', () => {
     expect(themeNameInput).not.toHaveAttribute('aria-describedby');
   });
 
+  it('rejects duplicate theme names and keeps focus on the theme name input', async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getAllByRole('button', { name: 'Add Theme' })[0]);
+    await user.type(screen.getByLabelText('Theme Name'), 'lunalight');
+    await user.click(screen.getByRole('button', { name: 'Add' }));
+
+    const themeNameInput = screen.getByLabelText('Theme Name');
+    const error = screen.getByRole('alert');
+
+    expect(error).toHaveTextContent('A theme with the same name already exists.');
+    expect(themeNameInput).toHaveAttribute('aria-invalid', 'true');
+    expect(themeNameInput).toHaveAttribute('aria-describedby', error.id);
+    expect(themeNameInput).toHaveFocus();
+  });
+
   it('keeps focus inside the add theme dialog', async () => {
     const user = userEvent.setup();
 
@@ -207,6 +227,9 @@ describe('App', () => {
     const addButton = within(dialog).getByRole('button', { name: 'Add' });
 
     expect(screen.getByLabelText('Theme Name')).toHaveFocus();
+    expect(dialog).toHaveAccessibleDescription(
+      'You can add a candidate by entering an image URL or selecting an image file.',
+    );
 
     closeButton.focus();
     await user.keyboard('{Shift>}{Tab}{/Shift}');
@@ -374,8 +397,11 @@ describe('App', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Add' }));
 
+    const localImageInput = screen.getByLabelText('Or choose a local image');
+
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveTextContent('Could not read the local image. Please choose another image.');
+    expect(localImageInput).toHaveFocus();
     expect(getAvailableDeckNames(container)).not.toContain('Broken Local Image Theme');
   });
 
@@ -562,6 +588,20 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Copy URL' }));
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not copy the share URL.');
+  });
+
+  it('builds the X share link from intro, hashtags, and the share URL only', () => {
+    render(<App />);
+
+    const shareLink = screen.getByRole('link', { name: 'Share on X' });
+    const shareText = new URL(shareLink.getAttribute('href') ?? '').searchParams.get('text') ?? '';
+
+    expect(shareText).toContain('I made a tier list with Tier Maker');
+    expect(shareText).toContain('#MasterDuel #YuGiOhMasterDuel #TIERMAKERFORMD');
+    expect(shareText).toContain('http://localhost:3000/?tier1=');
+    expect(shareText).not.toContain('Tier1');
+    expect(shareText).not.toContain('Kewl Tune');
+    expect(shareText).not.toContain('Solfachord Yummy');
   });
 
   it('moves a tier deck within the same tier with arrow keys', async () => {

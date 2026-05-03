@@ -88,6 +88,29 @@ describe('tierListState', () => {
     expect(tiers[0].decks).toEqual([sampleDeck, otherDeck]);
   });
 
+  it('uses the current deck id when moving with a stale drag index', () => {
+    const tiers: Tier[] = [
+      { name: 'Tier1', decks: [sampleDeck, otherDeck, thirdDeck] },
+      { name: 'Tier2', decks: [] },
+    ];
+
+    const result = moveDeckState(tiers, 0, 0, 0, 1, otherDeck.id);
+
+    expect(result[0].decks).toEqual([sampleDeck, thirdDeck]);
+    expect(result[1].decks).toEqual([otherDeck]);
+  });
+
+  it('ignores stale deck ids that are no longer in the source tier', () => {
+    const tiers: Tier[] = [
+      { name: 'Tier1', decks: [sampleDeck, otherDeck] },
+      { name: 'Tier2', decks: [] },
+    ];
+
+    const result = moveDeckState(tiers, 0, 0, 0, 1, thirdDeck.id);
+
+    expect(result).toBe(tiers);
+  });
+
   it('moves only the matching deck id when names are duplicated', () => {
     const duplicateNameDeck: Deck = { id: 'blue-eyes-alt', name: 'Blue-Eyes', image: '/blue-eyes-alt.png' };
     const tiers: Tier[] = [

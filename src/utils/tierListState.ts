@@ -9,6 +9,9 @@ const clampIndex = (index: number, length: number) => Math.max(0, Math.min(index
 const findDeckIndexById = (decks: Deck[], deckId: string) => decks.findIndex((candidate) => candidate.id === deckId);
 const hasDeckId = (decks: Deck[], deckId: string) => findDeckIndexById(decks, deckId) !== -1;
 const removeDeckAt = (decks: Deck[], index: number) => decks.filter((_, deckIndex) => deckIndex !== index);
+const getCurrentDragIndex = (decks: Deck[], fallbackIndex: number, deckId?: string) => (
+  deckId === undefined ? fallbackIndex : findDeckIndexById(decks, deckId)
+);
 
 const insertDeckAt = (decks: Deck[], deck: Deck, index: number) => {
   const nextDecks = [...decks];
@@ -22,6 +25,7 @@ export const moveDeckState = (
   hoverIndex: number,
   dragTierIndex: number,
   hoverTierIndex: number,
+  deckId?: string,
 ) => {
   if (
     dragTierIndex < 0 ||
@@ -34,16 +38,17 @@ export const moveDeckState = (
 
   const dragTier = tiers[dragTierIndex];
   const hoverTier = tiers[hoverTierIndex];
+  const currentDragIndex = getCurrentDragIndex(dragTier.decks, dragIndex, deckId);
 
   if (
-    dragIndex < 0 ||
-    dragIndex >= dragTier.decks.length ||
-    (dragTierIndex === hoverTierIndex && dragIndex === hoverIndex)
+    currentDragIndex < 0 ||
+    currentDragIndex >= dragTier.decks.length ||
+    (dragTierIndex === hoverTierIndex && currentDragIndex === hoverIndex)
   ) {
     return tiers;
   }
 
-  const movedDeck = dragTier.decks[dragIndex];
+  const movedDeck = dragTier.decks[currentDragIndex];
 
   if (!movedDeck) {
     return tiers;
@@ -51,7 +56,7 @@ export const moveDeckState = (
 
   if (dragTierIndex === hoverTierIndex) {
     const nextDecks = [...dragTier.decks];
-    nextDecks.splice(dragIndex, 1);
+    nextDecks.splice(currentDragIndex, 1);
     nextDecks.splice(clampIndex(hoverIndex, nextDecks.length), 0, movedDeck);
 
     return tiers.map((tier, index) => (
@@ -61,7 +66,7 @@ export const moveDeckState = (
     ));
   }
 
-  const nextDragDecks = removeDeckAt(dragTier.decks, dragIndex);
+  const nextDragDecks = removeDeckAt(dragTier.decks, currentDragIndex);
   const nextHoverDecks = insertDeckAt(hoverTier.decks, movedDeck, hoverIndex);
 
   return tiers.map((tier, index) => {

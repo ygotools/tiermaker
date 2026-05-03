@@ -7,7 +7,13 @@ import { useI18n } from '../i18n';
 type TierComponentProps = {
   tier: Tier;
   tierIndex: number;
-  moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
+  moveDeck: (
+    dragIndex: number,
+    hoverIndex: number,
+    dragTierIndex: number,
+    hoverTierIndex: number,
+    deckId?: string,
+  ) => void;
   moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
   moveTierDeckByKeyboard: (deck: Deck, tierIndex: number, action: TierKeyboardAction) => void;
@@ -36,9 +42,9 @@ const TierComponent: React.FC<TierComponentProps> = ({
       if (item.tierIndex === -1) { // AvailableDecksからのドロップ
         moveDeckFromAvailableDecks(item.deck, tierIndex);
       } else if (item.tierIndex !== tierIndex) {
-        moveDeck(item.index, tier.decks.length, item.tierIndex, tierIndex);
+        moveDeck(item.index, tier.decks.length, item.tierIndex, tierIndex, item.deck.id);
       } else if (tier.decks.length === 0) {
-        moveDeck(item.index, 0, item.tierIndex, tierIndex);
+        moveDeck(item.index, 0, item.tierIndex, tierIndex, item.deck.id);
       }
     },
   });

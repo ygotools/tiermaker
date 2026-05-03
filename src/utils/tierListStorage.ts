@@ -301,6 +301,26 @@ const hydrateSnapshotDeckNames = (snapshot: TierListSnapshot, defaultSnapshot: T
   };
 };
 
+const deduplicateSnapshotDecks = (snapshot: TierListSnapshot): TierListSnapshot => {
+  const usedDeckIds = new Set<string>();
+  const getUniqueDecks = (decks: Deck[]) => decks.filter((deck) => {
+    if (usedDeckIds.has(deck.id)) {
+      return false;
+    }
+
+    usedDeckIds.add(deck.id);
+    return true;
+  });
+
+  return {
+    tiers: snapshot.tiers.map((tier) => ({
+      ...tier,
+      decks: getUniqueDecks(tier.decks),
+    })),
+    availableDecks: getUniqueDecks(snapshot.availableDecks),
+  };
+};
+
 export const createDefaultTierListSnapshot = (): TierListSnapshot => ({
   tiers: SAMPLE_DATA.map(cloneTier),
   availableDecks: INITIAL_AVAILABLE_DECKS.map(cloneDeck),
@@ -344,7 +364,7 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
       return defaultSnapshot;
     }
 
-    return hydrateSnapshotDeckNames(parsed, defaultSnapshot);
+    return hydrateSnapshotDeckNames(deduplicateSnapshotDecks(parsed), defaultSnapshot);
   } catch {
     return defaultSnapshot;
   }

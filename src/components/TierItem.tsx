@@ -11,7 +11,13 @@ type TierItemProps = {
   tierIndex: number;
   tierName: string;
   tierDeckCount: number;
-  moveDeck: (dragIndex: number, hoverIndex: number, dragTierIndex: number, hoverTierIndex: number) => void;
+  moveDeck: (
+    dragIndex: number,
+    hoverIndex: number,
+    dragTierIndex: number,
+    hoverTierIndex: number,
+    deckId?: string,
+  ) => void;
   moveDeckFromAvailableDecks: (deck: Deck, hoverTierIndex: number, hoverIndex?: number) => void;
   moveDeckToAvailableDecks: (deck: Deck, sourceTierIndex: number, hoverIndex?: number) => void;
   moveTierDeckByKeyboard: (deck: Deck, tierIndex: number, action: TierKeyboardAction) => void;
@@ -85,7 +91,7 @@ const TierItem: React.FC<TierItemProps> = ({
       if (dragTierIndex === -1) {
         moveDeckFromAvailableDecks(item.deck, hoverTierIndex, hoverIndex);
       } else {
-        moveDeck(dragIndex, hoverIndex, dragTierIndex, hoverTierIndex);
+        moveDeck(dragIndex, hoverIndex, dragTierIndex, hoverTierIndex, item.deck.id);
       }
 
       item.index = hoverIndex;
@@ -101,8 +107,8 @@ const TierItem: React.FC<TierItemProps> = ({
     }),
     end: (item, monitor) => {
       const didDrop = monitor.didDrop();
-      if (!didDrop && item.tierIndex === tierIndex) {
-        moveDeckToAvailableDecks(item.deck, tierIndex);
+      if (!didDrop && item.tierIndex >= 0) {
+        moveDeckToAvailableDecks(item.deck, item.tierIndex);
       }
     },
   });
