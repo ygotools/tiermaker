@@ -390,6 +390,7 @@ export const createTierListShareUrl = (tiers: Tier[]) => {
       .map((deck) => deck.id),
   );
   const customDecksById = new Map<string, CustomDeckQueryValue>();
+  const sharedDeckIds = new Set<string>();
 
   tiers.forEach((tier, index) => {
     const queryKey = TIER_QUERY_KEYS[index];
@@ -399,21 +400,30 @@ export const createTierListShareUrl = (tiers: Tier[]) => {
     }
 
     const deckIds = tier.decks.flatMap((deck) => {
+      let shareDeckId: string | null = null;
+
       if (knownDeckIds.has(deck.id)) {
-        return [deck.id];
+        shareDeckId = deck.id;
+      } else {
+        const customDeckQueryValue = createCustomDeckQueryValue(deck);
+
+        if (!customDeckQueryValue) {
+          return [];
+        }
+
+        shareDeckId = customDeckQueryValue.id;
+
+        if (!knownDeckIds.has(customDeckQueryValue.id) && !customDecksById.has(customDeckQueryValue.id)) {
+          customDecksById.set(customDeckQueryValue.id, customDeckQueryValue);
+        }
       }
 
-      const customDeckQueryValue = createCustomDeckQueryValue(deck);
-
-      if (
-        customDeckQueryValue &&
-        !knownDeckIds.has(customDeckQueryValue.id) &&
-        !customDecksById.has(customDeckQueryValue.id)
-      ) {
-        customDecksById.set(customDeckQueryValue.id, customDeckQueryValue);
+      if (sharedDeckIds.has(shareDeckId)) {
+        return [];
       }
 
-      return customDeckQueryValue ? [customDeckQueryValue.id] : [];
+      sharedDeckIds.add(shareDeckId);
+      return [shareDeckId];
     });
 
     if (deckIds.length === 0) {

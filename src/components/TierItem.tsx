@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { Deck } from '../types';
+import { Deck, type DeckDragItem } from '../types';
 import { useI18n } from '../i18n';
 import { getDeckDisplayName } from '../utils/deckName';
 
@@ -75,7 +75,7 @@ const TierItem: React.FC<TierItemProps> = ({
   const [, drop] = useDrop({
     accept: 'deck',
     drop: () => ({ moved: true }),
-    hover(item: { deck: Deck; index: number; tierIndex: number }) {
+    hover(item: DeckDragItem) {
       if (!ref.current) {
         return;
       }
@@ -101,7 +101,7 @@ const TierItem: React.FC<TierItemProps> = ({
 
   const [{ isDraggingItem }, drag, preview] = useDrag({
     type: 'deck',
-    item: { deck, index, tierIndex },
+    item: { deck, index, tierIndex } satisfies DeckDragItem,
     collect: (monitor) => ({
       isDraggingItem: monitor.isDragging(),
     }),

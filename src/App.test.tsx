@@ -4,6 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import { createDefaultTierListSnapshot } from './utils/tierListStorage';
 
+const exportAsImageMock = vi.hoisted(() => vi.fn<() => Promise<void>>());
+
+vi.mock('./utils/exportImage', () => ({
+  exportAsImage: exportAsImageMock,
+}));
+
 const setNavigatorLanguage = (language: string, languages = [language]) => {
   Object.defineProperty(window.navigator, 'language', {
     configurable: true,
@@ -54,6 +60,8 @@ describe('App', () => {
     window.sessionStorage.clear();
     window.history.replaceState({}, '', '/');
     setClipboardWriteText();
+    exportAsImageMock.mockReset();
+    exportAsImageMock.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -631,6 +639,55 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Copy URL' }));
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not copy the share URL.');
+  });
+
+  it('disables the export button while exporting and prevents duplicate exports', async () => {
+    const user = userEvent.setup();
+    let finishExport: (() => void) | undefined;
+
+    exportAsImageMock.mockImplementation(() => new Promise<void>((resolve) => {
+      finishExport = resolve;
+    }));
+    render(<App />);
+
+    const exportButton = screen.getByRole('button', { name: 'Export as Image' });
+
+    await user.click(exportButton);
+
+    expect(exportAsImageMock).toHaveBeenCalledOnce();
+    expect(exportButton).toBeDisabled();
+    expect(exportButton).toHaveAttribute('aria-busy', 'true');
+    expect(exportButton).toHaveAccessibleName('Exporting...');
+
+    await user.click(exportButton);
+
+    expect(exportAsImageMock).toHaveBeenCalledOnce();
+
+    finishExport?.();
+
+    await waitFor(() => {
+      expect(exportButton).not.toBeDisabled();
+    });
+
+    expect(exportButton).toHaveAttribute('aria-busy', 'false');
+    expect(exportButton).toHaveAccessibleName('Export as Image');
+    expect(screen.getByRole('status')).toHaveTextContent('Image exported. Please check the downloaded PNG.');
+  });
+
+  it('shows feedback when image export fails', async () => {
+    const user = userEvent.setup();
+    const exportError = new Error('export failed');
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    exportAsImageMock.mockRejectedValue(exportError);
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: 'Export as Image' }));
+
+    expect(exportAsImageMock).toHaveBeenCalledOnce();
+    expect(screen.getByRole('button', { name: 'Export as Image' })).not.toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Failed to export the image. Please try again in a moment.');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to export the tier list image.', exportError);
   });
 
   it('builds the X share link from intro, hashtags, and the share URL only', () => {

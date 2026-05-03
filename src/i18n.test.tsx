@@ -109,6 +109,21 @@ describe('i18n', () => {
     expect(detectLocale()).toBe('ja');
   });
 
+  it('falls back to navigator language when localStorage is unavailable', () => {
+    vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+      throw new Error('localStorage is unavailable');
+    });
+
+    expect(detectLocale()).toBe('ja');
+  });
+
+  it('ignores unsupported stored locale values', () => {
+    setNavigatorLanguage('en-US');
+    window.localStorage.setItem('tier-maker-language', 'fr');
+
+    expect(detectLocale()).toBe('en');
+  });
+
   it('switches the active language through setLanguage', async () => {
     const user = userEvent.setup();
 
@@ -171,6 +186,26 @@ describe('i18n', () => {
     );
 
     expect(screen.getByText('更新履歴')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'switch-en' }));
+    expect(screen.getByText('Update History')).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe('en');
+  });
+
+  it('keeps initial render and language switching usable when localStorage is full', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Quota exceeded', 'QuotaExceededError');
+    });
+
+    render(
+      <I18nProvider>
+        <I18nProbe />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByText('更新履歴')).toBeInTheDocument();
+    expect(document.documentElement.lang).toBe('ja');
 
     await user.click(screen.getByRole('button', { name: 'switch-en' }));
     expect(screen.getByText('Update History')).toBeInTheDocument();

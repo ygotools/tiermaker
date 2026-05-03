@@ -575,14 +575,42 @@ describe('tierListStorage', () => {
         { id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' },
         { id: 'custom-theme', name: 'Custom Theme', image: 'https://example.com/custom-theme.png' },
       ] },
-      { name: 'Tier2', decks: [{ id: 'custom-theme', name: 'Custom Theme', image: 'https://example.com/custom-theme.png' }] },
+      { name: 'Tier2', decks: [] },
       { name: 'Tier3', decks: [] },
       { name: 'Tier4', decks: [] },
     ]);
     const params = new URL(shareUrl).searchParams;
 
     expect(params.get('tier1')).toBe('blue-eyes,custom-theme');
-    expect(params.get('tier2')).toBe('custom-theme');
+    expect(params.has('tier2')).toBe(false);
+    expect(JSON.parse(params.get('customDecks') ?? '')).toEqual([
+      { id: 'custom-theme', name: 'Custom Theme', imageUrl: 'https://example.com/custom-theme.png' },
+    ]);
+  });
+
+  it('deduplicates deck ids in share urls across malformed tier assignments', () => {
+    const shareUrl = createTierListShareUrl([
+      { name: 'Tier1', decks: [
+        { id: 'blue-eyes', name: 'Blue-Eyes', image: '/blue-eyes.png' },
+        { id: 'blue-eyes', name: 'Duplicate Blue-Eyes', image: '/duplicate-blue-eyes.png' },
+        { id: ' custom-theme ', name: ' Custom Theme ', image: ' https://example.com/custom-theme.png ' },
+      ] },
+      { name: 'Tier2', decks: [
+        { id: 'ryzeal', name: 'Ryzeal', image: '/ryzeal.png' },
+        { id: 'blue-eyes', name: 'Duplicate Blue-Eyes', image: '/duplicate-blue-eyes.png' },
+        { id: 'custom-theme', name: 'Duplicate Custom Theme', image: 'https://example.com/duplicate-custom-theme.png' },
+      ] },
+      { name: 'Tier3', decks: [
+        { id: 'custom-theme', name: 'Duplicate Custom Theme', image: 'https://example.com/duplicate-custom-theme.png' },
+      ] },
+      { name: 'Tier4', decks: [] },
+    ]);
+    const params = new URL(shareUrl).searchParams;
+
+    expect(params.get('tier1')).toBe('blue-eyes,custom-theme');
+    expect(params.get('tier2')).toBe('ryzeal');
+    expect(params.has('tier3')).toBe(false);
+    expect(params.toString()).not.toContain('duplicate');
     expect(JSON.parse(params.get('customDecks') ?? '')).toEqual([
       { id: 'custom-theme', name: 'Custom Theme', imageUrl: 'https://example.com/custom-theme.png' },
     ]);

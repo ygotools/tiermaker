@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import TierItem, { type TierKeyboardAction } from './TierItem';
-import { Tier, Deck } from '../types';
+import { Tier, Deck, type DeckDragItem } from '../types';
 import { useI18n } from '../i18n';
 
 type TierComponentProps = {
@@ -20,12 +20,6 @@ type TierComponentProps = {
   focusedDeckId: string | null;
 }
 
-type DeckDropItem = {
-  deck: Deck;
-  index: number;
-  tierIndex: number;
-}
-
 const tierColors = ['bg-red-500', 'bg-orange-500', 'bg-green-500', 'bg-blue-500', 'bg-gray-500'];
 
 const TierComponent: React.FC<TierComponentProps> = ({
@@ -39,7 +33,7 @@ const TierComponent: React.FC<TierComponentProps> = ({
 }) => {
   const i18n = useI18n();
   const tierDropRef = useRef<HTMLDivElement>(null);
-  const [, tierDrop] = useDrop<DeckDropItem>({
+  const [, tierDrop] = useDrop<DeckDragItem>({
     accept: 'deck',
     drop: (item, monitor) => {
       if (monitor.didDrop()) {

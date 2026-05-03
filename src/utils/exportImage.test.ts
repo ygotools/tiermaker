@@ -96,6 +96,7 @@ describe('exportAsImage image loading', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('retries an image that failed during a previous export', async () => {
@@ -203,5 +204,38 @@ describe('exportAsImage image loading', () => {
     expect(mockContext.fillRect).toHaveBeenCalledWith(120, 76, 160, 90);
     expect(mockContext.strokeRect).toHaveBeenCalledWith(120.5, 76.5, 159, 89);
     expect(mockContext.fillText).toHaveBeenCalledWith('Retry Me', 200, 154);
+  });
+
+  it('throws when a canvas 2D context is unavailable', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null);
+
+    const { exportAsImage } = await import('./exportImage');
+
+    await expect(exportAsImage({ tiers })).rejects.toThrow('Canvas 2D context is not available.');
+  });
+
+  it('rejects when the canvas cannot create a PNG blob', async () => {
+    vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation((callback: BlobCallback) => {
+      callback(null);
+    });
+
+    const { exportAsImage } = await import('./exportImage');
+
+    await expect(exportAsImage({ tiers })).rejects.toThrow('Failed to render canvas as a PNG blob.');
+  });
+
+  it('revokes the temporary download object URL after exporting', async () => {
+    vi.useFakeTimers();
+
+    const { exportAsImage } = await import('./exportImage');
+
+    await exportAsImage({ tiers });
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
+    expect(URL.revokeObjectURL).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(1000);
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:export-image');
   });
 });

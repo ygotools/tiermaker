@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { PlusCircle, Search, X } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import { Deck } from '../types';
+import { Deck, type DeckDragItem } from '../types';
 import { matchesDeckSearch } from '../utils/deckSearch';
 import { useI18n } from '../i18n';
 import { getDeckDisplayName } from '../utils/deckName';
@@ -548,7 +548,7 @@ const AvailableDeckItem: React.FC<{
   const [, drop] = useDrop({
     accept: 'deck',
     drop: () => ({ moved: true }),
-    hover(item: { deck: Deck; index: number; tierIndex: number }) {
+    hover(item: DeckDragItem) {
       if (!ref.current) {
         return;
       }
@@ -570,7 +570,7 @@ const AvailableDeckItem: React.FC<{
 
   const [{ isDragging }, drag, preview] = useDrag({
     type: 'deck',
-    item: { deck, index, tierIndex: -1 },
+    item: { deck, index, tierIndex: -1 } satisfies DeckDragItem,
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
