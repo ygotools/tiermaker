@@ -11,6 +11,49 @@ import {
   saveTierListSnapshot,
 } from './tierListStorage';
 
+// Keep storage behavior tests independent from production deck-list rotations.
+const masterdataMock = vi.hoisted(() => ({
+  SAMPLE_DATA: [
+    {
+      name: 'Tier1',
+      decks: [
+        {
+          id: 'killer-tune',
+          name: 'キラーチューン',
+          nameEn: 'Kewl Tune',
+          kana: 'きらーちゅーん',
+          image: '/static/deckimages/killer-tune.png',
+        },
+        { id: 'yummy', name: 'ヤミー', nameEn: 'Yummy', kana: 'やみー', image: '/static/deckimages/yummy.png' },
+      ],
+    },
+    {
+      name: 'Tier2',
+      decks: [
+        { id: 'vsk9', name: 'VSK9', nameEn: 'VSK9', kana: 'ぶいえすけーないん', image: '/static/deckimages/vsk9.png' },
+      ],
+    },
+    {
+      name: 'Tier3',
+      decks: [
+        { id: 'moonlight', name: '月光', nameEn: 'Lunalight', kana: 'むーんらいと', image: '/static/deckimages/moonlight.png' },
+      ],
+    },
+    {
+      name: 'Tier4',
+      decks: [
+        { id: 'malice', name: 'M∀LICE', nameEn: 'Maliss', kana: 'まりす', image: '/static/deckimages/malice.png' },
+      ],
+    },
+  ],
+  INITIAL_AVAILABLE_DECKS: [
+    { id: 'blue-eyes', name: '青眼', nameEn: 'Blue-Eyes', kana: 'ぶるーあいず', image: '/static/deckimages/blue-eyes.png' },
+    { id: 'ryzeal', name: 'ライゼオル', nameEn: 'Ryzeal', kana: 'らいぜおる', image: '/static/deckimages/ryzeal.png' },
+  ],
+}));
+
+vi.mock('../masterdata', () => masterdataMock);
+
 describe('tierListStorage', () => {
   beforeEach(() => {
     window.sessionStorage.clear();

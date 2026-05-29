@@ -5,7 +5,83 @@ import App from './App';
 import { createDefaultTierListSnapshot } from './utils/tierListStorage';
 
 const exportAsImageMock = vi.hoisted(() => vi.fn<() => Promise<void>>());
+// Keep UI behavior tests independent from production deck-list rotations.
+const masterdataMock = vi.hoisted(() => ({
+  SAMPLE_DATA: [
+    {
+      name: 'Tier1',
+      decks: [
+        {
+          id: 'killer-tune',
+          name: 'キラーチューン',
+          nameEn: 'Kewl Tune',
+          kana: 'きらーちゅーん',
+          image: '/static/deckimages/killer-tune.png',
+        },
+        {
+          id: 'doremi-yummy',
+          name: 'ドレミヤミー',
+          nameEn: 'Solfachord Yummy',
+          kana: 'どれみやみー',
+          image: '/static/deckimages/doremi-yummy.png',
+        },
+      ],
+    },
+    {
+      name: 'Tier2',
+      decks: [
+        { id: 'vsk9', name: 'VSK9', nameEn: 'VSK9', kana: 'ぶいえすけーないん', image: '/static/deckimages/vsk9.png' },
+        {
+          id: 'dracotail',
+          name: 'ドラゴンテイル',
+          nameEn: 'Dracotail',
+          kana: 'どらごんている',
+          image: '/static/deckimages/dracotail.png',
+        },
+        { id: 'malice', name: 'M∀LICE', nameEn: 'Maliss', kana: 'まりす', image: '/static/deckimages/malice.png' },
+        {
+          id: 'gemknight',
+          name: 'ジェムナイト',
+          nameEn: 'Gem-Knight',
+          kana: 'じぇむないと',
+          image: '/static/deckimages/gemknight.png',
+        },
+      ],
+    },
+    {
+      name: 'Tier3',
+      decks: [
+        { id: 'moonlight', name: '月光', nameEn: 'Lunalight', kana: 'むーんらいと', image: '/static/deckimages/moonlight.png' },
+      ],
+    },
+    {
+      name: 'Tier4',
+      decks: [
+        {
+          id: 'tearlaments',
+          name: 'ティアラメンツ',
+          nameEn: 'Tearlaments',
+          kana: 'てぃあらめんつ',
+          image: '/static/deckimages/tearlaments.png',
+        },
+      ],
+    },
+  ],
+  INITIAL_AVAILABLE_DECKS: [
+    {
+      id: 'onomato-ryzeal',
+      name: 'オノマトライゼオル',
+      nameEn: 'Onomat Ryzeal',
+      kana: 'おのまとらいぜおる',
+      image: '/static/deckimages/onomato-ryzeal.png',
+    },
+    { id: 'mitsurugi', name: '巳剣', nameEn: 'Mitsurugi', kana: 'みつるぎ', image: '/static/deckimages/mitsurugi.png' },
+    { id: 'ryzeal', name: 'ライゼオル', nameEn: 'Ryzeal', kana: 'らいぜおる', image: '/static/deckimages/ryzeal.png' },
+    { id: 'blue-eyes', name: '青眼', nameEn: 'Blue-Eyes', kana: 'ぶるーあいず', image: '/static/deckimages/blue-eyes.png' },
+  ],
+}));
 
+vi.mock('./masterdata', () => masterdataMock);
 vi.mock('./utils/exportImage', () => ({
   exportAsImage: exportAsImageMock,
 }));
