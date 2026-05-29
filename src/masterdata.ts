@@ -11,6 +11,7 @@ const ENGLISH_DECK_NAMES: Record<string, string> = {
   skystriker: 'Sky Striker',
   moonlight: 'Lunalight',
   tearlaments: 'Tearlaments',
+  odion: 'Odion',
   'onomato-ryzeal': 'Onomat Ryzeal',
   mitsurugi: 'Mitsurugi',
   yummy: 'Yummy',
@@ -55,6 +56,8 @@ const ENGLISH_DECK_NAMES: Record<string, string> = {
   kashtira: 'Kashtira',
   others_01: 'Other 1',
   others_02: 'Other 2',
+  'magnet-warrior': 'Magnet Warrior',
+  elfnote: 'Elfnote'
 };
 
 const withEnglishName = (deck: Deck): Deck => ({
@@ -67,29 +70,32 @@ export const SAMPLE_DATA: Tier[] = [
     name: 'Tier1',
     decks: [
       { id: 'killer-tune', name: 'キラーチューン', kana: 'きらーちゅーん', image: '/static/deckimages/killer-tune.png' },
-      { id: 'doremi-yummy', name: 'ドレミヤミー', kana: 'どれみやみー', image: '/static/deckimages/doremi-yummy.png' },
+      { id: 'skystriker', name: '閃刀姫', kana: 'せんとうき', image: '/static/deckimages/skystriker.png' },
+      { id: 'magnet-warrior', name: '磁石の戦士', kana: 'じしゃくのせんし', image: '/static/deckimages/magnet-warrior.png' },
     ],
   },
   {
     name: 'Tier2',
     decks: [
+      { id: 'orcust', name: 'オルフェゴール', kana: 'おるふぇごーる', image: '/static/deckimages/orcust.png' },
       { id: 'vsk9', name: 'VSK9', kana: 'ぶいえすけーないん', image: '/static/deckimages/vsk9.png' },
-      { id: 'dracotail', name: 'ドラゴンテイル', kana: 'どらごんている', image: '/static/deckimages/dracotail.png' },
-      { id: 'malice', name: 'M∀LICE', kana: 'まりす', image: '/static/deckimages/malice.png' },
-      { id: 'gemknight', name: 'ジェムナイト', kana: 'じぇむないと', image: '/static/deckimages/gemknight.png' },
+      { id: 'mitsurugi-ryzeal', name: '巳剣ライゼオル', kana: 'みつるぎらいぜおる', image: '/static/deckimages/mitsurugi-ryzeal.png' },
     ],
   },
   {
     name: 'Tier3',
     decks: [
-      { id: 'mitsurugi-ryzeal', name: '巳剣ライゼオル', kana: 'みつるぎらいぜおる', image: '/static/deckimages/mitsurugi-ryzeal.png' },
-      { id: 'skystriker', name: '閃刀姫', kana: 'せんとうき', image: '/static/deckimages/skystriker.png' },
       { id: 'moonlight', name: '月光', kana: 'むーんらいと', image: '/static/deckimages/moonlight.png' },
+      { id: 'malice', name: 'M∀LICE', kana: 'まりす', image: '/static/deckimages/malice.png' },
+      { id: 'gemknight', name: 'ジェムナイト', kana: 'じぇむないと', image: '/static/deckimages/gemknight.png' },
+      { id: 'elfnote', name: 'エルフェンノーツ', kana: 'えるふぇんのーつ', image: '/static/deckimages/elfnote.png' },
     ],
   },
   {
     name: 'Tier4',
     decks: [
+      { id: 'dracotail', name: 'ドラゴンテイル', kana: 'どらごんている', image: '/static/deckimages/dracotail.png' },
+      { id: 'doremi-yummy', name: 'ドレミヤミー', kana: 'どれみやみー', image: '/static/deckimages/doremi-yummy.png' },
       { id: 'tearlaments', name: 'ティアラメンツ', kana: 'てぃあらめんつ', image: '/static/deckimages/tearlaments.png' },
     ],
   },
@@ -99,10 +105,10 @@ export const SAMPLE_DATA: Tier[] = [
 }));
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
+  { id: 'odion', name: 'リシド', kana: 'りしど', image: '/static/deckimages/odion.png' },
   { id: 'onomato-ryzeal', name: 'オノマトライゼオル', kana: 'おのまとらいぜおる', image: '/static/deckimages/onomato-ryzeal.png' },
   { id: 'mitsurugi', name: '巳剣', kana: 'みつるぎ', image: '/static/deckimages/mitsurugi.png' },
   { id: 'yummy', name: 'ヤミー', kana: 'やみー', image: '/static/deckimages/yummy.png' },
-  { id: 'orcust', name: 'オルフェゴール', kana: 'おるふぇごーる', image: '/static/deckimages/orcust.png' },
   { id: 'metabeat', name: 'メタビート', kana: 'めたびーと', image: '/static/deckimages/metabeat.png' },
   { id: 'ryzeal', name: 'ライゼオル', kana: 'らいぜおる', image: '/static/deckimages/ryzeal.png' },
   { id: 'tenpai-dragon', name: '天盃龍', kana: 'てんぱいりゅう', image: '/static/deckimages/tenpai-dragon.png' },

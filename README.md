@@ -15,7 +15,7 @@ Live site: [https://tier.ygotools.com](https://tier.ygotools.com)
 - Download the tier list as a PNG image
 
 On initial load, tier and deck data defined in `src/masterdata.ts` is used.  
-The default dataset includes 10 sample decks placed in tiers and 42 decks in the bottom list.
+The default dataset includes 10 sample decks placed in tiers and 43 decks in the bottom list.
 
 ## Tech Stack
 
