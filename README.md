@@ -15,7 +15,9 @@ Live site: [https://tier.ygotools.com](https://tier.ygotools.com)
 - Download the tier list as a PNG image
 
 On initial load, tier and deck data defined in `src/masterdata.ts` is used.  
-The default dataset includes 10 sample decks placed in tiers and 43 decks in the bottom list.
+The default dataset includes 16 sample decks placed in tiers and 56 decks in the bottom list.
+The November 15, 2026 update follows [Game8's November 13 tier list](https://game8.jp/yugioh-masterduel/423817).
+New themes are also added to the candidates when an existing saved session is restored, preserving the user's tier placements.
 
 ## Tech Stack
 
@@ -63,7 +65,11 @@ Tier defaults and the deck list are managed in [src/masterdata.ts](./src/masterd
 Images are referenced from `public/static/deckimages/<theme>.png`.  
 To add a new deck, add its image path to `src/masterdata.ts` and run `pnpm download-assets` if needed.
 
-Assets are fetched from a public Google Cloud Storage bucket configured in `scripts/download-assets.mjs`.
+Legacy assets are fetched from a public Google Cloud Storage bucket configured in `scripts/download-assets.mjs`.
+New artwork is committed under `public/static/deckimages/bundled/` so a clean CI build includes it without a bucket upload.
+The downloader validates these bundled PNGs without overwriting them.
+DeviantArt source pages, artist credits, source dimensions, and crop coordinates are recorded in [sources.json](./public/static/deckimages/bundled/sources.json).
+The bundled images use a 480 × 270 canvas, with crops selected to keep the featured character visible above the deck label.
 
 ## Build and Deploy
 

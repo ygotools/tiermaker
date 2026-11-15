@@ -128,7 +128,11 @@ describe('tierListStorage', () => {
 
     const restored = loadTierListSnapshot();
 
-    expect(restored).toEqual(storedSnapshot);
+    const defaults = createDefaultTierListSnapshot();
+    expect(restored).toEqual({
+      ...storedSnapshot,
+      availableDecks: [...defaults.tiers.flatMap((tier) => tier.decks), ...defaults.availableDecks],
+    });
     expect(hasTierListShareQuery()).toBe(false);
   });
 
@@ -487,7 +491,11 @@ describe('tierListStorage', () => {
     } as typeof URLSearchParams;
 
     try {
-      expect(loadTierListSnapshot()).toEqual(storedSnapshot);
+      const defaults = createDefaultTierListSnapshot();
+      expect(loadTierListSnapshot()).toEqual({
+        ...storedSnapshot,
+        availableDecks: [...defaults.tiers.flatMap((tier) => tier.decks), ...defaults.availableDecks],
+      });
     } finally {
       globalThis.URLSearchParams = originalURLSearchParams;
     }
@@ -527,7 +535,7 @@ describe('tierListStorage', () => {
     expect(loadTierListSnapshot()).toEqual(snapshot);
   });
 
-  it('keeps stored snapshots even when deck count differs from master data', () => {
+  it('preserves saved tiers and custom decks while adding missing master decks to the candidates', () => {
     const snapshot = {
       tiers: [
         { name: 'Tier1', decks: [{ id: 'custom-theme', name: 'Blue-Eyes', image: '/blue-eyes.png' }] },
@@ -537,7 +545,34 @@ describe('tierListStorage', () => {
 
     window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify(snapshot));
 
-    expect(loadTierListSnapshot()).toEqual(snapshot);
+    const restored = loadTierListSnapshot();
+    const defaults = createDefaultTierListSnapshot();
+
+    expect(restored.tiers).toEqual(snapshot.tiers);
+    expect(restored.availableDecks).toEqual([
+      ...defaults.tiers.flatMap((tier) => tier.decks),
+      ...defaults.availableDecks,
+    ]);
+    saveTierListSnapshot(restored);
+    expect(loadTierListSnapshot()).toEqual(restored);
+  });
+
+  it('adds newly released decks once without changing existing placements or candidate order', () => {
+    const snapshot = createDefaultTierListSnapshot();
+    const movedDeck = snapshot.tiers[0].decks.shift()!;
+    snapshot.tiers[2].decks.push(movedDeck);
+    snapshot.availableDecks.reverse();
+    // Simulate a session saved before this deck was introduced into the catalog.
+    const newDeck = snapshot.tiers[1].decks.pop()!;
+    saveTierListSnapshot(snapshot);
+
+    const restored = loadTierListSnapshot();
+
+    expect(restored.tiers).toEqual(snapshot.tiers);
+    expect(restored.availableDecks).toEqual([...snapshot.availableDecks, newDeck]);
+    expect(restored.availableDecks[restored.availableDecks.length - 1]).not.toBe(newDeck);
+    saveTierListSnapshot(restored);
+    expect(loadTierListSnapshot()).toEqual(restored);
   });
 
   it('hydrates missing English names for known decks from master data', () => {
@@ -587,7 +622,12 @@ describe('tierListStorage', () => {
 
     expect(restored.tiers[0].decks.map((deck) => deck.id)).toEqual(['blue-eyes', 'ryzeal']);
     expect(restored.tiers[1].decks.map((deck) => deck.id)).toEqual(['custom-theme']);
-    expect(restored.availableDecks.map((deck) => deck.id)).toEqual(['malice']);
+    expect(restored.availableDecks[0].id).toBe('malice');
+    const allDeckIds = [
+      ...restored.tiers.flatMap((tier) => tier.decks),
+      ...restored.availableDecks,
+    ].map((deck) => deck.id);
+    expect(new Set(allDeckIds).size).toBe(allDeckIds.length);
     expect(restored.tiers[0].decks[0].name).toBe('青眼');
     expect(restored.tiers[1].decks[0].name).toBe('Custom Theme');
   });

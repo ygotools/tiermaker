@@ -10,19 +10,32 @@ const outputDir = path.join(projectRoot, "public", "static", "deckimages");
 const assetBaseUrl = "https://storage.googleapis.com/tiermaker-static/deckimages";
 
 function getThemeNames(masterdataSource) {
-  const matches = masterdataSource.matchAll(/\/static\/deckimages\/([a-zA-Z0-9_-]+)\.png/g);
+  const matches = masterdataSource.matchAll(/\/static\/deckimages\/((?:bundled\/)?[a-zA-Z0-9_-]+)\.png/g);
 
   return [...new Set([...matches].map((match) => match[1]))];
 }
 
 async function downloadThemeImage(themeName) {
+  const outputPath = path.join(outputDir, `${themeName}.png`);
+
+  if (themeName.startsWith('bundled/')) {
+    // New artwork ships with the repository instead of depending on the legacy bucket.
+    const buffer = await readFile(outputPath);
+
+    if (!buffer.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
+      throw new Error(`Invalid bundled PNG: ${themeName}.png`);
+    }
+
+    console.log(`Using bundled ${themeName}.png`);
+    return;
+  }
+
   const response = await fetch(`${assetBaseUrl}/${themeName}.png`);
 
   if (!response.ok) {
     throw new Error(`Failed to download ${themeName}.png: ${response.status} ${response.statusText}`);
   }
 
-  const outputPath = path.join(outputDir, `${themeName}.png`);
   const buffer = Buffer.from(await response.arrayBuffer());
 
   await writeFile(outputPath, buffer);
@@ -43,7 +56,7 @@ async function main() {
     await downloadThemeImage(themeName);
   }
 
-  console.log(`Downloaded ${themeNames.length} deck images to ${outputDir}`);
+  console.log(`Prepared ${themeNames.length} deck images in ${outputDir}`);
 }
 
 main().catch((error) => {

@@ -289,15 +289,25 @@ const mergeDeckWithDefault = (deck: Deck, deckDefaultsById: Map<string, Deck>): 
   };
 };
 
-const hydrateSnapshotDeckNames = (snapshot: TierListSnapshot, defaultSnapshot: TierListSnapshot): TierListSnapshot => {
+const reconcileSnapshotWithDefaults = (snapshot: TierListSnapshot, defaultSnapshot: TierListSnapshot): TierListSnapshot => {
   const deckDefaultsById = createDeckDefaultsMap(defaultSnapshot);
+  const savedDeckIds = new Set(
+    [...snapshot.tiers.flatMap((tier) => tier.decks), ...snapshot.availableDecks]
+      .map((deck) => deck.id),
+  );
+  const newDecks = [...deckDefaultsById.values()]
+    .filter((deck) => !savedDeckIds.has(deck.id))
+    .map(cloneDeck);
 
   return {
     tiers: snapshot.tiers.map((tier) => ({
       ...tier,
       decks: tier.decks.map((deck) => mergeDeckWithDefault(deck, deckDefaultsById)),
     })),
-    availableDecks: snapshot.availableDecks.map((deck) => mergeDeckWithDefault(deck, deckDefaultsById)),
+    availableDecks: [
+      ...snapshot.availableDecks.map((deck) => mergeDeckWithDefault(deck, deckDefaultsById)),
+      ...newDecks,
+    ],
   };
 };
 
@@ -364,7 +374,7 @@ export const loadTierListSnapshot = (): TierListSnapshot => {
       return defaultSnapshot;
     }
 
-    return hydrateSnapshotDeckNames(deduplicateSnapshotDecks(parsed), defaultSnapshot);
+    return reconcileSnapshotWithDefaults(deduplicateSnapshotDecks(parsed), defaultSnapshot);
   } catch {
     return defaultSnapshot;
   }

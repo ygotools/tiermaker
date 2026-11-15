@@ -1,0 +1,270 @@
+{
+  "reviewedAt": "2026-11-15",
+  "outputSize": [
+    480,
+    270
+  ],
+  "cropUnits": "Source pixels: x, y, width, height",
+  "images": [
+    {
+      "file": "artmage.png",
+      "title": "Artmage Diactorus [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/Artmage-Diactorus-%5BArtwork%5D-1193346671",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        80,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "blitzclique.png",
+      "title": "Whisker Blitzclique",
+      "author": "maskedyusei",
+      "source": "https://www.deviantart.com/maskedyusei/art/Whisker-Blitzclique-1407242620",
+      "sourceSize": [
+        1280,
+        1280
+      ],
+      "crop": [
+        0,
+        90,
+        1280,
+        720
+      ]
+    },
+    {
+      "file": "clown-crew.png",
+      "title": "Clown Crew Biancaviso",
+      "author": "maskedyusei",
+      "source": "https://www.deviantart.com/maskedyusei/art/Clown-Crew-Biancaviso-1377066156",
+      "sourceSize": [
+        1280,
+        1280
+      ],
+      "crop": [
+        0,
+        95,
+        1280,
+        720
+      ]
+    },
+    {
+      "file": "dark-magician.png",
+      "title": "Dark Magician, the Pharaoh's Servant",
+      "author": "maskedyusei",
+      "source": "https://www.deviantart.com/maskedyusei/art/Dark-Magician%2C-the-Pharaoh%27s-Servant-1407242931",
+      "sourceSize": [
+        1280,
+        1280
+      ],
+      "crop": [
+        0,
+        180,
+        1280,
+        720
+      ]
+    },
+    {
+      "file": "doomz.png",
+      "title": "DoomZ XII Zero - Drastea [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/DoomZ-XII-Zero---Drastea-%5BArtwork%5D-1231065422",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        0,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "enneacraft.png",
+      "title": "Enneacraft - Atori.MAR [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/Enneacraft---Atori.MAR-%5BArtwork%5D-1237398803",
+      "sourceSize": [
+        1024,
+        1310
+      ],
+      "crop": [
+        0,
+        100,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "fairy-tail.png",
+      "title": "Fairy Tail - Luna",
+      "author": "nepheskhaim",
+      "source": "https://www.deviantart.com/nepheskhaim/art/Fairy-Tail---Luna-1291101203",
+      "sourceSize": [
+        694,
+        1013
+      ],
+      "crop": [
+        80,
+        200,
+        534,
+        300.375
+      ]
+    },
+    {
+      "file": "invoked.png",
+      "title": "Invoked Mechaba (2nd) [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/Invoked-Mechaba-%282nd%29-%5BArtwork%5D-974115339",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        100,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "phantom-knights.png",
+      "title": "The Phantom Knights of Decayed Cloak [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/The-Phantom-Knights-of-Decayed-Cloak-%5BArtwork%5D-1373993731",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        100,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "power-patron.png",
+      "title": "Vidrium the Power Patron of Chaos Extermination",
+      "author": "korotime",
+      "source": "https://www.deviantart.com/korotime/art/Vidrium-the-Power-Patron-of-Chaos-Extermination-1283868178",
+      "sourceSize": [
+        813,
+        1209
+      ],
+      "crop": [
+        68,
+        220,
+        677,
+        380.8125
+      ]
+    },
+    {
+      "file": "radiant-typhoon.png",
+      "title": "Radiant Typhoon Fonix, the Great Flame",
+      "author": "maskedyusei",
+      "source": "https://www.deviantart.com/maskedyusei/art/Radiant-Typhoon-Fonix%2C-the-Great-Flame-1313290867",
+      "sourceSize": [
+        1280,
+        1280
+      ],
+      "crop": [
+        0,
+        140,
+        1280,
+        720
+      ]
+    },
+    {
+      "file": "rb.png",
+      "title": "R.B. The Brute Blues [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/R.B.-The-Brute-Blues-%5BArtwork%5D-1217730972",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        70,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "rikka.png",
+      "title": "Teardrop the Rikka Sacred Queen [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/Teardrop-the-Rikka-Sacred-Queen-%5BArtwork%5D-1398292902",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        70,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "witchcrafter.png",
+      "title": "Witchcrafter Madame Verre (2nd) [Artwork]",
+      "author": "nhociory",
+      "source": "https://www.deviantart.com/nhociory/art/Witchcrafter-Madame-Verre-%282nd%29-%5BArtwork%5D-1378275907",
+      "sourceSize": [
+        1024,
+        1024
+      ],
+      "crop": [
+        0,
+        150,
+        1024,
+        576
+      ]
+    },
+    {
+      "file": "elfnote-kewl-tune.png",
+      "layout": "Two equal portrait panels",
+      "sources": [
+        {
+          "title": "Elfnote Lucina (OCG) [Artwork]",
+          "author": "nhociory",
+          "source": "https://www.deviantart.com/nhociory/art/Elfnote-Lucina-%28OCG%29-%5BArtwork%5D-1331462455",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "crop": [
+            220,
+            60,
+            640,
+            720
+          ]
+        },
+        {
+          "title": "Kewl Tune Clip [Artwork]",
+          "author": "nhociory",
+          "source": "https://www.deviantart.com/nhociory/art/Kewl-Tune-Clip-%5BArtwork%5D-1243521392",
+          "sourceSize": [
+            1024,
+            1024
+          ],
+          "crop": [
+            200,
+            60,
+            640,
+            720
+          ]
+        }
+      ]
+    }
+  ]
+}

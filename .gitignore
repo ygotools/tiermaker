@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-public/static/deckimages/*
+# Legacy images come from Cloud Storage; bundled artwork is versioned in Git.
+public/static/deckimages/*.png
 .firebase/*
