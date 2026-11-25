@@ -73,6 +73,10 @@ const ENGLISH_DECK_NAMES: Record<string, string> = {
   'dark-magician': 'Dark Magician',
   'witchcrafter': 'Witchcrafter',
   'elfnote-kewl-tune': 'Elfnote Kewl Tune',
+  'sacred-beasts': 'Sacred Beasts',
+  's-force': 'S-Force',
+  synchron: 'Synchron',
+  'odd-eyes': 'Odd-Eyes',
 };
 
 const withEnglishName = (deck: Deck): Deck => ({
@@ -80,9 +84,9 @@ const withEnglishName = (deck: Deck): Deck => ({
   nameEn: ENGLISH_DECK_NAMES[deck.id] ?? deck.name,
 });
 
-// Default tiers reviewed on 2026-11-15 against Game8 (updated 2026-11-13).
+// Default tiers reviewed on 2026-11-26 against Game8 (updated 2026-11-25).
 // https://game8.jp/yugioh-masterduel/423817
-// Other recent contenders remain available for custom rankings.
+// New-pack decks stay in the candidates while their ratings are provisional.
 export const SAMPLE_DATA: Tier[] = [
   {
     name: 'Tier1',
@@ -126,6 +130,10 @@ export const SAMPLE_DATA: Tier[] = [
 }));
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
+  { id: 'sacred-beasts', name: '三幻魔', kana: 'さんげんま', image: '/static/deckimages/bundled/sacred-beasts.png' },
+  { id: 's-force', name: 'S-Force', kana: 'せきゅりてぃふぉーす えすふぉーす', image: '/static/deckimages/bundled/s-force.png' },
+  { id: 'synchron', name: 'シンクロン', kana: 'しんくろん すたーだすと', image: '/static/deckimages/bundled/synchron.png' },
+  { id: 'odd-eyes', name: 'オッドアイズ', kana: 'おっどあいず', image: '/static/deckimages/bundled/odd-eyes.png' },
   { id: 'elfnote-kewl-tune', name: 'エルフーン', kana: 'えるふーん えるふぇんのーつきらーちゅーん', image: '/static/deckimages/bundled/elfnote-kewl-tune.png' },
   { id: 'power-patron', name: '獄神', kana: 'ごくしん', image: '/static/deckimages/bundled/power-patron.png' },
   { id: 'doomz', name: 'ドゥームズ', kana: 'どぅーむず', image: '/static/deckimages/bundled/doomz.png' },
