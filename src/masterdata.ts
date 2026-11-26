@@ -132,7 +132,7 @@ export const SAMPLE_DATA: Tier[] = [
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { id: 'sacred-beasts', name: '三幻魔', kana: 'さんげんま', image: '/static/deckimages/bundled/sacred-beasts.png' },
   { id: 's-force', name: 'S-Force', kana: 'せきゅりてぃふぉーす えすふぉーす', image: '/static/deckimages/bundled/s-force.png' },
-  { id: 'synchron', name: 'シンクロン', kana: 'しんくろん すたーだすと', image: '/static/deckimages/bundled/synchron.png' },
+  { id: 'synchron', name: 'シンクロン', kana: 'しんくろん すたーだすと', image: '/static/deckimages/bundled/synchron.png?v=junk-speeder' },
   { id: 'odd-eyes', name: 'オッドアイズ', kana: 'おっどあいず', image: '/static/deckimages/bundled/odd-eyes.png' },
   { id: 'elfnote-kewl-tune', name: 'エルフーン', kana: 'えるふーん えるふぇんのーつきらーちゅーん', image: '/static/deckimages/bundled/elfnote-kewl-tune.png' },
   { id: 'power-patron', name: '獄神', kana: 'ごくしん', image: '/static/deckimages/bundled/power-patron.png' },

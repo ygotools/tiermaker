@@ -575,12 +575,15 @@ describe('tierListStorage', () => {
     expect(loadTierListSnapshot()).toEqual(restored);
   });
 
-  it('hydrates missing English names for known decks from master data', () => {
+  it('refreshes known artwork and hydrates missing English names while preserving custom images', () => {
     const snapshot = {
       tiers: [
         { name: 'Tier1', decks: [{ id: 'blue-eyes', name: '青眼', image: '/blue-eyes.png' }] },
       ],
-      availableDecks: [{ id: 'ryzeal', name: 'ライゼオル', image: '/ryzeal.png' }],
+      availableDecks: [
+        { id: 'ryzeal', name: 'ライゼオル', image: '/ryzeal.png' },
+        { id: 'custom-art', name: 'Custom Art', image: 'https://example.com/custom.png' },
+      ],
     };
 
     window.sessionStorage.setItem('tiermaker:tier-list', JSON.stringify(snapshot));
@@ -588,7 +591,10 @@ describe('tierListStorage', () => {
     const restored = loadTierListSnapshot();
 
     expect(restored.tiers[0].decks[0].nameEn).toBe('Blue-Eyes');
+    expect(restored.tiers[0].decks[0].image).toBe('/static/deckimages/blue-eyes.png');
     expect(restored.availableDecks[0].nameEn).toBe('Ryzeal');
+    expect(restored.availableDecks[0].image).toBe('/static/deckimages/ryzeal.png');
+    expect(restored.availableDecks[1]).toEqual(snapshot.availableDecks[1]);
   });
 
   it('deduplicates stored deck ids across tiers and available decks', () => {

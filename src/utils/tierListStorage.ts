@@ -285,6 +285,7 @@ const mergeDeckWithDefault = (deck: Deck, deckDefaultsById: Map<string, Deck>): 
 
   return {
     ...deck,
+    image: defaultDeck.image,
     nameEn: deck.nameEn ?? defaultDeck.nameEn,
   };
 };
