@@ -84,14 +84,16 @@ const withEnglishName = (deck: Deck): Deck => ({
   nameEn: ENGLISH_DECK_NAMES[deck.id] ?? deck.name,
 });
 
-// Default tiers reviewed on 2026-11-26 against Game8 (updated 2026-11-25).
+// Base tiers reviewed on 2026-11-26 against Game8 (updated 2026-11-25).
 // https://game8.jp/yugioh-masterduel/423817
-// New-pack decks stay in the candidates while their ratings are provisional.
+// Tier1 updated to the project owner's rankings on 2026-11-27.
 export const SAMPLE_DATA: Tier[] = [
   {
     name: 'Tier1',
     decks: [
+      { id: 'sacred-beasts', name: '三幻魔', kana: 'さんげんま', image: '/static/deckimages/bundled/sacred-beasts.png' },
       { id: 'dracotail', name: 'ドラゴンテイル', kana: 'どらごんている', image: '/static/deckimages/dracotail.png' },
+      { id: 'branded', name: '烙印', kana: 'らくいん', image: '/static/deckimages/branded.png' },
     ],
   },
   {
@@ -108,7 +110,6 @@ export const SAMPLE_DATA: Tier[] = [
       { id: 'witchcrafter', name: 'ウィッチクラフト', kana: 'うぃっちくらふと', image: '/static/deckimages/bundled/witchcrafter.png' },
       { id: 'invoked', name: '召喚獣', kana: 'しょうかんじゅう', image: '/static/deckimages/bundled/invoked.png' },
       { id: 'yummy', name: 'ヤミー', kana: 'やみー', image: '/static/deckimages/yummy.png' },
-      { id: 'branded', name: '烙印', kana: 'らくいん', image: '/static/deckimages/branded.png' },
       { id: 'fairy-tail', name: '妖精伝姫', kana: 'ふぇありーている', image: '/static/deckimages/bundled/fairy-tail.png' },
       { id: 'clown-crew', name: '道化の一座', kana: 'くらうんくるー どうけのいちざ', image: '/static/deckimages/bundled/clown-crew.png' },
     ],
@@ -130,7 +131,6 @@ export const SAMPLE_DATA: Tier[] = [
 }));
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
-  { id: 'sacred-beasts', name: '三幻魔', kana: 'さんげんま', image: '/static/deckimages/bundled/sacred-beasts.png' },
   { id: 's-force', name: 'S-Force', kana: 'せきゅりてぃふぉーす えすふぉーす', image: '/static/deckimages/bundled/s-force.png' },
   { id: 'synchron', name: 'シンクロン', kana: 'しんくろん すたーだすと', image: '/static/deckimages/bundled/synchron.png?v=junk-speeder' },
   { id: 'odd-eyes', name: 'オッドアイズ', kana: 'おっどあいず', image: '/static/deckimages/bundled/odd-eyes.png' },

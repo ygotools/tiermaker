@@ -58,6 +58,7 @@ const translations = {
     app: {
       updateHistoryTitle: '更新履歴',
       updateHistoryItems: [
+        '2026/11/27: 初期Tier1を【三幻魔】【ドラゴンテイル】【烙印】に変更しました。',
         '2026/11/26: 新パック「ザ・レルム・オブ・トリニティ」に対応し、【三幻魔】【S-Force】【シンクロン（スターダスト）】【オッドアイズ】を追加しました。',
         '2026/11/15: 初期Tierを更新し、【ブリッツクリーク】【アルトメギア】【ドゥームズ】【絢嵐】【獄神】【ウィッチクラフト】など15テーマを追加しました。',
         '2026/04: 【ドレミヤミー】【キラーチューン】を追加しました。',
@@ -127,6 +128,7 @@ const translations = {
     app: {
       updateHistoryTitle: 'Update History',
       updateHistoryItems: [
+        '2026/11/27: Set the default Tier1 to 【Sacred Beasts】【Dracotail】 and 【Branded】.',
         '2026/11/26: Added 【Sacred Beasts】【S-Force】【Synchron (Stardust)】 and 【Odd-Eyes】 for The Realm of Trinity.',
         '2026/11/15: Updated the default tiers and added 15 new deck themes, including 【Blitzclique】【Artmage】【DoomZ】【Radiant Typhoon】【Power Patron】 and 【Witchcrafter】.',
         '2026/04: Added 【Solfachord Yummy】 and 【Kewl Tune】.',

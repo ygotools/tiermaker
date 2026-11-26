@@ -15,9 +15,10 @@ Live site: [https://tier.ygotools.com](https://tier.ygotools.com)
 - Download the tier list as a PNG image
 
 On initial load, tier and deck data defined in `src/masterdata.ts` is used.  
-The default dataset includes 16 sample decks placed in tiers and 60 decks in the bottom list.
+The default dataset includes 17 sample decks placed in tiers and 59 decks in the bottom list.
 The November 26, 2026 update adds Sacred Beasts, S-Force, Synchron (Stardust), and Odd-Eyes from [The Realm of Trinity](https://game8.jp/yugioh-masterduel/844022).
-The default tiers were checked against [Game8's November 25 tier list](https://game8.jp/yugioh-masterduel/423817); new-pack decks remain in the candidates while their ratings are provisional.
+Tier1 contains Sacred Beasts, Dracotail, and Branded as requested by the project owner on November 27, 2026.
+The other default tiers are based on [Game8's November 25 tier list](https://game8.jp/yugioh-masterduel/423817).
 New themes are also added to the candidates when an existing saved session is restored, preserving the user's tier placements.
 
 ## Tech Stack
