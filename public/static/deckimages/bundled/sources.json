@@ -120,19 +120,20 @@
     },
     {
       "file": "invoked.png",
-      "title": "Invoked Mechaba (2nd) [Artwork]",
+      "title": "Aleister the Invoker [Artwork]",
       "author": "nhociory",
-      "source": "https://www.deviantart.com/nhociory/art/Invoked-Mechaba-%282nd%29-%5BArtwork%5D-974115339",
+      "source": "https://www.deviantart.com/nhociory/art/Aleister-the-Invoker-%5BArtwork%5D-974115169",
       "sourceSize": [
         1024,
         1024
       ],
       "crop": [
+        64,
         0,
-        100,
-        1024,
-        576
-      ]
+        896,
+        504
+      ],
+      "updatedAt": "2026-11-27"
     },
     {
       "file": "phantom-knights.png",

@@ -58,6 +58,7 @@ const translations = {
     app: {
       updateHistoryTitle: '更新履歴',
       updateHistoryItems: [
+        '2026/11/27: 【妖精伝姫】を候補一覧へ移し、【召喚獣】の画像を通常イラストの【召喚師アレイスター】に変更しました。',
         '2026/11/27: 初期Tier1を【三幻魔】【ドラゴンテイル】【烙印】に変更し、【エルフェンノーツ】をTier4へ、【キラーチューン】【VSK9】【M∀LICE】を候補一覧へ移しました。',
         '2026/11/26: 新パック「ザ・レルム・オブ・トリニティ」に対応し、【三幻魔】【S-Force】【シンクロン（スターダスト）】【オッドアイズ】を追加しました。',
         '2026/11/15: 初期Tierを更新し、【ブリッツクリーク】【アルトメギア】【ドゥームズ】【絢嵐】【獄神】【ウィッチクラフト】など15テーマを追加しました。',
@@ -128,6 +129,7 @@ const translations = {
     app: {
       updateHistoryTitle: 'Update History',
       updateHistoryItems: [
+        '2026/11/27: Moved 【Fairy Tail】 to the candidates and changed 【Invoked】 to the original 【Aleister the Invoker】 artwork.',
         '2026/11/27: Set Tier1 to 【Sacred Beasts】【Dracotail】 and 【Branded】; moved 【Elfnote】 to Tier4 and 【Kewl Tune】【VSK9】 and 【Maliss】 to the candidates.',
         '2026/11/26: Added 【Sacred Beasts】【S-Force】【Synchron (Stardust)】 and 【Odd-Eyes】 for The Realm of Trinity.',
         '2026/11/15: Updated the default tiers and added 15 new deck themes, including 【Blitzclique】【Artmage】【DoomZ】【Radiant Typhoon】【Power Patron】 and 【Witchcrafter】.',

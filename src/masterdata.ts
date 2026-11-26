@@ -107,9 +107,8 @@ export const SAMPLE_DATA: Tier[] = [
     name: 'Tier3',
     decks: [
       { id: 'witchcrafter', name: 'ウィッチクラフト', kana: 'うぃっちくらふと', image: '/static/deckimages/bundled/witchcrafter.png' },
-      { id: 'invoked', name: '召喚獣', kana: 'しょうかんじゅう', image: '/static/deckimages/bundled/invoked.png' },
+      { id: 'invoked', name: '召喚獣', kana: 'しょうかんじゅう', image: '/static/deckimages/bundled/invoked.png?v=aleister-original' },
       { id: 'yummy', name: 'ヤミー', kana: 'やみー', image: '/static/deckimages/yummy.png' },
-      { id: 'fairy-tail', name: '妖精伝姫', kana: 'ふぇありーている', image: '/static/deckimages/bundled/fairy-tail.png' },
       { id: 'clown-crew', name: '道化の一座', kana: 'くらうんくるー どうけのいちざ', image: '/static/deckimages/bundled/clown-crew.png' },
     ],
   },
@@ -131,6 +130,7 @@ export const INITIAL_AVAILABLE_DECKS: Deck[] = [
   { id: 'killer-tune', name: 'キラーチューン', kana: 'きらーちゅーん', image: '/static/deckimages/killer-tune.png' },
   { id: 'vsk9', name: 'VSK9', kana: 'ぶいえすけーないん', image: '/static/deckimages/vsk9.png' },
   { id: 'malice', name: 'M∀LICE', kana: 'まりす', image: '/static/deckimages/malice.png' },
+  { id: 'fairy-tail', name: '妖精伝姫', kana: 'ふぇありーている', image: '/static/deckimages/bundled/fairy-tail.png' },
   { id: 's-force', name: 'S-Force', kana: 'せきゅりてぃふぉーす えすふぉーす', image: '/static/deckimages/bundled/s-force.png' },
   { id: 'synchron', name: 'シンクロン', kana: 'しんくろん すたーだすと', image: '/static/deckimages/bundled/synchron.png?v=junk-speeder' },
   { id: 'odd-eyes', name: 'オッドアイズ', kana: 'おっどあいず', image: '/static/deckimages/bundled/odd-eyes.png' },
