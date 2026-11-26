@@ -86,7 +86,7 @@ const withEnglishName = (deck: Deck): Deck => ({
 
 // Base tiers reviewed on 2026-11-26 against Game8 (updated 2026-11-25).
 // https://game8.jp/yugioh-masterduel/423817
-// Tier1 updated to the project owner's rankings on 2026-11-27.
+// Default placements updated to the project owner's rankings on 2026-11-27.
 export const SAMPLE_DATA: Tier[] = [
   {
     name: 'Tier1',
@@ -99,7 +99,6 @@ export const SAMPLE_DATA: Tier[] = [
   {
     name: 'Tier2',
     decks: [
-      { id: 'elfnote', name: 'エルフェンノーツ', kana: 'えるふぇんのーつ', image: '/static/deckimages/elfnote.png' },
       { id: 'artmage', name: 'アルトメギア', kana: 'あるとめぎあ', image: '/static/deckimages/bundled/artmage.png' },
       { id: 'skystriker', name: '閃刀姫', kana: 'せんとうき', image: '/static/deckimages/skystriker.png' },
     ],
@@ -117,12 +116,10 @@ export const SAMPLE_DATA: Tier[] = [
   {
     name: 'Tier4',
     decks: [
-      { id: 'killer-tune', name: 'キラーチューン', kana: 'きらーちゅーん', image: '/static/deckimages/killer-tune.png' },
+      { id: 'elfnote', name: 'エルフェンノーツ', kana: 'えるふぇんのーつ', image: '/static/deckimages/elfnote.png' },
       { id: 'blitzclique', name: 'ブリッツクリーク', kana: 'ぶりっつくりーく', image: '/static/deckimages/bundled/blitzclique.png' },
       { id: 'mitsurugi', name: '巳剣', kana: 'みつるぎ', image: '/static/deckimages/mitsurugi.png' },
       { id: 'phantom-knights', name: '幻影騎士団', kana: 'ふぁんとむないつ げんえいきしだん', image: '/static/deckimages/bundled/phantom-knights.png' },
-      { id: 'vsk9', name: 'VSK9', kana: 'ぶいえすけーないん', image: '/static/deckimages/vsk9.png' },
-      { id: 'malice', name: 'M∀LICE', kana: 'まりす', image: '/static/deckimages/malice.png' },
     ],
   },
 ].map((tier) => ({
@@ -131,6 +128,9 @@ export const SAMPLE_DATA: Tier[] = [
 }));
 
 export const INITIAL_AVAILABLE_DECKS: Deck[] = [
+  { id: 'killer-tune', name: 'キラーチューン', kana: 'きらーちゅーん', image: '/static/deckimages/killer-tune.png' },
+  { id: 'vsk9', name: 'VSK9', kana: 'ぶいえすけーないん', image: '/static/deckimages/vsk9.png' },
+  { id: 'malice', name: 'M∀LICE', kana: 'まりす', image: '/static/deckimages/malice.png' },
   { id: 's-force', name: 'S-Force', kana: 'せきゅりてぃふぉーす えすふぉーす', image: '/static/deckimages/bundled/s-force.png' },
   { id: 'synchron', name: 'シンクロン', kana: 'しんくろん すたーだすと', image: '/static/deckimages/bundled/synchron.png?v=junk-speeder' },
   { id: 'odd-eyes', name: 'オッドアイズ', kana: 'おっどあいず', image: '/static/deckimages/bundled/odd-eyes.png' },
